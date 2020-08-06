@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "futtertrog.fullname" . }}
+data:
+  APP_NAME: {{ include "futtertrog.fullname" . }}
+  APP_URL: {{ .Values.ingress.host }}
+  DB_CONNECTION: mysql
+  DB_DATABASE: {{ .Values.mariadb.db.name }}
+  DB_HOST:  {{ .Values.mariadb.fullnameOverride }}
+  DB_PORT: {{ .Values.mariadb.service.port | quote}}
+  DB_USERNAME: {{ .Values.mariadb.db.user }}
+
+  MAIL_MAILER: {{ .Values.mailMailer | quote }}
+
+  HOLZKE_SCHEDULE: {{ .Values.holzkeSchedule | quote }}
+
+  {{- if .Values.nexmoKey}}
+  NEXMO_KEY: {{ .Values.nexmoKey | quote }}
+  {{- end }}
+
+  LOGIN_WITH_GITLAB: {{ .Values.loginWithGitlab | quote }}
+
+  {{- if .Values.gitlabUrl}}
+  GITLAB_URL: {{ .Values.gitlabUrl }}
+  {{- end }}
+
+  {{- if .Values.gitlabClientId}}
+  GITLAB_CLIENT_ID: {{ .Values.gitlabClientId }}
+  {{- end }}

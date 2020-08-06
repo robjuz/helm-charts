@@ -1,0 +1,13 @@
+apiVersion: v2
+name: futtertrog
+description: A Helm chart for Kubernetes
+home: https://github.com/robjuz/futtertrog
+type: application
+version: 0.1.0
+appVersion: latest
+dependencies:
+  - name: mariadb
+    version: 7.x.x
+    repository: "@bitnami"
+    tags:
+      - database
