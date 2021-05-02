@@ -1,0 +1,40 @@
+apiVersion: v1
+entries:
+  futtertrog:
+  - apiVersion: v2
+    appVersion: latest
+    created: "2021-05-02T18:13:17.351394734Z"
+    dependencies:
+    - name: mariadb
+      repository: '@bitnami'
+      tags:
+      - database
+      version: 7.x.x
+    description: A Helm chart for Kubernetes
+    digest: c4639117b06e2d34c3f1e540328f68826477cc75d804a7c3fefb9ab438910716
+    home: https://github.com/robjuz/futtertrog
+    name: futtertrog
+    type: application
+    urls:
+    - https://github.com/robjuz/helm-charts/releases/download/futtertrog-0.1.0/futtertrog-0.1.0.tgz
+    version: 0.1.0
+  kimai2:
+  - apiVersion: v2
+    appVersion: apache
+    created: "2021-05-02T18:13:17.526392332Z"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      version: 0.x.x
+    - condition: mariadb.enabled
+      name: mariadb
+      repository: https://charts.bitnami.com/bitnami
+      version: 9.x.x
+    description: A Helm chart for Kubernetes
+    digest: 1674a56bf1ecc67f4763191f941c5245cacd9090c0eb6b051f3a8a59c5cd83f2
+    name: kimai2
+    type: application
+    urls:
+    - https://github.com/robjuz/helm-charts/releases/download/kimai2-0.1.0/kimai2-0.1.0.tgz
+    version: 0.1.0
+generated: "2021-05-02T18:13:17.526397032Z"
