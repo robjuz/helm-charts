@@ -1,8 +1,9 @@
-{{- if .Values.persistence.enabled }}
+{{- if and .Values.persistence.enabled (not .Values.persistence.existingClaim) }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "kimai2.name" .}}-data
+  name: {{ include "common.names.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
   labels:
     app.kubernetes.io/part-of: {{ include "kimai2.name" . }}
     app.kubernetes.io/name: {{ include "kimai2.name" . }}-data
