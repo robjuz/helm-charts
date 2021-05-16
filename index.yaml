@@ -55,4 +55,13 @@ entries:
     urls:
     - https://github.com/robjuz/helm-charts/releases/download/kimai2-0.1.0/kimai2-0.1.0.tgz
     version: 0.1.0
-generated: "2021-05-16T20:19:00.814346614Z"
+  kirby3:
+  - apiVersion: v1
+    created: "2021-05-16T21:02:45.636779394Z"
+    description: A Helm chart for Kubernetes
+    digest: 58ce1d49967241fd01b4bc6f5284b19c84a59ce9b039a50e1a59e5c664491fe5
+    name: kirby3
+    urls:
+    - https://github.com/robjuz/helm-charts/releases/download/kirby3-1.0.0/kirby3-1.0.0.tgz
+    version: 1.0.0
+generated: "2021-05-16T21:02:45.636788994Z"
