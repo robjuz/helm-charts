@@ -1,0 +1,12 @@
+{{- if and .Values.ingress.enabled .Values.service.enabled -}}
+Application should be accessible at
+
+    {{ .Values.service.url }}
+{{- else -}}
+Application was deployed reusing the service at
+
+    {{ .Values.service.url }}
+
+It will share a load balancer with the previous release (or be unavailable if
+no service or ingress was previously deployed).
+{{- end -}}
