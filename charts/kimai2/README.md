@@ -6,7 +6,7 @@
 
 ```console
 helm repo add robjuz https://robjuz.github.io/helm-charts/
-helm install kimai kimai2/docs/helm
+helm install kimai robjuz/kimai2
 ```
 
 ## Introduction
