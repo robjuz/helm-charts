@@ -20,7 +20,7 @@ spec:
       secretName: {{ printf "%s-tls" .Values.ingress.hostname }}
   {{- end }}
   rules:
-    - host: {{ .Values.ingress.host | quote }}
+    - host: {{ .Values.ingress.hostname | quote }}
       http:
         paths:
           - path: /
