@@ -1,0 +1,143 @@
+{{- if not .Values.nominatimInitialize.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "nominatim.fullname" . }}
+  labels:
+    {{- include "nominatim.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "nominatim.selectorLabels" . | nindent 6 }}
+
+  {{- if .Values.updateStrategy }}
+  strategy: {{- toYaml .Values.updateStrategy | nindent 4 }}
+  {{- end }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "nominatim.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "nominatim.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          workingDir: /nominatim
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            {{- if .Values.nominatim.extraEnv }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.nominatim.extraEnv "context" $) | nindent 12 }}
+            {{- end }}
+            - name: NOMINATIM_DATABASE_DSN
+              value: {{ include "nominatim.databaseUrl" . }}
+            - name: NOMINATIM_DATABASE_MODULE_PATH
+              value: {{ .Values.nominatim.databaseModulePath }}
+            - name: NOMINATIM_REPLICATION_URL
+              value: {{ .Values.nominatimReplications.replicationUrl }}
+          command:
+            - /bin/bash
+            - -ec
+            - |
+                nominatim refresh --website
+                a2enmod rewrite
+                /usr/sbin/apache2ctl -D FOREGROUND
+          ports:
+            - name: http
+              containerPort: {{ include "nominatim.containerPort" . }}
+              protocol: TCP
+{{/*          livenessProbe:*/}}
+{{/*            httpGet:*/}}
+{{/*              path: /*/}}
+{{/*              port: http*/}}
+{{/*          readinessProbe:*/}}
+{{/*            httpGet:*/}}
+{{/*              path: /*/}}
+{{/*              port: http*/}}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: /dev/shm
+              name: dshm
+              {{- if .Values.flatnode.enabled }}
+            - mountPath: /nominatim/flatnode
+              name: flatnode
+              subPath: flatnode
+              {{- end }}
+            {{- if .Values.nominatimUi.enabled }}
+            - mountPath: /etc/apache2/sites-available
+              name: apache-config
+            - mountPath: /nominatim/nominatim-ui
+              name: nominatim-ui
+            {{- if .Values.nominatimUi.configuration }}
+            - name: ui-config
+              mountPath: /nominatim/nominatim-ui/dist/theme/config.theme.js
+              subPath: config.theme.js
+            {{- end }}
+            {{- end }}
+      {{- if .Values.nominatimUi.enabled }}
+      initContainers:
+         - name: nominatim-ui-download
+           image: curlimages/curl
+           workingDir: /nominatim/nominatim-ui
+           command:
+           - /bin/sh
+           - -ec
+           - |
+             curl -L {{ include "nominatim.uiUrl" . }} | tar -xz --strip-components 1
+           securityContext:
+             runAsUser: 1
+             allowPrivilegeEscalation: false
+             readOnlyRootFilesystem: true
+           volumeMounts:
+            - mountPath: /nominatim/nominatim-ui
+              name: nominatim-ui
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        {{- if  .Values.flatnode.enabled }}
+        - name: flatnode
+          persistentVolumeClaim:
+            claimName: {{ .Values.flatnode.existingClaim | default (include "nominatim.fullname" .) }}
+        {{- end }}
+        - name: dshm
+          emptyDir:
+            medium: Memory
+        {{- if .Values.nominatimUi.enabled }}
+        - name: apache-config
+          configMap:
+            name: {{ include "nominatim.fullname" . }}-apache-configmap
+        {{- if .Values.nominatimUi.configuration }}
+        - name: ui-config
+          configMap:
+            name: {{ include "nominatim.fullname" . }}-ui-configmap
+        {{- end }}
+        - name: nominatim-ui
+          emptyDir: {}
+        {{- end }}
+{{- end }}
