@@ -1,0 +1,59 @@
+{{- if and .Values.nominatimReplications.enabled (not .Values.nominatimInitialize.enabled) }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "nominatim.fullname" . }}-updates
+  labels:
+    app.kubernetes.io/name: {{ include "nominatim.name" . }}-updates
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "nominatim.name" . }}-updates
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "nominatim.name" . }}-updates
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}-updates
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          workingDir: /nominatim
+          env:
+            - name: NOMINATIM_DATABASE_DSN
+              value: {{ include "nominatim.databaseUrl" . }}
+            - name: NOMINATIM_DATABASE_MODULE_PATH
+              value: {{ .Values.nominatim.databaseModulePath }}
+            - name: NOMINATIM_REPLICATION_URL
+              value: {{ .Values.nominatimReplications.replicationUrl }}
+            - name: NOMINATIM_IMPORT_STYLE
+              value: {{ .Values.nominatimInitialize.importStyle }}
+            {{- if .Values.flatnode.enabled }}
+            - name: NOMINATIM_FLATNODE_FILE
+              value: /nominatim/flatnode/flatnode.file
+            {{- end }}
+            {{- if .Values.nominatimReplications.extraEnv }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.nominatim.extraEnv "context" $) | nindent 12 }}
+          {{- end }}
+          command:
+            - nominatim
+            - replication
+          volumeMounts:
+            - mountPath: /dev/shm
+              name: dshm
+            {{- if .Values.flatnode.enabled }}
+            - mountPath: /nominatim/flatnode
+              name: nominatim
+              subPath: flatnode
+          {{- end }}
+      restartPolicy: Always
+      volumes:
+      {{- if  .Values.flatnode.enabled }}
+      - name: nominatim
+        persistentVolumeClaim:
+          claimName: {{ .Values.flatnode.existingClaim | default (include "nominatim.fullname" .) }}
+      {{- end }}
+      - name: dshm
+        emptyDir:
+          medium: Memory
+{{- end }}

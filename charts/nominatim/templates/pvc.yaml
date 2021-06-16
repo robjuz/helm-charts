@@ -1,0 +1,19 @@
+{{- if and .Values.flatnode.enabled (not .Values.flatnode.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "nominatim.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    app.kubernetes.io/part-of: {{ include "nominatim.name" . }}
+    app.kubernetes.io/name: {{ include "nominatim.name" . }}-postgresql
+spec:
+  accessModes:
+    {{- range .Values.flatnode.accessModes }}
+    - {{ . | quote }}
+      {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.flatnode.size | quote }}
+  {{- include "common.storage.class" (dict "persistence" .Values.flatnode "global" .Values.global) | nindent 2 }}
+{{- end}}

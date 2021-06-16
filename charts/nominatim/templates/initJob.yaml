@@ -1,0 +1,133 @@
+{{- if .Values.nominatimInitialize.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "nominatim.fullname" . }}-init
+spec:
+  template:
+    spec:
+      initContainers:
+{{- if .Values.nominatimInitialize.importWikipedia }}
+        - name: import-wikipedia
+          image: curlimages/curl
+          workingDir: /nominatim
+          volumeMounts:
+            - mountPath: /nominatim
+              name: data
+          command:
+            - curl
+            - https://www.nominatim.org/data/wikimedia-importance.sql.gz
+            - -o
+            - wikimedia-importance.sql.gz
+{{- end }}
+
+{{- if .Values.nominatimInitialize.importGB_Postcode }}
+        - name: import-gb-postcode
+          image: curlimages/curl
+          workingDir: /nominatim
+          volumeMounts:
+            - mountPath: /nominatim
+              name: data
+          command:
+            - curl
+            - https://www.nominatim.org/data/gb_postcode_data.sql.gz
+            - -o
+            - gb_postcode_data.sql.gz
+{{- end }}
+
+{{- if .Values.nominatimInitialize.importUS_Postcode }}
+        - name: import-us-postcode
+          image: curlimages/curl
+          workingDir: /nominatim
+          volumeMounts:
+            - mountPath: /nominatim
+              name: data
+          command:
+            - curl
+            - https://www.nominatim.org/data/us_postcode_data.sql.gz
+            - -o
+            - us_postcode_data.sql.gz
+{{- end }}
+
+        - name: pbf-download
+          image: curlimages/curl
+          workingDir: /nominatim
+          volumeMounts:
+            - mountPath: /nominatim
+              name: data
+          command:
+            - curl
+            - -L
+            - {{ .Values.nominatimInitialize.pbfUrl }}
+            - --create-dirs
+            - -o
+            - data.osm.pbf
+
+        - name: clear-database
+          image: postgres
+          env:
+          - name: PGHOST
+            value: {{ include "nominatim.databaseHost" . }}
+          - name: PGUSER
+            value: {{ include "nominatim.databaseUser" . }}
+          - name: PGPASSWORD
+            value: {{ include "nominatim.databasePassword" . }}
+          command:
+            - psql
+            - -c
+            - "DROP DATABASE IF EXISTS {{ include "nominatim.databaseName" . }}"
+
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          workingDir: /nominatim
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: NOMINATIM_IMPORT_STYLE
+              value: {{ .Values.nominatimInitialize.importStyle }}
+            - name: NOMINATIM_DATABASE_DSN
+              value: {{ include "nominatim.databaseUrl" . }}
+            - name: NOMINATIM_DATABASE_MODULE_PATH
+              value: {{ .Values.nominatim.databaseModulePath }}
+            {{- if .Values.flatnode.enabled }}
+            - name: NOMINATIM_FLATNODE_FILE
+              value: /nominatim/flatnode/flatnode.file
+            {{- end }}
+            - name: REPLICATION_ENABLED
+              value: {{ .Values.nominatimReplications.enabled | quote }}
+            - name: THREADS
+              value: {{ .Values.nominatimInitialize.threads | quote }}
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              nominatim import --osm-file data.osm.pbf --threads $THREADS
+              nominatim admin --check-database
+
+              if [ "$REPLICATION_ENABLED" = "true" ]; then
+                nominatim replication --init
+              fi;
+
+          volumeMounts:
+            - mountPath: /nominatim
+              name: data
+            - mountPath: /dev/shm
+              name: dshm
+            {{- if .Values.flatnode.enabled }}
+            - mountPath: /nominatim/flatnode
+              name: flatnode
+              subPath: flatnode
+            {{- end }}
+      restartPolicy: OnFailure
+      volumes:
+        {{- if  .Values.flatnode.enabled }}
+        - name: flatnode
+          persistentVolumeClaim:
+            claimName: {{ .Values.flatnode.existingClaim | default (include "nominatim.fullname" .) }}
+        {{- end }}
+        - name: dshm
+          emptyDir:
+            medium: Memory
+        - name: data
+          emptyDir: {}
+{{- end }}
