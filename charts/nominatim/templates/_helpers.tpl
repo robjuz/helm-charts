@@ -87,7 +87,7 @@ Add environment variables to configure database values
 
 {{- define "nominatim.databasePort" -}}
 {{- if .Values.postgresql.enabled }}
-    {{- printf "%d" (.Values.postgresql.service.port | int ) -}}
+    {{- printf "%d" (.Values.postgresql.primary.service.ports.postgresql | int ) -}}
 {{- else -}}
     {{- printf "%d" (.Values.externalDatabase.port | int ) -}}
 {{- end -}}
@@ -98,7 +98,7 @@ Add environment variables to configure database values
 {{- "nominatim" -}}
 {{- end -}}
 
-{{- define "nominatim.databaseRoot" -}}
+{{- define "nominatim.databaseUser" -}}
 {{- if .Values.postgresql.enabled }}
     {{- "postgres" -}}
 {{- else -}}
@@ -106,25 +106,9 @@ Add environment variables to configure database values
 {{- end -}}
 {{- end -}}
 
-{{- define "nominatim.databaseUser" -}}
-{{- if .Values.postgresql.enabled }}
-    {{- printf "%s" .Values.postgresql.auth.password -}}
-{{- else -}}
-    {{- printf "%s" .Values.externalDatabase.user -}}
-{{- end -}}
-{{- end -}}
-
-{{- define "nominatim.databaseRootPassword" -}}
-{{- if .Values.postgresql.enabled }}
-    {{- printf "%s" .Values.postgresql.auth.postgresPassword -}}
-{{- else -}}
-    {{- printf "%s" .Values.externalDatabase.password -}}
-{{- end -}}
-{{- end -}}
-
 {{- define "nominatim.databasePassword" -}}
 {{- if .Values.postgresql.enabled }}
-    {{- printf "%s" .Values.postgresql.auth.password -}}
+    {{- printf "%s" .Values.postgresql.auth.postgresPassword -}}
 {{- else -}}
     {{- printf "%s" .Values.externalDatabase.password -}}
 {{- end -}}

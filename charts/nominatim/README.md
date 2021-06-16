@@ -43,11 +43,19 @@ To improve the import speed you can set additional PostgreSQL params
     enabled: true
   
   postgresql:
-    postgresqlExtendedConf:
-      {
-        "fsync": "off",
-        "fullPageWrites": "off"
-      }
+    primary:
+        extendedConfiguration: |
+          shared_buffers = 2GB
+          maintenance_work_mem = 10GB
+          autovacuum_work_mem = 2GB
+          work_mem = 50MB
+          effective_cache_size = 24GB
+          synchronous_commit = off
+          max_wal_size = 1GB
+          checkpoint_timeout = 10min
+          checkpoint_completion_target = 0.9
+          fsync = off
+          fullPageWrites = off
 ```
 
 To install the chart with the release name `nominatim`:
@@ -65,9 +73,6 @@ You also should remove the ```postgresqlExtendedConf```
 ```yaml
   nominatimInitialize:
     enabled: false
-
-  postgresql:
-    postgresqlExtendedConf:
 ```
 
 To install the chart with the release name `nominatim`:
@@ -175,20 +180,20 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ### Database Parameters
 
-| Name                                    | Description                                                                  | Value                         |
-|-----------------------------------------|------------------------------------------------------------------------------|-------------------------------|
-| `postgresql.enabled`                    | Deploy a PostgreSQL server to satisfy the applications database requirements | `true`                        |
-| `postgresql.image.repository`           | PostgreSQL image repository                                                  | `robjuz/postgresql-nominatim` |
-| `postgresql.image.tag`                  | PostgreSQL image tag                                                         | `latest`                      |
-| `postgresql.postgresqlPostgresPassword` | PostgreSQL root password                                                     | `nominatim`                   |
-| `postgresql.postgresqlUsername`         | PostgreSQL read-only user                                                    | `nominatim`                   |
-| `postgresql.postgresqlPassword`         | PostgreSQL database password                                                 | `nominatim`                   |
-| `postgresql.postgresqlDatabase`         | PostgreSQL database name                                                     | `nominatim`                   |
-| `postgresql.persistence.enabled`        | Enable persistence on PostgreSQL using PVC(s)                                | `true`                        |
-| `postgresql.persistence.storageClass`   | Persistent Volume storage class                                              | `nil`                         |
-| `postgresql.persistence.accessModes`    | Persistent Volume access modes                                               | `[ReadWriteOnce]`             |
-| `postgresql.persistence.size`           | Persistent Volume size                                                       | `500Gi`                       |
-
+| Name                                          | Description                                                                  | Value                         |
+|-----------------------------------------------|------------------------------------------------------------------------------|-------------------------------|
+| `postgresql.enabled`                          | Deploy a PostgreSQL server to satisfy the applications database requirements | `true`                        |
+| `postgresql.image.repository`                 | PostgreSQL image repository                                                  | `robjuz/postgresql-nominatim` |
+| `postgresql.image.tag`                        | PostgreSQL image tag                                                         | `14.4.0-4.0.1`                |
+| `postgresql.auth.postgresPassword`            | PostgreSQL root password                                                     | `nominatim`                   |
+| `postgresql.primary.persistence.enabled`      | Enable persistence on PostgreSQL using PVC(s)                                | `true`                        |
+| `postgresql.primary.persistence.storageClass` | Persistent Volume storage class                                              | `nil`                         |
+| `postgresql.primary.persistence.accessModes`  | Persistent Volume access modes                                               | `[ReadWriteOnce]`             |
+| `postgresql.primary.persistence.size`         | Persistent Volume size                                                       | `500Gi`                       |
+ | `externalDatase.host`                         | External PostgreSQL host (ignored if `postgresql.enabled = true`)            | localhost                     |
+ | `externalDatase.port`                         | External PostgreSQL post (ignored if `postgresql.enabled = true`)            | 5432                          |
+ | `externalDatase.user`                         | External PostgreSQL user (ignored if `postgresql.enabled = true`)            | nominatim                     |
+ | `externalDatase.password`                     | External PostgreSQL password (ignored if `postgresql.enabled = true`)        | ""                            |
 ## Configuration and installation details
 
 ### Flatnode support
@@ -210,6 +215,9 @@ externalDatabase.password=mypassword
 externalDatabase.database=mydatabase
 externalDatabase.port=3306
 ```
+
+* Make sure the database does not exist when running the init job. The nominatim tool will create a `nominatim` database for you
+* Make sure the DB user has superuser rights. The nominatim tool will try to enable the postgis extension and will fail otherwise
 
 ### Ingress
 

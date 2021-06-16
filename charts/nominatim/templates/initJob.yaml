@@ -81,21 +81,6 @@ spec:
             - -o
             - data.osm.pbf
 
-        - name: clear-database
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          env:
-            - name: PGHOST
-              value: {{ include "nominatim.databaseHost" . }}
-            - name: PGUSER
-              value: {{ include "nominatim.databaseRoot" . }}
-            - name: PGPASSWORD
-              value: {{ include "nominatim.databaseRootPassword" . }}
-            - name: PGDATABASE
-              value: postgres
-          command:
-            - psql
-            - -c
-            - "DROP DATABASE IF EXISTS nominatim"
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -132,6 +117,14 @@ spec:
 
               if [ "$REPLICATION_ENABLED" = "true" ]; then
                 nominatim replication --init
+                if [ "$FREEZE" = "true" ]; then
+                  echo "Skipping freeze because REPLICATION_URL is not empty"
+                fi
+              else
+               if [ "$FREEZE" = "true" ]; then
+                  echo "Freezing database"
+                  nominatim freeze
+                fi
               fi;
 
           volumeMounts:

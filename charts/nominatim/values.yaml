@@ -37,6 +37,7 @@ nominatimInitialize:
   importStyle: full
   # customStyleUrl: https://raw.githubusercontent.com/david-mart/Nominatim/master/settings/import-street.style
   threads: 16
+  freeze: false
 
 nominatimReplications:
   enabled: false
@@ -175,14 +176,22 @@ postgresql:
 
   auth:
     postgresPassword: nominatim
-    username: nominatim
-    password: nominatim
 
+  primary:
+    persistence:
+      size: 500Gi
 
-  persistence:
-    size: 500Gi
+    extendedConfiguration: |
+        shared_buffers = 2GB
+        maintenance_work_mem = 10GB
+        autovacuum_work_mem = 2GB
+        work_mem = 50MB
+        effective_cache_size = 24GB
+        synchronous_commit = off
+        max_wal_size = 1GB
+        checkpoint_timeout = 10min
+        checkpoint_completion_target = 0.9
 
-  postgresqlExtendedConf: {}
 
 externalDatabase:
   ## @param externalDatabase.host External Database server host

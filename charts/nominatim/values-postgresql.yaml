@@ -1,0 +1,12 @@
+image:
+  registry:
+  repository: robjuz/postgresql-nominatim
+  tag: 13.7.0-3.7.2
+
+postgresqlPostgresPassword: nominatim
+postgresqlUsername: nominatim
+postgresqlPassword: nominatim
+postgresqlDatabase: nominatim
+
+persistence:
+  size: 10Gi
