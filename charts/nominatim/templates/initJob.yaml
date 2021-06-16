@@ -1,0 +1,116 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "nominatim.fullname" . }}-init
+  annotations:
+    "helm.sh/hook": post-install
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "nominatim.fullname" . }}-init
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "nominatim.fullname" . }}-init
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+      {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          workingDir: {{ .Values.nominatim.projectDir }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: PBF_URL
+              value: {{ .Values.nominatimInitialize.pbfUrl }}
+            - name: IMPORT_WIKIPEDIA
+              value: {{ .Values.nominatimInitialize.importWikipedia | quote }}
+            - name: IMPORT_GB_POSTCODES
+              value: {{ .Values.nominatimInitialize.importGB_Postcode | quote }}
+            - name: IMPORT_US_POSTCODES
+              value: {{ .Values.nominatimInitialize.importUS_Postcode | quote }}
+            - name: NOMINATIM_IMPORT_STYLE
+              value: {{ .Values.nominatimInitialize.importStyle }}
+            - name: REPLICATION_ENABLED
+              value: {{ .Values.nominatimReplications.enabled | quote }}
+            - name: NOMINATIM_DATABASE_DSN
+              value: {{ include "nominatim.databaseUrl" . }}
+            - name: DATABASE_DSN
+              value: {{ include "nominatim.databaseDSN" . }}
+            - name: DATABASE_NAME
+              value: {{ include "nominatim.databaseName" . }}
+            - name: NOMINATIM_DATABASE_MODULE_PATH
+              value: {{ .Values.nominatim.databaseModulePath }}
+            {{- if .Values.flatnodes.enabled }}
+            - name: NOMINATIM_FLATNODE_FILE
+              value: {{ .Values.nominatim.projectDir }}/flatnode/flatnode.file
+          {{- end }}
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              psql "$DATABASE_DSN" -c "DROP DATABASE IF EXISTS $DATABASE_NAME"
+
+              if [ "$IMPORT_WIKIPEDIA" = "true" ]; then
+                echo "Downloading Wikipedia importance dump"
+                curl https://www.nominatim.org/data/wikimedia-importance.sql.gz -o wikimedia-importance.sql.gz
+              else
+                echo "Skipping optional Wikipedia importance import"
+              fi;
+
+              if [ "$IMPORT_GB_POSTCODES" = "true" ]; then
+                curl https://www.nominatim.org/data/gb_postcode_data.sql.gz -o gb_postcode_data.sql.gz
+              else \
+                echo "Skipping optional GB postcode import"
+              fi;
+              if [ "$IMPORT_US_POSTCODES" = "true" ]; then
+                curl https://www.nominatim.org/data/us_postcode_data.sql.gz -o us_postcode_data.sql.gz
+              else
+                echo "Skipping optional US postcode import"
+              fi;
+
+              echo Downloading OSM extract from "$PBF_URL"
+              curl -L "$PBF_URL" --create-dirs -o data.osm.pbf
+
+              nominatim import --osm-file data.osm.pbf --threads $THREADS
+              nominatim admin --check-database
+
+              if [ "$REPLICATION_ENABLED" = "true" ]; then
+                nominatim replication --init
+              fi;
+          volumeMounts:
+            - mountPath: /dev/shm
+              name: dshm
+            {{- if .Values.flatnodes.enabled }}
+            - mountPath: /nominatim/flatnode
+              name: nominatim
+              subPath: flatnode
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        {{- if  .Values.flatnodes.enabled }}
+        - name: nominatim
+          persistentVolumeClaim:
+            claimName: {{ .Values.flatnodes.existingClaim | default (include "nominatim.fullname" .) }}
+        {{- end }}
+        - name: dshm
+          emptyDir:
+            medium: Memory

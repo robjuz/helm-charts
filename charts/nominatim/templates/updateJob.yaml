@@ -1,0 +1,33 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ include "nominatim.fullname" . }}-updates
+spec:
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 120
+      backoffLimit: 1
+      template:
+        spec:
+          containers:
+            - name: {{ .Chart.Name }}-updates
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              workingDir: {{ .Values.nominatim.projectDir }}
+              env:
+                - name: NOMINATIM_DATABASE_DSN
+                  value: {{ include "nominatim.databaseUrl" . }}
+                - name: NOMINATIM_DATABASE_MODULE_PATH
+                  value: {{ .Values.nominatim.databaseModulePath }}
+                - name: NOMINATIM_REPLICATION_URL
+                  value: {{ .Values.nominatimReplications.replicationUrl }}
+              command:
+                - nominatim
+                - replication
+                - --once
+          restartPolicy: Never
+  schedule: "*/15 * * * *"
+  startingDeadlineSeconds: 30
+  successfulJobsHistoryLimit: 1
