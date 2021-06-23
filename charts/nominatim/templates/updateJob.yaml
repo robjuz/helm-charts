@@ -1,3 +1,4 @@
+{{-if .Values.nominatimReplications.enabled }}
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
@@ -23,6 +24,12 @@ spec:
                   value: {{ .Values.nominatim.databaseModulePath }}
                 - name: NOMINATIM_REPLICATION_URL
                   value: {{ .Values.nominatimReplications.replicationUrl }}
+                - name: NOMINATIM_IMPORT_STYLE
+                  value: {{ .Values.nominatimInitialize.importStyle }}
+                {{- if .Values.flatnodes.enabled }}
+                - name: NOMINATIM_FLATNODE_FILE
+                  value: {{ .Values.nominatim.projectDir }}/flatnode/flatnode.file
+                {{- end }}
               command:
                 - nominatim
                 - replication
@@ -31,3 +38,4 @@ spec:
   schedule: "*/15 * * * *"
   startingDeadlineSeconds: 30
   successfulJobsHistoryLimit: 1
+{{- end }}
