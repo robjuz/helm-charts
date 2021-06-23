@@ -40,6 +40,8 @@ spec:
               value: {{ .Values.nominatimInitialize.importStyle }}
             - name: REPLICATION_ENABLED
               value: {{ .Values.nominatimReplications.enabled | quote }}
+            - name: REPLICATION_URL
+              value: {{ .Values.nominatimReplications.replicationUrl | quote }}
             - name: NOMINATIM_DATABASE_DSN
               value: {{ include "nominatim.databaseUrl" . }}
             - name: DATABASE_DSN
@@ -92,7 +94,8 @@ spec:
             - mountPath: /nominatim/flatnode
               name: nominatim
               subPath: flatnode
-      {{- end }}
+            {{- end }}
+      restartPolicy: Never
       {{- with .Values.nodeSelector }}
       nodeSelector:
       {{- toYaml . | nindent 8 }}
