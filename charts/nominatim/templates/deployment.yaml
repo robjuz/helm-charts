@@ -1,3 +1,4 @@
+{{- if not .Values.nominatimInitialize.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -52,7 +53,7 @@ spec:
             - /bin/bash
             - -ec
             - |
-                cd ${PROJECT_DIR} && nominatim refresh --website
+                nominatim refresh --website
                 /usr/sbin/apache2ctl -D FOREGROUND
           ports:
             - name: http
@@ -71,7 +72,7 @@ spec:
           volumeMounts:
             - mountPath: /dev/shm
               name: dshm
-              {{- if .Values.flatnodes.enabled }}
+              {{- if .Values.flatnode.enabled }}
             - mountPath: /nominatim/flatnode
               name: nominatim
               subPath: flatnode
@@ -89,11 +90,12 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
-        {{- if  .Values.flatnodes.enabled }}
+        {{- if  .Values.flatnode.enabled }}
         - name: nominatim
           persistentVolumeClaim:
-            claimName: {{ .Values.flatnodes.existingClaim | default (include "nominatim.fullname" .) }}
+            claimName: {{ .Values.flatnode.existingClaim | default (include "nominatim.fullname" .) }}
         {{- end }}
         - name: dshm
           emptyDir:
             medium: Memory
+{{- end }}

@@ -87,7 +87,7 @@ Add environment variables to configure database values
 
 {{- define "nominatim.databasePort" -}}
 {{- if .Values.postgresql.enabled }}
-    {{- printf "5432" -}}
+    {{- printf "%d" (.Values.postgresql.service.port | int ) -}}
 {{- else -}}
     {{- printf "%d" (.Values.externalDatabase.port | int ) -}}
 {{- end -}}
@@ -125,8 +125,4 @@ Create the database URL. For the time being, this supports only an integrated My
 */}}
 {{- define "nominatim.databaseUrl" -}}
 pgsql:host={{ include "nominatim.databaseHost" . }};port={{ include "nominatim.databasePort" . }};user={{ include "nominatim.databaseUser" . }};password={{ include "nominatim.databasePassword" . }};dbname={{ include "nominatim.databaseName" . }}
-{{- end }}
-
-{{- define "nominatim.databaseDSN" -}}
-postgresql://{{ include "nominatim.databaseUser" . }}:{{ include "nominatim.databasePassword" . }}@{{ include "nominatim.databaseHost" . }}:{{ include "nominatim.databasePort" . }}
 {{- end }}
