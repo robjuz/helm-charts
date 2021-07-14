@@ -66,11 +66,14 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ### Kimai Configuration parameters
 
-| Name                                   | Description                           | Value                |
-| -------------------------------------- | ------------------------------------- | -------------------- |
-| `kimaiAdminEmail`                      | Email for the superadmin account      | `admin@kimai.local`  |
-| `kimaiAdminPassword`                   | Password for the superadmin account   | `changemeplease`     |
-| `kimaiEnvironment`                     | Kimai environment name                | `prod`               |
+| Name                                   | Description                                        | Value                              |
+| -------------------------------------- | -------------------------------------------------- | ---------------------------------- |
+| `kimaiAppSecret`                       | Secret used to encrypt session cookies             | `change_this_to_something_unique`  |
+| `kimaiAdminEmail`                      | Email for the superadmin account                   | `admin@kimai.local`                |
+| `kimaiAdminPassword`                   | Password for the superadmin account                | `changemeplease`                   |
+| `kimaiEnvironment`                     | Kimai environment name                             | `prod`                             |
+| `kimaiMailerUrl`                       | SMTP connection for emails                         | `null://localhost`                 |
+| `kimaiMailerFrom`                      | Application specific “from” address for all emails | `kimai@example.com`                |
 
 ### Kimai deployment parameters
 
