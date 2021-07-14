@@ -42,6 +42,8 @@ spec:
               value: {{ .Values.kimaiEnvironment }}
             - name: TRUSTED_HOSTS
               value: localhost,{{ .Values.ingress.hostname }}
+            - name: MAILER_FROM
+              value: {{ .Values.kimaiMailerFrom }}
           envFrom:
             - secretRef:
                 name: {{ include "kimai2.name" . }}-secret

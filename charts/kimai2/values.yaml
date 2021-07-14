@@ -30,6 +30,9 @@ nameOverride:
 ##
 fullnameOverride:
 
+## @param kimaiAppSecret Secret used to encrypt session cookies (users will be logged out if you change it)
+##
+kimaiAppSecret: change_this_to_something_unique
 ## @param kimaiAdminEmail Email for the superadmin account
 ##
 kimaiAdminEmail: admin@kimai.local
@@ -39,6 +42,12 @@ kimaiAdminPassword: changemeplease
 ## @param kimaiEnvironment Kimai environment name
 ##
 kimaiEnvironment: prod
+## @param kimaiMailerUrl Smtp connection for emails
+##
+kimaiMailerUrl: null://localhost
+## @param kimaiMailerFrom Application specific “from” address for all emails
+##
+kimaiMailerFrom: kimai@example.com
 
 podAnnotations: {}
 
