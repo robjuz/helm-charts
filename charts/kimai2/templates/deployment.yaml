@@ -38,14 +38,13 @@ spec:
           env:
             - name: ADMINMAIL
               value: {{ .Values.kimaiAdminEmail }}
-            - name: ADMINPASS
-              value: {{ .Values.kimaiAdminPassword }}
             - name: APP_ENV
               value: {{ .Values.kimaiEnvironment }}
-            - name: DATABASE_URL
-              value: {{ include "kimai2.databaseUrl" . }}
             - name: TRUSTED_HOSTS
               value: localhost,{{ .Values.ingress.hostname }}
+          envFrom:
+            - secretRef:
+                name: {{ include "kimai2.name" . }}-secret
           ports:
             - name: http
               containerPort: 8001
