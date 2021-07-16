@@ -8,7 +8,7 @@ spec:
     spec:
       initContainers:
 {{- if .Values.nominatimInitialize.importWikipedia }}
-        - name: import-wikipedia
+        - name: download-wikipedia
           image: curlimages/curl
           workingDir: /nominatim
           volumeMounts:
@@ -22,7 +22,7 @@ spec:
 {{- end }}
 
 {{- if .Values.nominatimInitialize.importGB_Postcode }}
-        - name: import-gb-postcode
+        - name: download-gb-postcode
           image: curlimages/curl
           workingDir: /nominatim
           volumeMounts:
@@ -36,7 +36,7 @@ spec:
 {{- end }}
 
 {{- if .Values.nominatimInitialize.importUS_Postcode }}
-        - name: import-us-postcode
+        - name: download-us-postcode
           image: curlimages/curl
           workingDir: /nominatim
           volumeMounts:
@@ -49,7 +49,7 @@ spec:
             - us_postcode_data.sql.gz
 {{- end }}
 
-        - name: pbf-download
+        - name: download-pbf
           image: curlimages/curl
           workingDir: /nominatim
           volumeMounts:
