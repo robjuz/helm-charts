@@ -1,0 +1,92 @@
+{{- if .Values.import.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "openstreetmaps-tile-server.fullname" . }}-init
+spec:
+  template:
+    spec:
+      initContainers:
+        - name: download-pbf
+          image: curlimages/curl
+          workingDir: /openstreetmaps-tile-server
+          volumeMounts:
+            - mountPath: /openstreetmaps-tile-server
+              name: data
+          command:
+            - curl
+            - -L
+            - {{ .Values.import.pbfUrl }}
+            - --create-dirs
+            - -o
+            - data.osm.pbf
+        - name: download-poly
+          image: curlimages/curl
+          workingDir: /openstreetmaps-tile-server
+          volumeMounts:
+            - mountPath: /openstreetmaps-tile-server
+              name: data
+          command:
+            - curl
+            - -L
+            - {{ .Values.import.polyfUrl }}
+            - --create-dirs
+            - -o
+            - data.poly
+
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          workingDir: /openstreetmaps-tile-server
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: UPDATES
+              value: {{ .Values.updates.enabled | quote }}
+            - name: THREADS
+              value: {{ .Values.import.threads | quote }}
+            - name: DATABASE_DSN
+              value: {{ include "openstreetmaps-tile-server.databaseDSN" . }}
+            - name: OSM2PGSQL_EXTRA_ARGS
+              value: {{ .Values.import.extraArgs | quote }}
+          command:
+            - /bin/bash
+            - -ec
+            - |
+
+              psql ${DATABASE_DSN} -c "CREATE EXTENSION postgis;"
+              psql ${DATABASE_DSN} -c "CREATE EXTENSION hstore;"
+
+              # Import data
+              osm2pgsql -d ${DATABASE_DSN} --create --slim -G --hstore --tag-transform-script /home/renderer/src/openstreetmap-carto/openstreetmap-carto.lua --number-processes ${THREADS} -S /home/renderer/src/openstreetmap-carto/openstreetmap-carto.style ./data.osm.pbf ${OSM2PGSQL_EXTRA_ARGS}
+
+              # Create indexes
+              psql ${DATABASE_DSN} -f /home/renderer/src/openstreetmap-carto/indexes.sql
+
+              #Import external data
+#              sudo chown -R renderer: /home/renderer/src
+#              sudo -u renderer python3 /home/renderer/src/openstreetmap-carto/scripts/get-external-data.py -c /home/renderer/src/openstreetmap-carto/external-data.yml -D /home/renderer/src/openstreetmap-carto/data
+          volumeMounts:
+            - mountPath: /openstreetmaps-tile-server
+              name: data
+            - mountPath: /dev/shm
+              name: dshm
+            {{- if .Values.persistance.enabled }}
+            - mountPath: /var/lib/mod_tile
+              name: persistance
+              subPath: mod_tile
+            {{- end }}
+      restartPolicy: OnFailure
+      volumes:
+        - name: persistance
+        {{- if  .Values.persistance.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistance.existingClaim | default (include "openstreetmaps-tile-server.fullname" .) }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
+        - name: dshm
+          emptyDir:
+            medium: Memory
+        - name: data
+          emptyDir: {}
+{{- end }}

@@ -1,0 +1,19 @@
+{{- if and .Values.persistance.enabled (not .Values.persistance.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "openstreetmaps-tile-server.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    app.kubernetes.io/part-of: {{ include "openstreetmaps-tile-server.name" . }}
+    app.kubernetes.io/name: {{ include "openstreetmaps-tile-server.name" . }}-postgresql
+spec:
+  accessModes:
+    {{- range .Values.persistance.accessModes }}
+    - {{ . | quote }}
+      {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.persistance.size | quote }}
+  {{- include "common.storage.class" (dict "persistence" .Values.persistance "global" .Values.global) | nindent 2 }}
+{{- end}}

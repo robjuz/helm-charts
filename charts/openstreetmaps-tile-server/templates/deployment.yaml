@@ -1,0 +1,98 @@
+{{- if not .Values.import.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "openstreetmaps-tile-server.fullname" . }}
+  labels:
+    {{- include "openstreetmaps-tile-server.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "openstreetmaps-tile-server.selectorLabels" . | nindent 6 }}
+
+  {{- if .Values.updateStrategy }}
+  strategy: {{- toYaml .Values.updateStrategy | nindent 4 }}
+  {{- end }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "openstreetmaps-tile-server.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "openstreetmaps-tile-server.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          workingDir: /openstreetmaps-tile-server
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: THREADS
+              value: {{ .Values.tilesServer.threads | quote }}
+            - name: DATABASE_DSN
+              value: {{ include "openstreetmaps-tile-server.databaseDSN" . }}
+            - name: OSM2PGSQL_EXTRA_ARGS
+              value: {{ .Values.import.extraArgs | quote }}
+          command:
+            - /bin/bash
+            - -ec
+            - |
+                sed -i -E "s/num_threads=[0-9]+/num_threads=${THREADS:-4}/g" /usr/local/etc/renderd.conf
+                renderd -f -c /usr/local/etc/renderd.conf
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: /dev/shm
+              name: dshm
+              {{- if .Values.persistance.enabled }}
+            - mountPath: /openstreetmaps-tile-server/persistance
+              name: persistance
+              subPath: persistance
+              {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        {{- if  .Values.persistance.enabled }}
+        - name: persistance
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistance.existingClaim | default (include "openstreetmaps-tile-server.fullname" .) }}
+        {{- end }}
+        - name: dshm
+          emptyDir:
+            medium: Memory
+{{- end }}
