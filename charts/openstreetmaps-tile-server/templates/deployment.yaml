@@ -50,6 +50,8 @@ spec:
             - /bin/bash
             - -ec
             - |
+                service apache2 restart
+
                 cd /home/renderer/src/openstreetmap-carto/
                 sed -i '/^    type: "postgis"/a \ \ \ \ host: "tiles\-postgresql"\n\ \ \ \ user: "postgres"\n\ \ \ \ password: "tiles"' project.mml
                 carto project.mml > mapnik.xml
