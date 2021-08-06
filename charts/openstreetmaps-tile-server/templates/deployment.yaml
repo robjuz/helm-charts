@@ -75,11 +75,9 @@ spec:
           volumeMounts:
             - mountPath: /dev/shm
               name: dshm
-              {{- if .Values.persistence.enabled }}
             - mountPath: /var/lib/mod_tile
-              name: tile_cache
+              name: mod_tile
               subPath: mod_tile
-              {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -93,10 +91,12 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
-        {{- if  .Values.persistence.enabled }}
-        - name: tile_cache
+        - name: mod_tile
+          {{- if  .Values.persistence.enabled }}
           persistentVolumeClaim:
             claimName: {{ .Values.persistence.existingClaim | default (include "openstreetmaps-tile-server.fullname" .) }}
+          {{- else }}
+          emptyDir: {}
         {{- end }}
         - name: dshm
           emptyDir:
