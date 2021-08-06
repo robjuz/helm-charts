@@ -58,7 +58,7 @@ persistence:
   ##
   accessModes:
     - ReadWriteOnce
-    - ReadWriteMany
+#    - ReadWriteMany
   ## @param persistence.size Persistent Volume size
   ##
   size: 100Gi
@@ -79,7 +79,7 @@ flatnode:
   ## @param flatnode.accessModes [array] Persistent Volume access modes
   ##
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   ## @param flatnode.size Persistent Volume size
   ##
   size: 100Gi

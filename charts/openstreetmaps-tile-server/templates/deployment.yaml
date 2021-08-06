@@ -50,7 +50,7 @@ spec:
             - /bin/bash
             - -ec
             - |
-                /etc/init.d/apachd2 start
+                /etc/init.d/apache2 start
 
                 cd /home/renderer/src/openstreetmap-carto/
                 sed -i '/^    type: "postgis"/a \ \ \ \ host: "tiles\-postgresql"\n\ \ \ \ user: "postgres"\n\ \ \ \ password: "tiles"' project.mml
