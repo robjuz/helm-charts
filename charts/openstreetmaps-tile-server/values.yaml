@@ -184,8 +184,6 @@ affinity: {}
 postgresql:
   enabled: true
   postgresqlPostgresPassword: tiles
-#  postgresqlUsername: tiles
-#  postgresqlPassword: tiles
   postgresqlDatabase: gis
 
   persistence:
