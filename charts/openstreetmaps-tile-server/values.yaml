@@ -44,21 +44,21 @@ tilesServer:
   extraArgs: ''
   threads: 4
 
-persistance:
-  ## @param persistance.enabled Enable persistance using Persistent Volume Claims
+persistence:
+  ## @param persistence.enabled Enable persistence using Persistent Volume Claims
   ##
   enabled: false
-  ## @param persistance.storageClass Persistent Volume storage class
+  ## @param persistence.storageClass Persistent Volume storage class
   ## If defined, storageClassName: <storageClass>
   ## If set to "-", storageClassName: "", which disables dynamic provisioning
   ## If undefined (the default) or set to null, no storageClassName spec is set, choosing the default provisioner
   ##
   storageClass:
-  ## @param persistance.accessModes [array] Persistent Volume access modes
+  ## @param persistence.accessModes [array] Persistent Volume access modes
   ##
   accessModes:
     - ReadWriteMany
-  ## @param persistance.size Persistent Volume size
+  ## @param persistence.size Persistent Volume size
   ##
   size: 100Gi
   ## @param persistence.existingClaim The name of an existing PVC to use for persistence

@@ -1,4 +1,4 @@
-{{- if and .Values.persistance.enabled (not .Values.persistance.existingClaim) }}
+{{- if and .Values.persistence.enabled (not .Values.persistence.existingClaim) }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -9,11 +9,11 @@ metadata:
     app.kubernetes.io/name: {{ include "openstreetmaps-tile-server.name" . }}-postgresql
 spec:
   accessModes:
-    {{- range .Values.persistance.accessModes }}
+    {{- range .Values.persistence.accessModes }}
     - {{ . | quote }}
       {{- end }}
   resources:
     requests:
-      storage: {{ .Values.persistance.size | quote }}
-  {{- include "common.storage.class" (dict "persistence" .Values.persistance "global" .Values.global) | nindent 2 }}
+      storage: {{ .Values.persistence.size | quote }}
+  {{- include "common.storage.class" (dict "persistence" .Values.persistence "global" .Values.global) | nindent 2 }}
 {{- end}}

@@ -22,7 +22,7 @@ This chart has been tested to work with NGINX Ingress and cert-manager on top of
 - Kubernetes 1.12+
 - Helm 3.1.0
 - PV provisioner support in the underlying infrastructure
-- ReadWriteMany volumes for deployment scaling and persistance support
+- ReadWriteMany volumes for deployment scaling and persistence support
 
 ## Installing the Chart
 
@@ -160,15 +160,15 @@ The command removes all the Kubernetes components associated with the chart and 
 | `ingress.tls`                      | Enable TLS configuration for the host defined at `ingress.hostname` parameter    | `false`        |
 | `ingress.secrets`                  | Custom TLS certificates as secrets                                               | `[]`           |
 
-### persistance Parameters
+### persistence Parameters
 
 | Name                                          | Description                                                | Value             |
 | --------------------------------------------- | -----------------------------------------------------------| ----------------- |
-| `persistance.enabled`                         | Enable persistance using Persistent Volume Claims             | `false`            |
-| `persistance.storageClass`                    | Persistent Volume storage class                            | `nil`             |
-| `persistance.accessModes`                     | Persistent Volume access modes                             | `[ReadWriteMany]` |
-| `persistance.size`                            | Persistent Volume size                                     | `100Gi`             |
-| `persistance.existingClaim`                   | The name of an existing PVC to use for persistance            | `nil`             |
+| `persistence.enabled`                         | Enable persistence using Persistent Volume Claims             | `false`            |
+| `persistence.storageClass`                    | Persistent Volume storage class                            | `nil`             |
+| `persistence.accessModes`                     | Persistent Volume access modes                             | `[ReadWriteMany]` |
+| `persistence.size`                            | Persistent Volume size                                     | `100Gi`             |
+| `persistence.existingClaim`                   | The name of an existing PVC to use for persistence            | `nil`             |
 
 ### Database Parameters
 
@@ -188,10 +188,10 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ## Configuration and installation details
 
-### persistance support
+### persistence support
 
-When importing large extracts (Europe/Planet) the usage of persistance is recommended. 
-Using persistance with replication enabled requires the usage of a ReadWriteMany volume, because the persistance file needs to be shared within the pods.
+When importing large extracts (Europe/Planet) the usage of persistence is recommended. 
+Using persistence with replication enabled requires the usage of a ReadWriteMany volume, because the persistence file needs to be shared within the pods.
 This also applies when scaling the openstreetmaps-tile-server deployment.
 
 ### External database support

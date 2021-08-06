@@ -50,7 +50,7 @@ spec:
             - /bin/bash
             - -ec
             - |
-                service apache2 restart
+                /etc/init.d/apachd2 start
 
                 cd /home/renderer/src/openstreetmap-carto/
                 sed -i '/^    type: "postgis"/a \ \ \ \ host: "tiles\-postgresql"\n\ \ \ \ user: "postgres"\n\ \ \ \ password: "tiles"' project.mml
@@ -62,23 +62,23 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
-{{/*          livenessProbe:*/}}
-{{/*            httpGet:*/}}
-{{/*              path: /*/}}
-{{/*              port: http*/}}
-{{/*          readinessProbe:*/}}
-{{/*            httpGet:*/}}
-{{/*              path: /*/}}
-{{/*              port: http*/}}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - mountPath: /dev/shm
               name: dshm
-              {{- if .Values.persistance.enabled }}
-            - mountPath: /openstreetmaps-tile-server/persistance
-              name: persistance
-              subPath: persistance
+              {{- if .Values.persistence.enabled }}
+            - mountPath: /var/lib/mod_tile
+              name: tile_cache
+              subPath: mod_tile
               {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -93,10 +93,10 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
-        {{- if  .Values.persistance.enabled }}
-        - name: persistance
+        {{- if  .Values.persistence.enabled }}
+        - name: tile_cache
           persistentVolumeClaim:
-            claimName: {{ .Values.persistance.existingClaim | default (include "openstreetmaps-tile-server.fullname" .) }}
+            claimName: {{ .Values.persistence.existingClaim | default (include "openstreetmaps-tile-server.fullname" .) }}
         {{- end }}
         - name: dshm
           emptyDir:

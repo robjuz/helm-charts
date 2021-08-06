@@ -28,9 +28,9 @@
 {{/*              value: {{ .Values.openstreetmaps-tile-serverReplications.replicationUrl }}*/}}
 {{/*            - name: openstreetmaps-tile-server_IMPORT_STYLE*/}}
 {{/*              value: {{ .Values.openstreetmaps-tile-serverInitialize.importStyle }}*/}}
-{{/*            {{- if .Values.persistance.enabled }}*/}}
-{{/*            - name: openstreetmaps-tile-server_persistance_FILE*/}}
-{{/*              value: /openstreetmaps-tile-server/persistance/persistance.file*/}}
+{{/*            {{- if .Values.persistence.enabled }}*/}}
+{{/*            - name: openstreetmaps-tile-server_persistence_FILE*/}}
+{{/*              value: /openstreetmaps-tile-server/persistence/persistence.file*/}}
 {{/*            {{- end }}*/}}
 {{/*            {{- if .Values.openstreetmaps-tile-serverReplications.extraEnv }}*/}}
 {{/*            {{- include "common.tplvalues.render" (dict "value" .Values.openstreetmaps-tile-server.extraEnv "context" $) | nindent 12 }}*/}}
@@ -41,17 +41,17 @@
 {{/*          volumeMounts:*/}}
 {{/*            - mountPath: /dev/shm*/}}
 {{/*              name: dshm*/}}
-{{/*            {{- if .Values.persistance.enabled }}*/}}
-{{/*            - mountPath: /openstreetmaps-tile-server/persistance*/}}
+{{/*            {{- if .Values.persistence.enabled }}*/}}
+{{/*            - mountPath: /openstreetmaps-tile-server/persistence*/}}
 {{/*              name: openstreetmaps-tile-server*/}}
-{{/*              subPath: persistance*/}}
+{{/*              subPath: persistence*/}}
 {{/*          {{- end }}*/}}
 {{/*      restartPolicy: Always*/}}
 {{/*      volumes:*/}}
-{{/*      {{- if  .Values.persistance.enabled }}*/}}
+{{/*      {{- if  .Values.persistence.enabled }}*/}}
 {{/*      - name: openstreetmaps-tile-server*/}}
 {{/*        persistentVolumeClaim:*/}}
-{{/*          claimName: {{ .Values.persistance.existingClaim | default (include "openstreetmaps-tile-server.fullname" .) }}*/}}
+{{/*          claimName: {{ .Values.persistence.existingClaim | default (include "openstreetmaps-tile-server.fullname" .) }}*/}}
 {{/*      {{- end }}*/}}
 {{/*      - name: dshm*/}}
 {{/*        emptyDir:*/}}
