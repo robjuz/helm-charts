@@ -28,6 +28,6 @@ dependencies:
     version: 1.x.x
     repository: https://charts.bitnami.com/bitnami
   - name: postgresql
-    version: 10.5.3
+    version: 10.9.1
     repository: https://charts.bitnami.com/bitnami
     condition: postgresql.enabled

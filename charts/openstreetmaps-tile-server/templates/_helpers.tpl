@@ -96,7 +96,7 @@ Add environment variables to configure database values
 
 {{- define "openstreetmaps-tile-server.databaseName" -}}
 {{- if .Values.postgresql.enabled }}
-    {{- printf "%s" .Values.externalDatabase.database -}}
+    {{- printf "%s" .Values.postgresql.postgresqlDatabase -}}
 {{- else -}}
     {{- printf "%s" .Values.externalDatabase.database -}}
 {{- end -}}
@@ -120,13 +120,6 @@ Add environment variables to configure database values
 {{- end -}}
 {{- end -}}
 
-{{/*
-Create the database URL. For the time being, this supports only an integrated MySQL
-*/}}
-{{- define "openstreetmaps-tile-server.databaseUrl" -}}
-pgsql:host={{ include "openstreetmaps-tile-server.databaseHost" . }};port={{ include "openstreetmaps-tile-server.databasePort" . }};user={{ include "openstreetmaps-tile-server.databaseUser" . }};password={{ include "openstreetmaps-tile-server.databasePassword" . }};dbname={{ include "openstreetmaps-tile-server.databaseName" . }}
-{{- end }}
-
 {{- define "openstreetmaps-tile-server.databaseDSN" -}}
-postgresql://{{ include "openstreetmaps-tile-server.databaseUser" . }}:{{ include "openstreetmaps-tile-server.databasePassword" . }}@{{ include "openstreetmaps-tile-server.databaseHost" . }}:{{ include "openstreetmaps-tile-server.databasePort" . }}
+postgresql://{{ include "openstreetmaps-tile-server.databaseUser" . }}:{{ include "openstreetmaps-tile-server.databasePassword" . }}@{{ include "openstreetmaps-tile-server.databaseHost" . }}:{{ include "openstreetmaps-tile-server.databasePort" . }}/{{ include "openstreetmaps-tile-server.databaseName" . }}
 {{- end }}

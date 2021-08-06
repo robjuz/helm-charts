@@ -29,7 +29,7 @@ nameOverride: ""
 fullnameOverride: ""
 
 import:
-  enabled: true
+  enabled: false
   pbfUrl: https://download.geofabrik.de/europe/germany/sachsen-latest.osm.pbf
   polyfUrl: https://download.geofabrik.de/europe/germany/sachsen.poly
   threads: 16
@@ -183,12 +183,12 @@ affinity: {}
 postgresql:
   enabled: true
   postgresqlPostgresPassword: tiles
-  postgresqlUsername: tiles
-  postgresqlPassword: tiles
-#  postgresqlDatabase: openstreetmaps-tile-server
+#  postgresqlUsername: tiles
+#  postgresqlPassword: tiles
+  postgresqlDatabase: gis
 
   persistence:
-    size: 500Gi
+    size: 10Gi
 
   postgresqlExtendedConf:
     {

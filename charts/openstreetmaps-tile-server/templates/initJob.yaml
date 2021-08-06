@@ -63,8 +63,7 @@ spec:
               psql ${DATABASE_DSN} -f /home/renderer/src/openstreetmap-carto/indexes.sql
 
               #Import external data
-#              sudo chown -R renderer: /home/renderer/src
-#              sudo -u renderer python3 /home/renderer/src/openstreetmap-carto/scripts/get-external-data.py -c /home/renderer/src/openstreetmap-carto/external-data.yml -D /home/renderer/src/openstreetmap-carto/data
+              python3 /home/renderer/src/openstreetmap-carto/scripts/get-external-data.py -H tiles-postgresql -U postgres -w tiles -c /home/renderer/src/openstreetmap-carto/external-data.yml -D /home/renderer/src/openstreetmap-carto/data
           volumeMounts:
             - mountPath: /openstreetmaps-tile-server
               name: data
