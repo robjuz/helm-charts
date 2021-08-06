@@ -70,11 +70,11 @@ spec:
             - mountPath: /dev/shm
               name: dshm
             - mountPath: /var/lib/mod_tile
-              name: mod_tile
+              name: tiles
               subPath: mod_tile
       restartPolicy: OnFailure
       volumes:
-        - name: mod_tile
+        - name: tiles
         {{- if  .Values.persistence.enabled }}
           persistentVolumeClaim:
             claimName: {{ .Values.persistence.existingClaim | default (include "openstreetmaps-tile-server.fullname" .) }}
