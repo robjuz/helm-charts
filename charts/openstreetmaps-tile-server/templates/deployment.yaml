@@ -1,4 +1,3 @@
-{{- if not .Values.import.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -46,6 +45,8 @@ spec:
               value: {{ include "openstreetmaps-tile-server.databaseDSN" . }}
             - name: OSM2PGSQL_EXTRA_ARGS
               value: {{ .Values.import.extraArgs | quote }}
+            - name: ALLOW_CORS
+              value: {{ .Values.tilesServer.allowCors | quote}}
           command:
             - /bin/bash
             - -ec
@@ -101,4 +102,3 @@ spec:
         - name: dshm
           emptyDir:
             medium: Memory
-{{- end }}

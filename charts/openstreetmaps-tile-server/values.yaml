@@ -36,11 +36,11 @@ import:
   extraArgs: ''
 
 updates:
-  enabled: false
+  enabled: true
   replicationUrl: https://download.geofabrik.de/europe/germany/sachsen-updates/
 
 tilesServer:
-  allowCors: false
+  allowCors: 0
   extraArgs: ''
   threads: 4
 
@@ -183,7 +183,8 @@ affinity: {}
 
 postgresql:
   enabled: true
-  postgresqlPostgresPassword: tiles
+  postgresqlUsername: postgres
+  postgresqlPassword: tiles
   postgresqlDatabase: gis
 
   persistence:

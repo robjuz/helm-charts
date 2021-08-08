@@ -1,59 +1,42 @@
-{{/*{{- if and .Values.openstreetmaps-tile-serverReplications.enabled (not .Values.openstreetmaps-tile-serverInitialize.enabled) }}*/}}
-{{/*apiVersion: apps/v1*/}}
-{{/*kind: Deployment*/}}
-{{/*metadata:*/}}
-{{/*  name: {{ include "openstreetmaps-tile-server.fullname" . }}-updates*/}}
-{{/*  labels:*/}}
-{{/*    app.kubernetes.io/name: {{ include "openstreetmaps-tile-server.name" . }}-updates*/}}
-{{/*spec:*/}}
-{{/*  selector:*/}}
-{{/*    matchLabels:*/}}
-{{/*      app.kubernetes.io/name: {{ include "openstreetmaps-tile-server.name" . }}-updates*/}}
-{{/*  template:*/}}
-{{/*    metadata:*/}}
-{{/*      labels:*/}}
-{{/*        app.kubernetes.io/name: {{ include "openstreetmaps-tile-server.name" . }}-updates*/}}
-{{/*    spec:*/}}
-{{/*      containers:*/}}
-{{/*        - name: {{ .Chart.Name }}-updates*/}}
-{{/*          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"*/}}
-{{/*          imagePullPolicy: {{ .Values.image.pullPolicy }}*/}}
-{{/*          workingDir: /openstreetmaps-tile-server*/}}
-{{/*          env:*/}}
-{{/*            - name: openstreetmaps-tile-server_DATABASE_DSN*/}}
-{{/*              value: {{ include "openstreetmaps-tile-server.databaseUrl" . }}*/}}
-{{/*            - name: openstreetmaps-tile-server_DATABASE_MODULE_PATH*/}}
-{{/*              value: {{ .Values.openstreetmaps-tile-server.databaseModulePath }}*/}}
-{{/*            - name: openstreetmaps-tile-server_REPLICATION_URL*/}}
-{{/*              value: {{ .Values.openstreetmaps-tile-serverReplications.replicationUrl }}*/}}
-{{/*            - name: openstreetmaps-tile-server_IMPORT_STYLE*/}}
-{{/*              value: {{ .Values.openstreetmaps-tile-serverInitialize.importStyle }}*/}}
-{{/*            {{- if .Values.persistence.enabled }}*/}}
-{{/*            - name: openstreetmaps-tile-server_persistence_FILE*/}}
-{{/*              value: /openstreetmaps-tile-server/persistence/persistence.file*/}}
-{{/*            {{- end }}*/}}
-{{/*            {{- if .Values.openstreetmaps-tile-serverReplications.extraEnv }}*/}}
-{{/*            {{- include "common.tplvalues.render" (dict "value" .Values.openstreetmaps-tile-server.extraEnv "context" $) | nindent 12 }}*/}}
-{{/*          {{- end }}*/}}
-{{/*          command:*/}}
-{{/*            - openstreetmaps-tile-server*/}}
-{{/*            - replication*/}}
-{{/*          volumeMounts:*/}}
-{{/*            - mountPath: /dev/shm*/}}
-{{/*              name: dshm*/}}
-{{/*            {{- if .Values.persistence.enabled }}*/}}
-{{/*            - mountPath: /openstreetmaps-tile-server/persistence*/}}
-{{/*              name: openstreetmaps-tile-server*/}}
-{{/*              subPath: persistence*/}}
-{{/*          {{- end }}*/}}
-{{/*      restartPolicy: Always*/}}
-{{/*      volumes:*/}}
-{{/*      {{- if  .Values.persistence.enabled }}*/}}
-{{/*      - name: openstreetmaps-tile-server*/}}
-{{/*        persistentVolumeClaim:*/}}
-{{/*          claimName: {{ .Values.persistence.existingClaim | default (include "openstreetmaps-tile-server.fullname" .) }}*/}}
-{{/*      {{- end }}*/}}
-{{/*      - name: dshm*/}}
-{{/*        emptyDir:*/}}
-{{/*          medium: Memory*/}}
-{{/*{{- end }}*/}}
+{{- if and .Values.updates.enabled (not .Values.import.enabled) }}
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ include "openstreetmaps-tile-server.fullname" . }}-updates
+  labels:
+    app.kubernetes.io/name: {{ include "openstreetmaps-tile-server.name" . }}-updates
+spec:
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: {{ .Chart.Name }}-updates
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              workingDir: /openstreetmaps-tile-server
+              env:
+                - name: OSM2PGSQL_EXTRA_ARGS
+                  value: {{ include "openstreetmaps-tile-server.databaseDSN" . }}
+              command:
+                - openstreetmap-tiles-update-expire
+              volumeMounts:
+                - mountPath: /dev/shm
+                  name: dshm
+                - mountPath: /var/lib/mod_tile
+                  name: tiles
+                  subPath: mod_tile
+          restartPolicy: OnFailure
+          volumes:
+          - name: tiles
+            {{- if  .Values.persistence.enabled }}
+            persistentVolumeClaim:
+              claimName: {{ .Values.persistence.existingClaim | default (include "openstreetmaps-tile-server.fullname" .) }}
+            {{- else }}
+            emptyDir: {}
+            {{- end }}
+          - name: dshm
+            emptyDir:
+              medium: Memory
+{{- end }}

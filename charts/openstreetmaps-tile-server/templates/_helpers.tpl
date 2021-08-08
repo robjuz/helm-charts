@@ -114,7 +114,7 @@ Add environment variables to configure database values
 
 {{- define "openstreetmaps-tile-server.databasePassword" -}}
 {{- if .Values.postgresql.enabled }}
-    {{- printf "%s" .Values.postgresql.postgresqlPostgresPassword -}}
+    {{- printf "%s" .Values.postgresql.postgresqlPassword -}}
 {{- else -}}
     {{- printf "%s" .Values.externalDatabase.password -}}
 {{- end -}}

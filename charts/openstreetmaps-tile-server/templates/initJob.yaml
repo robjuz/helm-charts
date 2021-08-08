@@ -53,8 +53,8 @@ spec:
             - -ec
             - |
 
-              psql ${DATABASE_DSN} -c "CREATE EXTENSION postgis;"
-              psql ${DATABASE_DSN} -c "CREATE EXTENSION hstore;"
+              psql ${DATABASE_DSN} -c "CREATE EXTENSION IF NOT EXISTS postgis;"
+              psql ${DATABASE_DSN} -c "CREATE EXTENSION IF NOT EXISTS hstore;"
 
               # Import data
               osm2pgsql -d ${DATABASE_DSN} --create --slim -G --hstore --tag-transform-script /home/renderer/src/openstreetmap-carto/openstreetmap-carto.lua --number-processes ${THREADS} -S /home/renderer/src/openstreetmap-carto/openstreetmap-carto.style ./data.osm.pbf ${OSM2PGSQL_EXTRA_ARGS}
