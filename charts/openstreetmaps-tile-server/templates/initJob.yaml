@@ -20,12 +20,31 @@ spec:
             - --create-dirs
             - -o
             - data.osm.pbf
+{{- if .Values.updates.enabled | quote }}
+        - name: initialize-updates
+            image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+            workingDir: /openstreetmaps-tile-server
+            volumeMounts:
+              - mountPath: /openstreetmaps-tile-server
+                name: data
+            command:
+              - /bin/bash
+              - -ec
+              - |
+                # determine and set osmosis_replication_timestamp (for consecutive updates)
+                osmium fileinfo data.osm.pbf > /var/lib/mod_tile/data.osm.pbf.info
+                osmium fileinfo data.osm.pbf | grep 'osmosis_replication_timestamp=' | cut -b35-44 > /var/lib/mod_tile/replication_timestamp.txt
+                REPLICATION_TIMESTAMP=$(cat /var/lib/mod_tile/replication_timestamp.txt)
+
+                # initial setup of osmosis workspace (for consecutive updates)
+                openstreetmap-tiles-update-expire $REPLICATION_TIMESTAMP
+{{- end }}
         - name: download-poly
           image: curlimages/curl
-          workingDir: /openstreetmaps-tile-server
+          workingDir: /var/lib/mod_tile
           volumeMounts:
-            - mountPath: /openstreetmaps-tile-server
-              name: data
+            - mountPath: /var/lib/mod_tile
+              name: tiles
           command:
             - curl
             - -L
@@ -40,8 +59,6 @@ spec:
           workingDir: /openstreetmaps-tile-server
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            - name: UPDATES
-              value: {{ .Values.updates.enabled | quote }}
             - name: THREADS
               value: {{ .Values.import.threads | quote }}
             - name: DATABASE_DSN
@@ -64,6 +81,9 @@ spec:
 
               #Import external data
               python3 /home/renderer/src/openstreetmap-carto/scripts/get-external-data.py -H tiles-postgresql -U postgres -w tiles -c /home/renderer/src/openstreetmap-carto/external-data.yml -D /home/renderer/src/openstreetmap-carto/data
+
+              # Register that data has changed for mod_tile caching purposes
+              touch /var/lib/mod_tile/planet-import-complete
           volumeMounts:
             - mountPath: /openstreetmaps-tile-server
               name: data

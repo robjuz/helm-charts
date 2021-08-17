@@ -7,20 +7,42 @@ metadata:
     app.kubernetes.io/name: {{ include "openstreetmaps-tile-server.name" . }}-updates
 spec:
   schedule: "*/1 * * * *"
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 1
+  successfulJobsHistoryLimit: 1
   jobTemplate:
     spec:
       template:
         spec:
+          affinity:
+            podAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: app.kubernetes.io/name
+                        operator: In
+                        values:
+                          - {{ include "openstreetmaps-tile-server.name" . }}
+                  topologyKey: "kubernetes.io/hostname"
           containers:
             - name: {{ .Chart.Name }}-updates
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
               imagePullPolicy: {{ .Values.image.pullPolicy }}
               workingDir: /openstreetmaps-tile-server
               env:
-                - name: OSM2PGSQL_EXTRA_ARGS
+                - name: DATABASE_DSN
                   value: {{ include "openstreetmaps-tile-server.databaseDSN" . }}
+                - name: PGPASSWORD
+                  value: {{ include "openstreetmaps-tile-server.databasePassword" . }}
               command:
-                - openstreetmap-tiles-update-expire
+                - /bin/bash
+                - -ec
+                - |
+                    ln -s /dev/stdout /var/log/tiles/run.log
+                    sed -i s+TRIM_OPTIONS=.*+TRIM_OPTIONS="\"-d gis --host tiles-postgresql --user postgres --password\""+g /usr/bin/openstreetmap-tiles-update-expire
+                    sed -i s+DBNAME=.*+DBNAME=${DATABASE_DSN}+g /usr/bin/openstreetmap-tiles-update-expire
+
+                    openstreetmap-tiles-update-expire
               volumeMounts:
                 - mountPath: /dev/shm
                   name: dshm

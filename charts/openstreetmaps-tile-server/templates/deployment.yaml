@@ -31,6 +31,7 @@ spec:
       serviceAccountName: {{ include "openstreetmaps-tile-server.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -43,8 +44,6 @@ spec:
               value: {{ .Values.tilesServer.threads | quote }}
             - name: DATABASE_DSN
               value: {{ include "openstreetmaps-tile-server.databaseDSN" . }}
-            - name: OSM2PGSQL_EXTRA_ARGS
-              value: {{ .Values.import.extraArgs | quote }}
             - name: ALLOW_CORS
               value: {{ .Values.tilesServer.allowCors | quote}}
           command:
@@ -57,7 +56,7 @@ spec:
                 sed -i '/^    type: "postgis"/a \ \ \ \ host: "tiles\-postgresql"\n\ \ \ \ user: "postgres"\n\ \ \ \ password: "tiles"' project.mml
                 carto project.mml > mapnik.xml
 
-                sed -i -E "s/num_threads=[0-9]+/num_threads=${THREADS:-4}/g" /usr/local/etc/renderd.conf
+                sed -i -E "s/num_threads=[0-9]+/num_threads=${THREADS}/g" /usr/local/etc/renderd.conf
                 renderd -f -c /usr/local/etc/renderd.conf
           ports:
             - name: http
