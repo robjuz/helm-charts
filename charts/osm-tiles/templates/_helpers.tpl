@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "openstreetmaps-tile-server.name" -}}
+{{- define "osm-tiles.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "openstreetmaps-tile-server.fullname" -}}
+{{- define "osm-tiles.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "openstreetmaps-tile-server.chart" -}}
+{{- define "osm-tiles.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "openstreetmaps-tile-server.labels" -}}
-helm.sh/chart: {{ include "openstreetmaps-tile-server.chart" . }}
-{{ include "openstreetmaps-tile-server.selectorLabels" . }}
+{{- define "osm-tiles.labels" -}}
+helm.sh/chart: {{ include "osm-tiles.chart" . }}
+{{ include "osm-tiles.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,17 +45,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "openstreetmaps-tile-server.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "openstreetmaps-tile-server.name" . }}
+{{- define "osm-tiles.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "osm-tiles.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "openstreetmaps-tile-server.serviceAccountName" -}}
+{{- define "osm-tiles.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "openstreetmaps-tile-server.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "osm-tiles.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
@@ -65,7 +65,7 @@ Create the name of the service account to use
 Create a default fully qualified postgresql name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
-{{- define "openstreetmaps-tile-server.postgresql.fullname" -}}
+{{- define "osm-tiles.postgresql.fullname" -}}
 {{- $name := default "postgresql" .Values.postgresql.nameOverride -}}
 {{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
@@ -73,19 +73,19 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{/*
 Add environment variables to configure database values
 */}}
-{{- define "openstreetmaps-tile-server.database" -}}
-{{- ternary (include "openstreetmaps-tile-server.postgresql.fullname" .) .Values.externalDatabase.host .Values.postgresql.enabled | quote -}}
+{{- define "osm-tiles.database" -}}
+{{- ternary (include "osm-tiles.postgresql.fullname" .) .Values.externalDatabase.host .Values.postgresql.enabled | quote -}}
 {{- end -}}
 
 
 
 
-{{- define "openstreetmaps-tile-server.databaseHost" -}}
-{{- printf "%s" (include "openstreetmaps-tile-server.postgresql.fullname" .) -}}
+{{- define "osm-tiles.databaseHost" -}}
+{{- printf "%s" (include "osm-tiles.postgresql.fullname" .) -}}
 {{- end -}}
 
 
-{{- define "openstreetmaps-tile-server.databasePort" -}}
+{{- define "osm-tiles.databasePort" -}}
 {{- if .Values.postgresql.enabled }}
     {{- printf "5432" -}}
 {{- else -}}
@@ -94,7 +94,7 @@ Add environment variables to configure database values
 {{- end -}}
 
 
-{{- define "openstreetmaps-tile-server.databaseName" -}}
+{{- define "osm-tiles.databaseName" -}}
 {{- if .Values.postgresql.enabled }}
     {{- printf "%s" .Values.postgresql.postgresqlDatabase -}}
 {{- else -}}
@@ -103,7 +103,7 @@ Add environment variables to configure database values
 {{- end -}}
 
 
-{{- define "openstreetmaps-tile-server.databaseUser" -}}
+{{- define "osm-tiles.databaseUser" -}}
 {{- if .Values.postgresql.enabled }}
     {{- printf "postgres" -}}
 {{- else -}}
@@ -112,7 +112,7 @@ Add environment variables to configure database values
 {{- end -}}
 
 
-{{- define "openstreetmaps-tile-server.databasePassword" -}}
+{{- define "osm-tiles.databasePassword" -}}
 {{- if .Values.postgresql.enabled }}
     {{- printf "%s" .Values.postgresql.postgresqlPassword -}}
 {{- else -}}
@@ -120,6 +120,6 @@ Add environment variables to configure database values
 {{- end -}}
 {{- end -}}
 
-{{- define "openstreetmaps-tile-server.databaseDSN" -}}
-postgresql://{{ include "openstreetmaps-tile-server.databaseUser" . }}:{{ include "openstreetmaps-tile-server.databasePassword" . }}@{{ include "openstreetmaps-tile-server.databaseHost" . }}:{{ include "openstreetmaps-tile-server.databasePort" . }}/{{ include "openstreetmaps-tile-server.databaseName" . }}
+{{- define "osm-tiles.databaseDSN" -}}
+postgresql://{{ include "osm-tiles.databaseUser" . }}:{{ include "osm-tiles.databasePassword" . }}@{{ include "osm-tiles.databaseHost" . }}:{{ include "osm-tiles.databasePort" . }}/{{ include "osm-tiles.databaseName" . }}
 {{- end }}

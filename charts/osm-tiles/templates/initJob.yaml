@@ -2,16 +2,16 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "openstreetmaps-tile-server.fullname" . }}-init
+  name: {{ include "osm-tiles.fullname" . }}-init
 spec:
   template:
     spec:
       initContainers:
         - name: download-pbf
           image: curlimages/curl
-          workingDir: /openstreetmaps-tile-server
+          workingDir: /osm-tiles
           volumeMounts:
-            - mountPath: /openstreetmaps-tile-server
+            - mountPath: /osm-tiles
               name: data
           command:
             - curl
@@ -20,25 +20,24 @@ spec:
             - --create-dirs
             - -o
             - data.osm.pbf
-{{- if .Values.updates.enabled | quote }}
+{{- if .Values.updates.enabled }}
         - name: initialize-updates
-            image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-            workingDir: /openstreetmaps-tile-server
-            volumeMounts:
-              - mountPath: /openstreetmaps-tile-server
-                name: data
-            command:
-              - /bin/bash
-              - -ec
-              - |
-                # determine and set osmosis_replication_timestamp (for consecutive updates)
-                osmium fileinfo data.osm.pbf > /var/lib/mod_tile/data.osm.pbf.info
-                osmium fileinfo data.osm.pbf | grep 'osmosis_replication_timestamp=' | cut -b35-44 > /var/lib/mod_tile/replication_timestamp.txt
-                REPLICATION_TIMESTAMP=$(cat /var/lib/mod_tile/replication_timestamp.txt)
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          workingDir: /osm-tiles
+          volumeMounts:
+            - mountPath: /osm-tiles
+              name: data
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              # determine and set osmosis_replication_timestamp (for consecutive updates)
+              osmium fileinfo data.osm.pbf > /var/lib/mod_tile/data.osm.pbf.info
+              osmium fileinfo data.osm.pbf | grep 'osmosis_replication_timestamp=' | cut -b35-44 > /var/lib/mod_tile/replication_timestamp.txt
+              REPLICATION_TIMESTAMP=$(cat /var/lib/mod_tile/replication_timestamp.txt)
 
-                # initial setup of osmosis workspace (for consecutive updates)
-                openstreetmap-tiles-update-expire $REPLICATION_TIMESTAMP
-{{- end }}
+              # initial setup of osmosis workspace (for consecutive updates)
+              openstreetmap-tiles-update-expire $REPLICATION_TIMESTAMP
         - name: download-poly
           image: curlimages/curl
           workingDir: /var/lib/mod_tile
@@ -48,23 +47,19 @@ spec:
           command:
             - curl
             - -L
-            - {{ .Values.import.polyfUrl }}
+            - {{ .Values.updates.polyfUrl }}
             - --create-dirs
             - -o
             - data.poly
+{{- end }}
 
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          workingDir: /openstreetmaps-tile-server
+          image: "{{ .Values.import.image.repository }}:{{ .Values.import.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            - name: THREADS
-              value: {{ .Values.import.threads | quote }}
             - name: DATABASE_DSN
-              value: {{ include "openstreetmaps-tile-server.databaseDSN" . }}
-            - name: OSM2PGSQL_EXTRA_ARGS
-              value: {{ .Values.import.extraArgs | quote }}
+              value: {{ include "osm-tiles.databaseDSN" . }}
           command:
             - /bin/bash
             - -ec
@@ -85,7 +80,7 @@ spec:
               # Register that data has changed for mod_tile caching purposes
               touch /var/lib/mod_tile/planet-import-complete
           volumeMounts:
-            - mountPath: /openstreetmaps-tile-server
+            - mountPath: /osm-tiles
               name: data
             - mountPath: /dev/shm
               name: dshm
@@ -97,7 +92,7 @@ spec:
         - name: tiles
         {{- if  .Values.persistence.enabled }}
           persistentVolumeClaim:
-            claimName: {{ .Values.persistence.existingClaim | default (include "openstreetmaps-tile-server.fullname" .) }}
+            claimName: {{ .Values.persistence.existingClaim | default (include "osm-tiles.fullname" .) }}
         {{- else }}
           emptyDir: {}
         {{- end }}

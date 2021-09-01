@@ -2,11 +2,11 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "openstreetmaps-tile-server.fullname" . }}
+  name: {{ include "osm-tiles.fullname" . }}
   namespace: {{ .Release.Namespace | quote }}
   labels:
-    app.kubernetes.io/part-of: {{ include "openstreetmaps-tile-server.name" . }}
-    app.kubernetes.io/name: {{ include "openstreetmaps-tile-server.name" . }}-postgresql
+    app.kubernetes.io/part-of: {{ include "osm-tiles.name" . }}
+    app.kubernetes.io/name: {{ include "osm-tiles.name" . }}-postgresql
 spec:
   accessModes:
     {{- range .Values.persistence.accessModes }}

@@ -1,0 +1,122 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "osm-tiles.fullname" . }}
+  labels:
+    {{- include "osm-tiles.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "osm-tiles.selectorLabels" . | nindent 6 }}
+
+  {{- if .Values.updateStrategy }}
+  strategy: {{- toYaml .Values.updateStrategy | nindent 4 }}
+  {{- end }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "osm-tiles.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "osm-tiles.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+
+      containers:
+        - name: apache
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          workingDir: /osm-tiles
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+{{- if .Values.tilesServer.allowCors }}
+          env:
+            - name: ALLOW_CORS
+              value: "1"
+{{- end }}
+          command:
+            - apachectl
+            - -D
+            - FOREGROUND
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: /var/lib/mod_tile
+              name: tiles
+              subPath: mod_tile
+            - mountPath: /var/run/renderd
+              name: run-renderd
+        - name: renderd
+          securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          workingDir: /osm-tiles
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: THREADS
+              value: {{ .Values.tilesServer.threads | quote }}
+            - name: DATABASE_DSN
+              value: {{ include "osm-tiles.databaseDSN" . }}
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              cd /home/renderer/src/openstreetmap-carto/
+              sed -i '/^    type: "postgis"/a \ \ \ \ host: "tiles\-postgresql"\n\ \ \ \ user: "postgres"\n\ \ \ \ password: "tiles"' project.mml
+              carto project.mml > mapnik.xml
+
+              sed -i -E "s/num_threads=[0-9]+/num_threads=${THREADS}/g" /usr/local/etc/renderd.conf
+              renderd -f -c /usr/local/etc/renderd.conf
+          resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: /var/lib/mod_tile
+              name: tiles
+              subPath: mod_tile
+            - mountPath: /var/run/renderd
+              name: run-renderd
+
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: tiles
+          {{- if  .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "osm-tiles.fullname" .) }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - name: run-renderd
+          emptyDir: {}

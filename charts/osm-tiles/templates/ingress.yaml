@@ -2,9 +2,9 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "openstreetmaps-tile-server.name" . }}
+  name: {{ include "osm-tiles.name" . }}
   labels:
-    {{- include "openstreetmaps-tile-server.labels" . | nindent 4 }}
+    {{- include "osm-tiles.labels" . | nindent 4 }}
   annotations:
     {{- if .Values.ingress.certManager }}
     kubernetes.io/tls-acme: "true"
@@ -27,7 +27,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ include "openstreetmaps-tile-server.fullname" . }}
+                name: {{ include "osm-tiles.fullname" . }}
                 port:
                   name: http
 {{- end }}

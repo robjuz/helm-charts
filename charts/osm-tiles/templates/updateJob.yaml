@@ -2,9 +2,9 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: {{ include "openstreetmaps-tile-server.fullname" . }}-updates
+  name: {{ include "osm-tiles.fullname" . }}-updates
   labels:
-    app.kubernetes.io/name: {{ include "openstreetmaps-tile-server.name" . }}-updates
+    app.kubernetes.io/name: {{ include "osm-tiles.name" . }}-updates
 spec:
   schedule: "*/1 * * * *"
   concurrencyPolicy: Forbid
@@ -12,6 +12,7 @@ spec:
   successfulJobsHistoryLimit: 1
   jobTemplate:
     spec:
+      backoffLimit: 0
       template:
         spec:
           affinity:
@@ -22,18 +23,18 @@ spec:
                       - key: app.kubernetes.io/name
                         operator: In
                         values:
-                          - {{ include "openstreetmaps-tile-server.name" . }}
+                          - {{ include "osm-tiles.name" . }}
                   topologyKey: "kubernetes.io/hostname"
           containers:
             - name: {{ .Chart.Name }}-updates
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
               imagePullPolicy: {{ .Values.image.pullPolicy }}
-              workingDir: /openstreetmaps-tile-server
+              workingDir: /osm-tiles
               env:
                 - name: DATABASE_DSN
-                  value: {{ include "openstreetmaps-tile-server.databaseDSN" . }}
+                  value: {{ include "osm-tiles.databaseDSN" . }}
                 - name: PGPASSWORD
-                  value: {{ include "openstreetmaps-tile-server.databasePassword" . }}
+                  value: {{ include "osm-tiles.databasePassword" . }}
               command:
                 - /bin/bash
                 - -ec
@@ -49,12 +50,12 @@ spec:
                 - mountPath: /var/lib/mod_tile
                   name: tiles
                   subPath: mod_tile
-          restartPolicy: OnFailure
+          restartPolicy: Never
           volumes:
           - name: tiles
             {{- if  .Values.persistence.enabled }}
             persistentVolumeClaim:
-              claimName: {{ .Values.persistence.existingClaim | default (include "openstreetmaps-tile-server.fullname" .) }}
+              claimName: {{ .Values.persistence.existingClaim | default (include "osm-tiles.fullname" .) }}
             {{- else }}
             emptyDir: {}
             {{- end }}

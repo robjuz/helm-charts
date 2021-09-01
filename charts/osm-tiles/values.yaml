@@ -1,11 +1,11 @@
-# Default values for openstreetmaps-tile-server.
+# Default values for osm-tiles.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
 replicaCount: 1
 
-## @param updateStrategy.type openstreetmaps-tile-server deployment strategy type
-## @param updateStrategy.rollingUpdate openstreetmaps-tile-server deployment rolling update configuration parameters
+## @param updateStrategy.type osm-tiles deployment strategy type
+## @param updateStrategy.rollingUpdate osm-tiles deployment rolling update configuration parameters
 ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
 ## NOTE: Set it to `Recreate` if you use a PV that cannot be mounted on multiple pods
 ## e.g:
@@ -30,17 +30,26 @@ fullnameOverride: ""
 
 import:
   enabled: false
+  image:
+    repository: openfirmware/osm2pgsql
+    pullPolicy: IfNotPresent
+    tag: "0.87.2"
   pbfUrl: https://download.geofabrik.de/europe/germany/sachsen-latest.osm.pbf
-  polyfUrl: https://download.geofabrik.de/europe/germany/sachsen.poly
   threads: 16
   extraArgs: ''
 
 updates:
-  enabled: true
-  replicationUrl: https://download.geofabrik.de/europe/germany/sachsen-updates/
+  enabled: false
+  polyfUrl: https://download.geofabrik.de/europe/germany/sachsen.poly
+
+prerender:
+  enabled: false
+  minZoom: 0
+  maxZoom: 10
+  threads: 4
 
 tilesServer:
-  allowCors: 0
+  allowCors: false
   extraArgs: ''
   threads: 4
 
@@ -114,7 +123,7 @@ service:
   port: 80
 
 ingress:
-  ## @param ingress.enabled Enable ingress record generation for openstreetmaps-tile-server
+  ## @param ingress.enabled Enable ingress record generation for osm-tiles
   ##
   enabled: false
   ## @param ingress.certManager Add the corresponding annotations for cert-manager integration
@@ -126,7 +135,7 @@ ingress:
   annotations: {}
   ## @param ingress.hostname Default host for the ingress record
   ##
-  hostname: openstreetmaps-tile-server.local
+  hostname: osm-tiles.local
   ## @param ingress.tls Enable TLS configuration for the host defined at `ingress.hostname` parameter
   ## TLS certificates will be retrieved from a TLS secret with name: `{{- printf "%s-tls" .Values.ingress.hostname }}`
   ## You can:
@@ -144,7 +153,7 @@ ingress:
   ## Please see README.md for more information
   ## e.g:
   ## secrets:
-  ##   - name: openstreetmaps-tile-server.local-tls
+  ##   - name: osm-tiles.local-tls
   ##     key: |-
   ##       -----BEGIN RSA PRIVATE KEY-----
   ##       ...

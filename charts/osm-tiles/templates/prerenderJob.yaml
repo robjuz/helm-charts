@@ -1,0 +1,65 @@
+{{- if .Values.prerender.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "osm-tiles.fullname" . }}-prerender
+spec:
+  template:
+    spec:
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - {{ include "osm-tiles.name" . }}
+              topologyKey: "kubernetes.io/hostname"
+
+      containers:
+        - name: {{ .Chart.Name }}-prerender
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: THREADS
+              value: {{ .Values.prerender.threads | quote }}
+            - name: MIN_ZOOM
+              value: {{ .Values.prerender.minZoom | quote }}
+            - name: MAX_ZOOM
+              value: {{ .Values.prerender.maxZoom | quote }}
+            - name: DATABASE_DSN
+              value: {{ include "osm-tiles.databaseDSN" . }} {{ .Chart.Name }}
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              cd /home/renderer/src/openstreetmap-carto/
+              sed -i '/^    type: "postgis"/a \ \ \ \ host: "tiles\-postgresql"\n\ \ \ \ user: "postgres"\n\ \ \ \ password: "tiles"' project.mml
+              carto project.mml > mapnik.xml
+
+              sed -i -E "s/num_threads=[0-9]+/num_threads=${THREADS}/g" /usr/local/etc/renderd.conf
+              renderd -c /usr/local/etc/renderd.conf
+
+              render_list -a -m ajt -z ${MIN_ZOOM} -Z ${MAX_ZOOM} -n ${THREADS}
+          volumeMounts:
+            - mountPath: /dev/shm
+              name: dshm
+            - mountPath: /var/lib/mod_tile
+              name: tiles
+              subPath: mod_tile
+      restartPolicy: OnFailure
+      volumes:
+        - name: tiles
+        {{- if  .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "osm-tiles.fullname" .) }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
+        - name: dshm
+          emptyDir:
+            medium: Memory
+        - name: data
+          emptyDir: {}
+{{- end }}
