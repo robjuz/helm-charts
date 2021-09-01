@@ -1,30 +1,43 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "futtertrog.fullname" . }}
+  name: {{ include "futtertrog.name" . }}-config
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: primary
 data:
-  APP_NAME: {{ include "futtertrog.fullname" . }}
-  APP_URL: {{ .Values.ingress.host }}
-  DB_CONNECTION: mysql
-  DB_DATABASE: {{ .Values.mariadb.db.name }}
-  DB_HOST:  {{ .Values.mariadb.fullnameOverride }}
-  DB_PORT: {{ .Values.mariadb.service.port | quote}}
-  DB_USERNAME: {{ .Values.mariadb.db.user }}
 
-  MAIL_MAILER: {{ .Values.mailMailer | quote }}
-
-  HOLZKE_SCHEDULE: {{ .Values.holzkeSchedule | quote }}
-
-  {{- if .Values.nexmoKey}}
-  NEXMO_KEY: {{ .Values.nexmoKey | quote }}
+  {{- if .Values.services.gitlab.enabled}}
+  LOGIN_WITH_GITLAB: {{ .Values.services.gitlab.enabled | quote }}
+  GITLAB_URL: {{ .Values.services.gitlab.url | quote }}
+  GITLAB_CLIENT_ID: {{ .Values.services.gitlab.clientId | quote }}
   {{- end }}
 
-  LOGIN_WITH_GITLAB: {{ .Values.loginWithGitlab | quote }}
-
-  {{- if .Values.gitlabUrl}}
-  GITLAB_URL: {{ .Values.gitlabUrl }}
+  {{- if .Values.mealProviders.holzke.enabled}}
+  HOLZKE_LOGIN: {{ .Values.mealProviders.holzke.login | quote }}
+  HOLZKE_SCHEDULE: {{ .Values.mealProviders.holzke.cronjob | quote }}
+  HOLZKE_ORDER_INFO: {{ .Values.mealProviders.holzke.orderInfo | quote }}
   {{- end }}
 
-  {{- if .Values.gitlabClientId}}
-  GITLAB_CLIENT_ID: {{ .Values.gitlabClientId }}
+  NEXMO_KEY: {{ .Values.services.nexmo.key | quote }}
+
+  CALL_A_PIZZA_LOCATION: {{ .Values.mealProviders.call_a_pizza.location | quote }}
+{{/*  CALL_A_PIZZA_MEALS: {{ .Values.mealProviders.call_a_pizza.categories | quote }}*/}}
+
+  MAIL_DRIVER: {{ .Values.mail.driver | quote }}
+
+  {{- if .Values.mail.host }}
+  MAIL_HOST: {{ .Values.mail.host | quote }}
+  {{- end }}
+
+  {{- if .Values.mail.port}}
+  MAIL_PORT: {{ .Values.mail.port | quote }}
+  {{- end }}
+
+  {{- if .Values.mail.username}}
+  MAIL_USERNAME: {{ .Values.mail.username | quote }}
+  {{- end }}
+
+  {{- if .Values.mail.encryption }}
+  MAIL_ENCRYPTION: {{ .Values.mail.encryption | quote }}
   {{- end }}

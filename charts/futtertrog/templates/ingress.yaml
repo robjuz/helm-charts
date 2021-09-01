@@ -1,32 +1,33 @@
 {{- if .Values.ingress.enabled -}}
-{{- $fullName := include "futtertrog.fullname" . -}}
-{{- if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
-apiVersion: networking.k8s.io/v1beta1
-{{- else -}}
-apiVersion: extensions/v1beta1
-{{- end }}
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ $fullName }}
+  name: {{ include "futtertrog.name" . }}
   labels:
     {{- include "futtertrog.labels" . | nindent 4 }}
-  {{- with .Values.ingress.annotations }}
   annotations:
-    {{- toYaml . | nindent 4 }}
+    {{- if .Values.ingress.certManager }}
+    kubernetes.io/tls-acme: "true"
+    {{- end }}
+    {{- if .Values.ingress.annotations }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.ingress.annotations "context" $) | nindent 4 }}
   {{- end }}
 spec:
-  {{- if .Values.ingress.tls.enabled }}
   tls:
+  {{- if .Values.ingress.tls }}
     - hosts:
-        - {{ .Values.ingress.host }}
-      secretName: {{ .Values.ingress.tls.secretName }}
+        - {{ .Values.ingress.hostname | quote }}
+      secretName: {{ printf "%s-tls" .Values.ingress.hostname }}
   {{- end }}
   rules:
-    - host: {{ .Values.ingress.host }}
+    - host: {{ .Values.ingress.hostname | quote }}
       http:
         paths:
           - path: /
+            pathType: Prefix
             backend:
-              serviceName: {{ $fullName }}
-              servicePort: 80
-  {{- end }}
+              service:
+                name: {{ include "futtertrog.fullname" . }}
+                port:
+                  name: http
+{{- end }}

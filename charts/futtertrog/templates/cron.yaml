@@ -1,9 +1,15 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: laravel-schedule-run
+  name: {{ include "common.names.fullname" . }}-cron
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: primary
 spec:
+  schedule: "* * * * *"
   concurrencyPolicy: Replace
+  startingDeadlineSeconds: 30
+  successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
   jobTemplate:
     spec:
@@ -12,26 +18,19 @@ spec:
       template:
         spec:
           containers:
-            - args:
-                - /bin/bash
-                - -c
-                - php artisan schedule:run
-              envFrom:
-                - configMapRef:
-                    name: {{ template "futtertrog.fullname" . }}
-                - secretRef:
-                    name: {{ template "futtertrog.fullname" . }}
+            - name: {{ .Chart.Name }}
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
               imagePullPolicy: {{ .Values.image.pullPolicy }}
-              name: artisan-schedule
-              resources:
-                limits:
-                  cpu: 200m
-                  memory: 200M
-                requests:
-                  cpu: 100m
-                  memory: 100M
+              args:
+                - php
+                - artisan
+                - schedule:run
+              envFrom:
+                - configMapRef:
+                    name: {{ template "futtertrog.fullname" . }}-config
+                - secretRef:
+                    name: {{ template "futtertrog.fullname" . }}-secret
+              {{- if .Values.resources }}
+              resources: {{- toYaml .Values.resources | nindent 16 }}
+              {{- end }}
           restartPolicy: Never
-  schedule: "* * * * *"
-  startingDeadlineSeconds: 30
-  successfulJobsHistoryLimit: 1

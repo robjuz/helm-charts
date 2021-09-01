@@ -1,13 +1,18 @@
 apiVersion: v2
 name: futtertrog
 description: A Helm chart for Kubernetes
-home: https://github.com/robjuz/futtertrog
 type: application
-version: 0.1.0
-appVersion: latest
+version: 1.0.0
+appVersion: "latest"
+home: https://github.com/robjuz/helm-charts/tree/master/charts/futtertrog
+sources:
+  - https://github.com/robjuz/futtertrog
+
 dependencies:
+  - name: common
+    version: 0.x.x
+    repository: https://charts.bitnami.com/bitnami
   - name: mariadb
-    version: 7.x.x
-    repository: "@bitnami"
-    tags:
-      - database
+    repository: https://charts.bitnami.com/bitnami
+    version: 9.x.x
+    condition: mariadb.enabled

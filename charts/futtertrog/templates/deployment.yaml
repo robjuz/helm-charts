@@ -1,7 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "futtertrog.fullname" . }}
+  name: {{ include "common.names.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "futtertrog.labels" . | nindent 4 }}
 spec:
@@ -9,12 +10,16 @@ spec:
   selector:
     matchLabels:
       {{- include "futtertrog.selectorLabels" . | nindent 6 }}
+
+  {{- if .Values.updateStrategy }}
+  strategy: {{- toYaml .Values.updateStrategy | nindent 4 }}
+  {{- end }}
   template:
     metadata:
-    {{- with .Values.podAnnotations }}
+      {{- with .Values.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
-    {{- end }}
+      {{- end }}
       labels:
         {{- include "futtertrog.selectorLabels" . | nindent 8 }}
     spec:
@@ -22,33 +27,23 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "futtertrog.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      initContainers:
-      - args:
-          - /bin/bash
-          - -c
-          - php artisan migrate --force
-        envFrom:
-          - configMapRef:
-              name: {{ template "futtertrog.fullname" . }}
-          - secretRef:
-              name: {{ template "futtertrog.fullname" . }}
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        name: artisan-migrate
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          {{- if .Values.extraEnvVars }}
+          {{- include "common.tplvalues.render" (dict "value" .Values.extraEnvVars "context" $) | nindent 12 }}
+          {{- end }}
           envFrom:
             - configMapRef:
-                name: {{ template "futtertrog.fullname" . }}
+                name: {{ include "futtertrog.name" . }}-config
             - secretRef:
-                name: {{ template "futtertrog.fullname" . }}
+                name: {{ include "futtertrog.name" . }}-secret
           ports:
             - name: http
               containerPort: 80
@@ -57,12 +52,15 @@ spec:
             httpGet:
               path: /
               port: http
+            periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /
               port: http
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            periodSeconds: 10
+          {{- if .Values.resources }}
+          resources: {{- toYaml .Values.resources | nindent 12 }}
+          {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

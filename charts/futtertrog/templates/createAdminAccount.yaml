@@ -1,0 +1,33 @@
+{{- if and .Values.adminName .Values.adminEmail .Values.adminPassword }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "futtertrog.fullname" . }}-crate-admin
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: primary
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "20"
+spec:
+  template:
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+          - configMapRef:
+              name: {{ template "futtertrog.fullname" . }}-config
+          - secretRef:
+              name: {{ template "futtertrog.fullname" . }}-secret
+          command:
+            - php
+            - artisan
+            - futtertrog:create-admin
+            - -n
+            - {{ .Values.adminName }}
+            - {{ .Values.adminEmail }}
+            - {{ .Values.adminPassword }}
+      restartPolicy: OnFailure
+{{- end }}
