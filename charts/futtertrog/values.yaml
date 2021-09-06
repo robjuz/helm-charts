@@ -41,6 +41,9 @@ services:
   nexmo:
     key: ''
     secret: ''
+  vapid:
+    public_key: ''
+    private_key: ''
 
 mealProviders:
   holzke:

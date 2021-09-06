@@ -41,3 +41,7 @@ data:
   {{- if .Values.mail.encryption }}
   MAIL_ENCRYPTION: {{ .Values.mail.encryption | quote }}
   {{- end }}
+
+  {{- if .Values.services.vapid.public_key }}
+  VAPID_PUBLIC_KEY: {{ .Values.services.vapid.public_key | quote }}
+  {{- end }}
