@@ -3,6 +3,27 @@ entries:
   futtertrog:
   - apiVersion: v2
     appVersion: master
+    created: "2021-09-14T22:13:10.464112666Z"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      version: 0.x.x
+    - condition: mariadb.enabled
+      name: mariadb
+      repository: https://charts.bitnami.com/bitnami
+      version: 9.x.x
+    description: A Helm chart for Kubernetes
+    digest: 307c893f9a7c0de346cb93c5d08c3f0402883f14e415182eee89e8e21de5c7b8
+    home: https://github.com/robjuz/helm-charts/tree/master/charts/futtertrog
+    name: futtertrog
+    sources:
+    - https://github.com/robjuz/futtertrog
+    type: application
+    urls:
+    - https://github.com/robjuz/helm-charts/releases/download/futtertrog-1.4.0/futtertrog-1.4.0.tgz
+    version: 1.4.0
+  - apiVersion: v2
+    appVersion: master
     created: "2021-09-14T19:01:43.919485487Z"
     dependencies:
     - name: common
@@ -437,4 +458,4 @@ entries:
     urls:
     - https://github.com/robjuz/helm-charts/releases/download/nominatim-0.1.0/nominatim-0.1.0.tgz
     version: 0.1.0
-generated: "2021-09-14T19:01:43.919697088Z"
+generated: "2021-09-14T22:13:10.464532102Z"
