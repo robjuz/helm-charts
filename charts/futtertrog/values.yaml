@@ -5,11 +5,14 @@ replicaCount: 1
 ## @param updateStrategy.type Futtertrog deployment strategy type
 ## @param updateStrategy.rollingUpdate Futtertrog deployment rolling update configuration parameters
 ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+## updateStrategy:
+##  type: RollingUpdate
+##  rollingUpdate:
+##    maxSurge: 25%
+##    maxUnavailable: 25%
+##
 updateStrategy:
-  type: RollingUpdate
-  rollingUpdate:
-    maxSurge: 25%
-    maxUnavailable: 25%
+  type: Recreate
 
 image:
   repository: robjuz/futtertrog
