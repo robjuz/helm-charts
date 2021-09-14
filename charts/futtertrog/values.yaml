@@ -54,10 +54,15 @@ mealProviders:
     orderInfo: ''
   call_a_pizza:
     enabled: false
-    location: dresden_loebtau_sued
-#    categories:
-#      - pizza/pizza-klassiker
-#      - burger
+    location: ''
+    categories:
+      - pizza/pizza-klassiker
+      - burger
+  flaschenpost:
+    enabled: false
+    zipcode: ''
+    categories:
+      - limonade/cola
 
 mail:
   driver: log

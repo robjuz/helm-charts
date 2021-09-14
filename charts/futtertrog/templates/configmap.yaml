@@ -22,7 +22,10 @@ data:
   NEXMO_KEY: {{ .Values.services.nexmo.key | quote }}
 
   CALL_A_PIZZA_LOCATION: {{ .Values.mealProviders.call_a_pizza.location | quote }}
-{{/*  CALL_A_PIZZA_MEALS: {{ .Values.mealProviders.call_a_pizza.categories | quote }}*/}}
+  CALL_A_PIZZA_CATEGORIES: {{ .Values.mealProviders.call_a_pizza.categories | toJson | quote }}
+
+  FLASCHENPOST_ZIPCODE: {{ .Values.mealProviders.flaschenpost.zipcode | quote }}
+  FLASCHENPOST_CATEGORIES: {{ .Values.mealProviders.flaschenpost.categories | toJson | quote }}
 
   MAIL_DRIVER: {{ .Values.mail.driver | quote }}
 
