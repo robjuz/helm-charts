@@ -2,9 +2,9 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: {{ include "osm-tiles.fullname" . }}-updates
+  name: {{ include "common.names.fullname" . }}-updates
   labels:
-    app.kubernetes.io/name: {{ include "osm-tiles.name" . }}-updates
+    app.kubernetes.io/name: {{ include "common.names.name" . }}-updates
 spec:
   schedule: "*/1 * * * *"
   concurrencyPolicy: Forbid
@@ -23,7 +23,7 @@ spec:
                       - key: app.kubernetes.io/name
                         operator: In
                         values:
-                          - {{ include "osm-tiles.name" . }}
+                          - {{ include "common.names.name" . }}
                   topologyKey: "kubernetes.io/hostname"
           containers:
             - name: {{ .Chart.Name }}-updates
@@ -55,7 +55,7 @@ spec:
           - name: tiles
             {{- if  .Values.persistence.enabled }}
             persistentVolumeClaim:
-              claimName: {{ .Values.persistence.existingClaim | default (include "osm-tiles.fullname" .) }}
+              claimName: {{ .Values.persistence.existingClaim | default (include "common.names.fullname" .) }}
             {{- else }}
             emptyDir: {}
             {{- end }}

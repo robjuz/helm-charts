@@ -30,10 +30,6 @@ fullnameOverride: ""
 
 import:
   enabled: false
-  image:
-    repository: openfirmware/osm2pgsql
-    pullPolicy: IfNotPresent
-    tag: "0.87.2"
   pbfUrl: https://download.geofabrik.de/europe/germany/sachsen-latest.osm.pbf
   threads: 16
   extraArgs: ''
@@ -188,45 +184,55 @@ nodeSelector: {}
 
 tolerations: []
 
-affinity:
-  podAffinity:
-    preferredDuringSchedulingIgnoredDuringExecution:
-      - weight: 100
-        podAffinityTerm:
-          labelSelector:
-            matchExpressions:
-              - key: app.kubernetes.io/name
-                operator: In
-                values:
-                  - postgresql
-          topologyKey: "kubernetes.io/hostname"
-
 postgresql:
   enabled: true
-  postgresqlUsername: postgres
-  postgresqlPassword: tiles
-  postgresqlDatabase: gis
+
+  pgpool:
+    adminPassword: tiles
+
+  postgresql:
+    replicaCount: 3
+    username: postgres
+    password: tiles
+    database: gis
+
+    repmgrUsername: postgres
+    repmgrPassword: tiles
+    repmgrDatabase: gis
+
+    initdbScripts:
+      postgis.sql: |
+        CREATE EXTENSION IF NOT EXISTS postgis;
+        CREATE EXTENSION IF NOT EXISTS hstore;
+
+    extendedConf: |-
+        shared_buffers = 128MB
+        min_wal_size = 1GB
+        max_wal_size = 2GB
+        maintenance_work_mem = 256MB
+        max_connections = 250
+        temp_buffers = 32MB
+        work_mem = 128MB
+        wal_buffers = 1024kB
+        wal_writer_delay = 500ms
+        commit_delay = 10000
+        random_page_cost = 1.1
+        track_activity_query_size = 16384
+        autovacuum_vacuum_scale_factor = 0.05
+        autovacuum_analyze_scale_factor = 0.0
+
+
+    extraVolumes:
+      - name: dshm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 512Mi
+    extraVolumeMounts:
+      - name: dshm
+        mountPath: /dev/shm
 
   persistence:
     size: 10Gi
-
-  postgresqlExtendedConf:
-    {
-      "shared_buffers": "128MB",
-      "min_wal_size": "1GB",
-      "max_wal_size": "2GB",
-      "maintenance_work_mem": "256MB",
-      "max_connections": "250",
-      "temp_buffers": "32MB",
-      "work_mem": "128MB",
-      "wal_buffers": "1024kB",
-      "wal_writer_delay": "500ms",
-      "commit_delay": "10000",
-      "random_page_cost": "1.1",
-      "track_activity_query_size": "16384",
-      "autovacuum_vacuum_scale_factor": "0.05",
-      "autovacuum_analyze_scale_factor": "0.02"
-    }
 
 externalDatabase:
   enabled: false

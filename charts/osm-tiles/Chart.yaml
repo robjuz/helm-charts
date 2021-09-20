@@ -27,7 +27,8 @@ dependencies:
   - name: common
     version: 1.x.x
     repository: https://charts.bitnami.com/bitnami
-  - name: postgresql
-    version: 10.9.1
+  - name: postgresql-ha
+    version: 7.9.3
     repository: https://charts.bitnami.com/bitnami
     condition: postgresql.enabled
+    alias: postgresql

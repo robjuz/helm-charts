@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "osm-tiles.fullname" . }}-init
+  name: {{ include "common.names.fullname" . }}-init
 spec:
   template:
     spec:
@@ -20,6 +20,23 @@ spec:
             - --create-dirs
             - -o
             - data.osm.pbf
+
+        - name: build-openstreetmap-carto
+          image: node:lts
+          workingDir: /osm-tiles/
+          volumeMounts:
+            - mountPath: /osm-tiles
+              name: data
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              wget -c https://github.com/gravitystorm/openstreetmap-carto/archive/refs/tags/v5.3.1.tar.gz -O - | tar -xz
+              cd openstreetmap-carto-5.3.1
+              sed -ie 's#https:\/\/naciscdn.org\/naturalearth\/110m\/cultural\/ne_110m_admin_0_boundary_lines_land.zip#https:\/\/naturalearth.s3.amazonaws.com\/110m_cultural\/ne_110m_admin_0_boundary_lines_land.zip#g' external-data.yml
+              npm install -g carto
+              carto project.mml > mapnik.xml
+
 {{- if .Values.updates.enabled }}
         - name: initialize-updates
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -53,37 +70,56 @@ spec:
             - data.poly
 {{- end }}
 
-      containers:
-        - name: {{ .Chart.Name }}
-          image: "{{ .Values.import.image.repository }}:{{ .Values.import.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          env:
-            - name: DATABASE_DSN
-              value: {{ include "osm-tiles.databaseDSN" . }}
-          command:
-            - /bin/bash
-            - -ec
-            - |
-
-              psql ${DATABASE_DSN} -c "CREATE EXTENSION IF NOT EXISTS postgis;"
-              psql ${DATABASE_DSN} -c "CREATE EXTENSION IF NOT EXISTS hstore;"
-
-              # Import data
-              osm2pgsql -d ${DATABASE_DSN} --create --slim -G --hstore --tag-transform-script /home/renderer/src/openstreetmap-carto/openstreetmap-carto.lua --number-processes ${THREADS} -S /home/renderer/src/openstreetmap-carto/openstreetmap-carto.style ./data.osm.pbf ${OSM2PGSQL_EXTRA_ARGS}
-
-              # Create indexes
-              psql ${DATABASE_DSN} -f /home/renderer/src/openstreetmap-carto/indexes.sql
-
-              #Import external data
-              python3 /home/renderer/src/openstreetmap-carto/scripts/get-external-data.py -H tiles-postgresql -U postgres -w tiles -c /home/renderer/src/openstreetmap-carto/external-data.yml -D /home/renderer/src/openstreetmap-carto/data
-
-              # Register that data has changed for mod_tile caching purposes
-              touch /var/lib/mod_tile/planet-import-complete
+        - name: osm2psql
+          image: "robjuz/osm2pgsql"
           volumeMounts:
             - mountPath: /osm-tiles
               name: data
             - mountPath: /dev/shm
               name: dshm
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              osm2pgsql -d {{ include "osm-tiles.databaseDSN" . }} \
+              --create -G --hstore \
+              --tag-transform-script /osm-tiles/openstreetmap-carto-5.3.1/openstreetmap-carto.lua \
+              --number-processes {{ .Values.import.threads | quote }} \
+              -S /osm-tiles/openstreetmap-carto-5.3.1/openstreetmap-carto.style \
+              /osm-tiles/data.osm.pbf
+
+        - name: create-indexes
+          image: "bitnami/postgresql"
+          volumeMounts:
+            - mountPath: /osm-tiles
+              name: data
+            - mountPath: /dev/shm
+              name: dshm
+          command:
+            - psql
+            - ${DATABASE_DSN}
+            - -f /osm-tiles/openstreetmap-carto-5.3.1/indexes.sql
+
+        - name: import-external-data
+          image: python:3-alpine
+          volumeMounts:
+          - mountPath: /osm-tiles
+            name: data
+          command:
+            - python3
+            - /osm-tiles/openstreetmap-carto-5.3.1/scripts/get-external-data.py
+            - -H {{ include "osm-tiles.databaseHost" .}}
+            - -U postgres
+            - -w tiles
+            - -c /osm-tiles/openstreetmap-carto-5.3.1/external-data.yml
+            - -D /osm-tiles/openstreetmap-carto-5.3.1/data
+
+      containers:
+        - name: import
+          image: python:3-alpine
+          command:
+            - touch /var/lib/mod_tile/planet-import-complete
+          volumeMounts:
             - mountPath: /var/lib/mod_tile
               name: tiles
               subPath: mod_tile
@@ -92,7 +128,7 @@ spec:
         - name: tiles
         {{- if  .Values.persistence.enabled }}
           persistentVolumeClaim:
-            claimName: {{ .Values.persistence.existingClaim | default (include "osm-tiles.fullname" .) }}
+            claimName: {{ .Values.persistence.existingClaim | default (include "common.names.fullname" .) }}
         {{- else }}
           emptyDir: {}
         {{- end }}

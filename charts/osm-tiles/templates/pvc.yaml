@@ -2,11 +2,11 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "osm-tiles.fullname" . }}
+  name: {{ include "common.names.fullname" . }}
   namespace: {{ .Release.Namespace | quote }}
   labels:
-    app.kubernetes.io/part-of: {{ include "osm-tiles.name" . }}
-    app.kubernetes.io/name: {{ include "osm-tiles.name" . }}-postgresql
+    app.kubernetes.io/part-of: {{ include "common.names.name" . }}
+    app.kubernetes.io/name: {{ include "common.names.name" . }}-postgresql
 spec:
   accessModes:
     {{- range .Values.persistence.accessModes }}

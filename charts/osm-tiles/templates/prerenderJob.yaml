@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "osm-tiles.fullname" . }}-prerender
+  name: {{ include "common.names.fullname" . }}-prerender
 spec:
   template:
     spec:
@@ -14,7 +14,7 @@ spec:
                   - key: app.kubernetes.io/name
                     operator: In
                     values:
-                      - {{ include "osm-tiles.name" . }}
+                      - {{ include "common.names.name" . }}
               topologyKey: "kubernetes.io/hostname"
 
       containers:
@@ -53,7 +53,7 @@ spec:
         - name: tiles
         {{- if  .Values.persistence.enabled }}
           persistentVolumeClaim:
-            claimName: {{ .Values.persistence.existingClaim | default (include "osm-tiles.fullname" .) }}
+            claimName: {{ .Values.persistence.existingClaim | default (include "common.names.fullname" .) }}
         {{- else }}
           emptyDir: {}
         {{- end }}
