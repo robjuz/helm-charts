@@ -7,19 +7,19 @@ spec:
   template:
     spec:
       initContainers:
-        - name: download-pbf
-          image: curlimages/curl
-          workingDir: /osm-tiles
-          volumeMounts:
-            - mountPath: /osm-tiles
-              name: data
-          command:
-            - curl
-            - -L
-            - {{ .Values.import.pbfUrl }}
-            - --create-dirs
-            - -o
-            - data.osm.pbf
+{{/*        - name: download-pbf*/}}
+{{/*          image: curlimages/curl*/}}
+{{/*          workingDir: /osm-tiles*/}}
+{{/*          volumeMounts:*/}}
+{{/*            - mountPath: /osm-tiles*/}}
+{{/*              name: data*/}}
+{{/*          command:*/}}
+{{/*            - curl*/}}
+{{/*            - -L*/}}
+{{/*            - {{ .Values.import.pbfUrl }}*/}}
+{{/*            - --create-dirs*/}}
+{{/*            - -o*/}}
+{{/*            - data.osm.pbf*/}}
 
         - name: build-openstreetmap-carto
           image: node:lts
@@ -55,6 +55,7 @@ spec:
 
               # initial setup of osmosis workspace (for consecutive updates)
               openstreetmap-tiles-update-expire $REPLICATION_TIMESTAMP
+
         - name: download-poly
           image: curlimages/curl
           workingDir: /var/lib/mod_tile
@@ -70,23 +71,23 @@ spec:
             - data.poly
 {{- end }}
 
-        - name: osm2psql
-          image: "robjuz/osm2pgsql"
-          volumeMounts:
-            - mountPath: /osm-tiles
-              name: data
-            - mountPath: /dev/shm
-              name: dshm
-          command:
-            - /bin/bash
-            - -ec
-            - |
-              osm2pgsql -d {{ include "osm-tiles.databaseDSN" . }} \
-              --create -G --hstore \
-              --tag-transform-script /osm-tiles/openstreetmap-carto-5.3.1/openstreetmap-carto.lua \
-              --number-processes {{ .Values.import.threads | quote }} \
-              -S /osm-tiles/openstreetmap-carto-5.3.1/openstreetmap-carto.style \
-              /osm-tiles/data.osm.pbf
+{{/*        - name: osm2psql*/}}
+{{/*          image: "robjuz/osm2pgsql"*/}}
+{{/*          volumeMounts:*/}}
+{{/*            - mountPath: /osm-tiles*/}}
+{{/*              name: data*/}}
+{{/*            - mountPath: /dev/shm*/}}
+{{/*              name: dshm*/}}
+{{/*          command:*/}}
+{{/*            - /bin/bash*/}}
+{{/*            - -ec*/}}
+{{/*            - |*/}}
+{{/*              osm2pgsql -d {{ include "osm-tiles.databaseDSN" . }} \*/}}
+{{/*              --create -G --hstore \*/}}
+{{/*              --tag-transform-script /osm-tiles/openstreetmap-carto-5.3.1/openstreetmap-carto.lua \*/}}
+{{/*              --number-processes {{ .Values.import.threads | quote }} \*/}}
+{{/*              -S /osm-tiles/openstreetmap-carto-5.3.1/openstreetmap-carto.style \*/}}
+{{/*              /osm-tiles/data.osm.pbf*/}}
 
         - name: create-indexes
           image: "bitnami/postgresql"
@@ -97,11 +98,13 @@ spec:
               name: dshm
           command:
             - psql
-            - ${DATABASE_DSN}
-            - -f /osm-tiles/openstreetmap-carto-5.3.1/indexes.sql
+            - -d
+            - {{ include "osm-tiles.databaseDSN" . }}
+            - -f
+            - /osm-tiles/openstreetmap-carto-5.3.1/indexes.sql
 
         - name: import-external-data
-          image: python:3-alpine
+          image: python:3
           volumeMounts:
           - mountPath: /osm-tiles
             name: data
@@ -116,7 +119,7 @@ spec:
 
       containers:
         - name: import
-          image: python:3-alpine
+          image: python:3
           command:
             - touch /var/lib/mod_tile/planet-import-complete
           volumeMounts:
