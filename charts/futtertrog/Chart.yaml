@@ -2,11 +2,11 @@ apiVersion: v2
 name: futtertrog
 description: A Helm chart for Kubernetes
 type: application
-version: 1.4.0
-appVersion: "master"
+version: 1.5.0
+appVersion: 21.10.0
 home: https://github.com/robjuz/helm-charts/tree/master/charts/futtertrog
 sources:
-  - https://github.com/robjuz/futtertrog
+  - https://github.com/robjuz/futtertrog/tree/21.10.0
 
 dependencies:
   - name: common
