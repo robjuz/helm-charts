@@ -134,3 +134,10 @@ Create the database URL. For the time being, this supports only an integrated My
 {{- define "futtertrog.databaseUrl" -}}
 mysql://{{ include "futtertrog.databaseUser" . }}:{{ include "futtertrog.databasePassword" . }}@{{ include "futtertrog.databaseHost" . }}/{{ include "futtertrog.databaseName" . }}
 {{- end }}
+
+{{/*
+Get a hostname from URL
+*/}}
+{{- define "hostname" -}}
+{{- . | trimPrefix "http://" |  trimPrefix "https://" | trimSuffix "/" | trim | quote -}}
+{{- end -}}

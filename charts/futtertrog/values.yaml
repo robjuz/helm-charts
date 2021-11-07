@@ -120,6 +120,9 @@ ingress:
   ## @param ingress.hostname Default host for the ingress record
   ##
   hostname: futtertrog.local
+  ## @param ingress.additionalHosts List of additional hosts for the ingress record
+  ##
+  additionalHosts: []
   ## @param ingress.tls Enable TLS configuration for the host defined at `ingress.hostname` parameter
   ## TLS certificates will be retrieved from a TLS secret with name: `{{- printf "%s-tls" .Values.ingress.hostname }}`
   ## You can:

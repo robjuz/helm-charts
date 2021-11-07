@@ -17,11 +17,17 @@ spec:
   {{- if .Values.ingress.tls }}
     - hosts:
         - {{ .Values.ingress.hostname | quote }}
+{{- if .Values.ingress.additionalHosts }}
+{{- range $host := .Values.ingress.additionalHosts }}
+    - {{ template "hostname" $host }}
+{{- end -}}
+{{- end }}
       secretName: {{ printf "%s-tls" .Values.ingress.hostname }}
   {{- end }}
   rules:
-    - host: {{ .Values.ingress.hostname | quote }}
+    - host: {{ template "hostname" .Values.ingress.hostname }}
       http:
+        &httpRule
         paths:
           - path: /
             pathType: Prefix
@@ -30,4 +36,11 @@ spec:
                 name: {{ include "futtertrog.fullname" . }}
                 port:
                   name: http
+{{- if .Values.ingress.additionalHosts }}
+{{- range $host := .Values.ingress.additionalHosts }}
+    - host: {{ template "hostname" $host }}
+      http:
+        <<: *httpRule
+{{- end -}}
+{{- end -}}
 {{- end }}
