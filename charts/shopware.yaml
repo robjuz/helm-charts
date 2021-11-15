@@ -1,0 +1,39 @@
+shopware:
+  appUrl: http://shopware.k8s.hw.ag
+
+extraEnvVars:
+  - name: TRUSTED_PROXIES
+    value: 127.0.0.1,REMOTE_ADDR
+
+ingress:
+  enabled: true
+  hostname: shopware.k8s.hw.ag
+  ingressClassName: nginx
+  annotations:
+    kubernetes.io/tls-acme: "true"
+  tls: true
+
+livenessProbe:
+  enabled: false
+
+readinessProbe:
+  enabled: false
+
+service:
+  type: ClusterIP
+
+persistence:
+  enabled: false
+
+elasticsearch:
+  master:
+    replicas: 1
+  data:
+    replicas: 1
+  coordinating:
+    replicas: 1
+
+redis:
+  master:
+    persistence:
+      enabled: false
