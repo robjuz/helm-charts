@@ -444,38 +444,10 @@ ingress:
 
 ## @section Persistence Parameters
 
-## State Persistence Parameters
-## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
-##
-statePersistence:
-  ## @param statePersistence.storageClass Persistent Volume storage class
-  ## If defined, storageClassName: <storageClass>
-  ## If set to "-", storageClassName: "", which disables dynamic provisioning
-  ## If undefined (the default) or set to null, no storageClassName spec is set, choosing the default provisioner
-  ##
-  storageClass: ""
-  ## @param statePersistence.accessModes [array] Persistent Volume access modes
-  ##
-  accessModes:
-    - ReadWriteOnce
-  ## @param statePersistence.size Persistent Volume size
-  ##
-  size: 10Mi
-  ## @param statePersistence.dataSource Custom PVC data source
-  ##
-  dataSource: {}
-  ## @param persistence.existingClaim The name of an existing PVC to use for persistence
-  ##
-  existingClaim: ""
-
-
 ## Persistence Parameters
 ## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
 ##
 persistence:
-  ## @param persistence.enabled Enable persistence using Persistent Volume Claims
-  ##
-  enabled: true
   ## @param persistence.storageClass Persistent Volume storage class
   ## If defined, storageClassName: <storageClass>
   ## If set to "-", storageClassName: "", which disables dynamic provisioning
