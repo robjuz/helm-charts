@@ -524,4 +524,52 @@ entries:
     urls:
     - https://github.com/robjuz/helm-charts/releases/download/nominatim-0.1.0/nominatim-0.1.0.tgz
     version: 0.1.0
-generated: "2021-11-07T13:48:53.308387042Z"
+  shopware:
+  - annotations:
+      category: CMS
+    apiVersion: v2
+    appVersion: 6.4.6
+    created: "2021-11-15T17:07:56.946250628Z"
+    dependencies:
+    - condition: mariadb.enabled
+      name: mariadb
+      repository: https://charts.bitnami.com/bitnami
+      version: 9.x.x
+    - condition: redis.enabled
+      name: redis
+      repository: https://charts.bitnami.com/bitnami
+      version: 15.x.x
+    - condition: elasticsearch.enabled
+      name: elasticsearch
+      repository: https://charts.bitnami.com/bitnami
+      version: 17.x.x
+    - condition: minio.enabled
+      name: minio
+      repository: https://charts.bitnami.com/bitnami
+      version: 9.x.x
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - bitnami-common
+      version: 1.x.x
+    description: Web publishing platform for building blogs and websites.
+    digest: 096d040f6cdd0533c014acc67c1aa54e1b0ae78d756f39d2bef3562943d9d6c3
+    home: https://github.com/robjuz/helm-chars/charts/tree/master/charts/shopware6
+    keywords:
+    - application
+    - cms
+    - http
+    - php
+    - web
+    - shopware
+    maintainers:
+    - email: robjuz@gmail.com
+      name: robjuz
+    name: shopware
+    sources:
+    - https://github.com/shyim/shopware
+    - https://www.shopware.com
+    urls:
+    - https://github.com/robjuz/helm-charts/releases/download/shopware-1.0.0/shopware-1.0.0.tgz
+    version: 1.0.0
+generated: "2021-11-15T17:07:56.946318229Z"
