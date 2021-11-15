@@ -22,6 +22,16 @@ spec:
       {{- if .Values.schedulerName }}
       schedulerName: {{ .Values.schedulerName | quote }}
       {{- end }}
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - {{ include "common.names.name" . }}
+              topologyKey: "kubernetes.io/hostname"
       containers:
         - name: init
           image: {{ template "shopware.image" . }}
