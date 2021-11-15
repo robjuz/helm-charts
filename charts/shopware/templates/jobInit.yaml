@@ -1,0 +1,80 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ printf "%s-init" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
+  namespace: {{ .Release.Namespace }}
+  name: {{ include "common.names.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "10"
+  {{- if .Values.commonAnnotations }}
+  {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  template:
+    spec:
+      {{- include "shopware.imagePullSecrets" . | nindent 6 }}
+      {{- if .Values.schedulerName }}
+      schedulerName: {{ .Values.schedulerName | quote }}
+      {{- end }}
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - {{ include "common.names.name" . }}
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: init
+          image: {{ template "shopware.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          args: [ "maintenance" ]
+          envFrom:
+            - configMapRef:
+                name: {{ template "common.names.fullname" . }}
+            - secretRef:
+                name: {{ template "common.names.fullname" . }}
+          volumeMounts:
+            - mountPath: /var/www/html/config/jwt/
+              name: shopware-jwt
+              readOnly: true
+            - mountPath: /var/www/html/custom/plugins
+              name: shopware-data
+              subPath: plugins
+            - mountPath: /var/www/html/files
+              name: shopware-data
+              subPath: files
+            - mountPath: /var/www/html/public/theme
+              name: shopware-data
+              subPath: theme
+            - mountPath: /var/www/html/public/media
+              name: shopware-data
+              subPath: media
+            - mountPath: /var/www/html/public/bundles
+              name: shopware-data
+              subPath: bundles
+            - mountPath: /var/www/html/public/sitemap
+              name: shopware-data
+              subPath: sitemap
+            - mountPath: /var/www/html/public/thumbnail
+              name: shopware-data
+              subPath: thumbnail
+      restartPolicy: OnFailure
+      volumes:
+        - name: shopware-jwt
+          secret:
+            secretName: {{ printf "%s-jwt" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
+        - name: shopware-data
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "common.names.fullname" .) }}
+        {{- if .Values.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}
