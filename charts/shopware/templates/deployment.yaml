@@ -87,6 +87,29 @@ spec:
             - mountPath: /var/www/html/config/jwt/
               name: shopware-jwt
               readOnly: true
+            - mountPath: /var/www/html/config/jwt/
+              name: shopware-jwt
+            - mountPath: /var/www/html/custom/plugins
+              name: shopware-data
+              subPath: plugins
+            - mountPath: /var/www/html/files
+              name: shopware-data
+              subPath: files
+            - mountPath: /var/www/html/public/theme
+              name: shopware-data
+              subPath: theme
+            - mountPath: /var/www/html/public/media
+              name: shopware-data
+              subPath: media
+            - mountPath: /var/www/html/public/bundles
+              name: shopware-data
+              subPath: bundles
+            - mountPath: /var/www/html/public/sitemap
+              name: shopware-data
+              subPath: sitemap
+            - mountPath: /var/www/html/public/thumbnail
+              name: shopware-data
+              subPath: thumbnail
         {{- if and .Values.podSecurityContext.enabled .Values.volumePermissions.enabled .Values.persistence.enabled }}
         - name: volume-permissions
           image: "{{ template "shopware.volumePermissions.image" . }}"
