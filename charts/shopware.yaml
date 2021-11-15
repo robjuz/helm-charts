@@ -9,9 +9,9 @@ ingress:
   enabled: true
   hostname: shopware.k8s.hw.ag
   ingressClassName: nginx
-  annotations:
-    kubernetes.io/tls-acme: "true"
-  tls: true
+#  annotations:
+#    kubernetes.io/tls-acme: "true"
+#  tls: true
 
 livenessProbe:
   enabled: false

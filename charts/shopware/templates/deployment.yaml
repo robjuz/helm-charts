@@ -87,8 +87,6 @@ spec:
             - mountPath: /var/www/html/config/jwt/
               name: shopware-jwt
               readOnly: true
-            - mountPath: /var/www/html/config/jwt/
-              name: shopware-jwt
             - mountPath: /var/www/html/custom/plugins
               name: shopware-data
               subPath: plugins
