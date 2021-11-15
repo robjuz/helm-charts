@@ -66,48 +66,6 @@ spec:
       securityContext: {{- omit .Values.podSecurityContext "enabled" | toYaml | nindent 8 }}
       {{- end }}
       initContainers:
-        - name: init
-          image: {{ template "shopware.image" . }}
-          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
-          args: [ "maintenance" ]
-          {{- if eq ( toString ( .Values.shopwareInit.securityContext.runAsUser )) "auto " }}
-          securityContext: {{- omit .Values.shopwareInit.securityContext "runAsUser" | toYaml | nindent 12 }}
-          {{- else }}
-          securityContext: {{- .Values.shopwareInit.securityContext | toYaml | nindent 12 }}
-          {{- end }}
-          {{- if .Values.shopwareInit.resources }}
-          resources: {{- toYaml .Values.shopwareInit.resources | nindent 12 }}
-          {{- end }}
-          envFrom:
-            - configMapRef:
-                name: {{ template "common.names.fullname" . }}
-            - secretRef:
-                name: {{ template "common.names.fullname" . }}
-          volumeMounts:
-            - mountPath: /var/www/html/config/jwt/
-              name: shopware-jwt
-              readOnly: true
-            - mountPath: /var/www/html/custom/plugins
-              name: shopware-data
-              subPath: plugins
-            - mountPath: /var/www/html/files
-              name: shopware-data
-              subPath: files
-            - mountPath: /var/www/html/public/theme
-              name: shopware-data
-              subPath: theme
-            - mountPath: /var/www/html/public/media
-              name: shopware-data
-              subPath: media
-            - mountPath: /var/www/html/public/bundles
-              name: shopware-data
-              subPath: bundles
-            - mountPath: /var/www/html/public/sitemap
-              name: shopware-data
-              subPath: sitemap
-            - mountPath: /var/www/html/public/thumbnail
-              name: shopware-data
-              subPath: thumbnail
         {{- if and .Values.podSecurityContext.enabled .Values.volumePermissions.enabled .Values.persistence.enabled }}
         - name: volume-permissions
           image: "{{ template "shopware.volumePermissions.image" . }}"
@@ -142,9 +100,6 @@ spec:
           resources: {{- toYaml .Values.volumePermissions.resources | nindent 12 }}
           {{- end }}
           volumeMounts:
-            - mountPath: /state
-              name: shopware-state
-              subPath: state
             - mountPath: /var/www/html/custom/plugins
               name: shopware-data
               subPath: plugins
@@ -279,9 +234,6 @@ spec:
           {{- else }}
           emptyDir: {}
           {{ end }}
-        - name: shopware-state
-          persistentVolumeClaim:
-            claimName: {{ .Values.statePersistence.existingClaim | default (printf "%s-state" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-") }}
         {{- if .Values.extraVolumes }}
         {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumes "context" $) | nindent 8 }}
         {{- end }}
