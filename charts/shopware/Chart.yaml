@@ -41,4 +41,4 @@ name: shopware
 sources:
   - https://github.com/shyim/shopware
   - https://www.shopware.com
-version: 1.0.2
+version: 1.0.3
