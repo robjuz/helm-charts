@@ -26,7 +26,7 @@ dependencies:
     version: 1.x.x
 description: Web publishing platform for building blogs and websites.
 engine: gotpl
-home: https://github.com/robjuz/helm-chars/charts/tree/master/charts/shopware6
+home: https://github.com/robjuz/helm-charts/tree/master/charts/shopware
 keywords:
   - application
   - cms
@@ -41,4 +41,4 @@ name: shopware
 sources:
   - https://github.com/shyim/shopware
   - https://www.shopware.com
-version: 1.0.1
+version: 1.0.2
