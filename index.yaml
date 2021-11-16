@@ -529,6 +529,53 @@ entries:
       category: CMS
     apiVersion: v2
     appVersion: 6.4.6
+    created: "2021-11-16T12:14:14.515510677Z"
+    dependencies:
+    - condition: mariadb.enabled
+      name: mariadb
+      repository: https://charts.bitnami.com/bitnami
+      version: 9.x.x
+    - condition: redis.enabled
+      name: redis
+      repository: https://charts.bitnami.com/bitnami
+      version: 15.x.x
+    - condition: elasticsearch.enabled
+      name: elasticsearch
+      repository: https://charts.bitnami.com/bitnami
+      version: 17.x.x
+    - condition: minio.enabled
+      name: minio
+      repository: https://charts.bitnami.com/bitnami
+      version: 9.x.x
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - bitnami-common
+      version: 1.x.x
+    description: Web publishing platform for building blogs and websites.
+    digest: db60e27072c6c23357fd26a856821a3ed12da66d17682355ce378c53ebf3f5fe
+    home: https://github.com/robjuz/helm-charts/tree/master/charts/shopware
+    keywords:
+    - application
+    - cms
+    - http
+    - php
+    - web
+    - shopware
+    maintainers:
+    - email: robjuz@gmail.com
+      name: robjuz
+    name: shopware
+    sources:
+    - https://github.com/shyim/shopware
+    - https://www.shopware.com
+    urls:
+    - https://github.com/robjuz/helm-charts/releases/download/shopware-1.0.4/shopware-1.0.4.tgz
+    version: 1.0.4
+  - annotations:
+      category: CMS
+    apiVersion: v2
+    appVersion: 6.4.6
     created: "2021-11-16T08:26:55.697399947Z"
     dependencies:
     - condition: mariadb.enabled
@@ -713,4 +760,4 @@ entries:
     urls:
     - https://github.com/robjuz/helm-charts/releases/download/shopware-1.0.0/shopware-1.0.0.tgz
     version: 1.0.0
-generated: "2021-11-16T08:26:55.699360544Z"
+generated: "2021-11-16T12:14:14.515997784Z"
