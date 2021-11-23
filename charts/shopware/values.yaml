@@ -82,6 +82,8 @@ shopware:
   consumer:
     enabled: true
     replicaCount: 1
+    memoryLimit: 512M
+    timeLimit: 600
   scheduledTask:
     enabled: true
     replicaCount: 1
