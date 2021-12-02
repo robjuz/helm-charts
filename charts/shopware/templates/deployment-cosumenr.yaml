@@ -16,14 +16,18 @@ metadata:
   {{- end }}
 spec:
   selector:
-    matchLabels: {{- include "common.labels.matchLabels" . | nindent 6 }}
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+      role: consumer
   {{- if .Values.updateStrategy }}
   strategy: {{- toYaml .Values.updateStrategy | nindent 4 }}
   {{- end }}
   replicas: {{ .Values.shopware.consumer.replicaCount }}
   template:
     metadata:
-      labels: {{- include "common.labels.standard" . | nindent 8 }}
+      labels:
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
+        role: consumer
         {{- if .Values.podLabels }}
         {{- include "common.tplvalues.render" (dict "value" .Values.podLabels "context" $) | nindent 8 }}
         {{- end }}
