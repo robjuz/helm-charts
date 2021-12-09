@@ -81,9 +81,12 @@ Add environment variables to configure database values
 
 
 {{- define "nominatim.databaseHost" -}}
-{{- printf "%s" (include "nominatim.postgresql.fullname" .) -}}
+{{- if .Values.postgresql.enabled }}
+   {{- printf "%s" (include "nominatim.postgresql.fullname" .) -}}
+{{- else - }}
+   {{- printf "%d" (.Values.externalDatabase.host ) -}}
 {{- end -}}
-
+{{- end -}}
 
 {{- define "nominatim.databasePort" -}}
 {{- if .Values.postgresql.enabled }}
