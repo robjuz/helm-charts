@@ -1,4 +1,4 @@
-{{- if not .Values.persistence.existingClaim }}
+{{- if not (or .Values.persistence.existingClaim .Values.minio.enabled )}}
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:

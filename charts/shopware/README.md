@@ -115,24 +115,11 @@ The command removes all the Kubernetes components associated with the chart and 
 | `smtpProtocol`                         | SMTP protocol                                                                         | `""`               |
 | `smtpExistingSecret`                   | The name of an existing secret with SMTP credentials                                  | `""`               |
 | `allowEmptyPassword`                   | Allow the container to be started with blank passwords                                | `true`             |
-| `allowOverrideNone`                    | Configure Apache to prohibit overriding directives with htaccess files                | `false`            |
-| `htaccessPersistenceEnabled`           | Persist custom changes on htaccess files                                              | `false`            |
-| `customHTAccessCM`                     | The name of an existing ConfigMap with custom htaccess rules                          | `""`               |
 | `command`                              | Override default container command (useful when using custom images)                  | `[]`               |
 | `args`                                 | Override default container args (useful when using custom images)                     | `[]`               |
 | `extraEnvVars`                         | Array with extra environment variables to add to the Shopware container              | `[]`               |
 | `extraEnvVarsCM`                       | Name of existing ConfigMap containing extra env vars                                  | `""`               |
 | `extraEnvVarsSecret`                   | Name of existing Secret containing extra env vars                                     | `""`               |
-
-
-### Shopware Multisite Configuration parameters
-
-| Name                            | Description                                                                                                                        | Value       |
-| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `multisite.enable`              | Whether to enable Shopware Multisite configuration.                                                                               | `false`     |
-| `multisite.host`                | Shopware Multisite hostname/address. This value is mandatory when enabling Multisite mode.                                        | `""`        |
-| `multisite.networkType`         | Shopware Multisite network type to enable. Allowed values: `subfolder`, `subdirectory` or `subdomain`.                            | `subdomain` |
-| `multisite.enableNipIoRedirect` | Whether to enable IP address redirection to nip.io wildcard DNS. Useful when running on an IP address with subdomain network type. | `false`     |
 
 
 ### Shopware deployment parameters
@@ -222,7 +209,6 @@ The command removes all the Kubernetes components associated with the chart and 
 | `persistence.enabled`                         | Enable persistence using Persistent Volume Claims                                               | `true`                  |
 | `persistence.storageClass`                    | Persistent Volume storage class                                                                 | `""`                    |
 | `persistence.accessModes`                     | Persistent Volume access modes                                                                  | `[]`                    |
-| `persistence.accessMode`                      | Persistent Volume access mode (DEPRECATED: use `persistence.accessModes` instead)               | `ReadWriteOnce`         |
 | `persistence.size`                            | Persistent Volume size                                                                          | `10Gi`                  |
 | `persistence.dataSource`                      | Custom PVC data source                                                                          | `{}`                    |
 | `persistence.existingClaim`                   | The name of an existing PVC to use for persistence                                              | `""`                    |
@@ -244,9 +230,9 @@ The command removes all the Kubernetes components associated with the chart and 
 | `pdb.create`               | Enable a Pod Disruption Budget creation                        | `false` |
 | `pdb.minAvailable`         | Minimum number/percentage of pods that should remain scheduled | `1`     |
 | `pdb.maxUnavailable`       | Maximum number/percentage of pods that may be made unavailable | `""`    |
-| `autoscaling.enabled`      | Enable Horizontal POD autoscaling for Shopware                | `false` |
-| `autoscaling.minReplicas`  | Minimum number of Shopware replicas                           | `1`     |
-| `autoscaling.maxReplicas`  | Maximum number of Shopware replicas                           | `11`    |
+| `autoscaling.enabled`      | Enable Horizontal POD autoscaling for Shopware                 | `false` |
+| `autoscaling.minReplicas`  | Minimum number of Shopware replicas                            | `1`     |
+| `autoscaling.maxReplicas`  | Maximum number of Shopware replicas                            | `11`    |
 | `autoscaling.targetCPU`    | Target CPU utilization percentage                              | `50`    |
 | `autoscaling.targetMemory` | Target Memory utilization percentage                           | `50`    |
 
@@ -307,7 +293,7 @@ Specify each parameter using the `--set key=value[,key=value]` argument to `helm
 ```console
 helm install my-release \
   --set shopwareUsername=admin \
-  --set shopwarePassword=password \
+  --set shopwarePassword=shopware \
   --set mariadb.auth.rootPassword=secretpassword \
     bitnami/shopware
 ```
@@ -384,14 +370,6 @@ To enable Ingress integration, set `ingress.enabled` to `true`. The `ingress.hos
 
 The chart also facilitates the creation of TLS secrets for use with the Ingress controller, with different options for certificate management. [Learn more about TLS secrets](https://docs.bitnami.com/kubernetes/apps/shopware/administration/enable-tls/).
 
-### `.htaccess` files
-
-For performance and security reasons, it is a good practice to configure Apache with the `AllowOverride None` directive. Instead of using `.htaccess` files, Apache will load the same directives at boot time. These directives are located in `/opt/bitnami/shopware/shopware-htaccess.conf`.
-
-By default, the container image includes all the default `.htaccess` files in Shopware (together with the default plugins). To enable this feature, install the chart with the value `allowOverrideNone=yes`.
-
-[Learn more about working with `.htaccess` files](https://docs.bitnami.com/kubernetes/apps/shopware/configuration/understand-htaccess/).
-
 ## Persistence
 
 The [Bitnami Shopware](https://github.com/bitnami/bitnami-docker-shopware) image stores the Shopware data and configurations at the `/bitnami` path of the container. Persistent Volume Claims are used to keep the data across deployments.
@@ -420,112 +398,3 @@ If additional containers are needed in the same pod as Shopware (such as additio
 This chart allows you to set your custom affinity using the `affinity` parameter. Find more information about Pod affinity in the [kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity).
 
 As an alternative, use one of the preset configurations for pod affinity, pod anti-affinity, and node affinity available at the [bitnami/common](https://github.com/bitnami/charts/tree/master/bitnami/common#affinities) chart. To do so, set the `podAffinityPreset`, `podAntiAffinityPreset`, or `nodeAffinityPreset` parameters.
-
-## Troubleshooting
-
-Find more information about how to deal with common errors related to Bitnami's Helm charts in [this troubleshooting guide](https://docs.bitnami.com/general/how-to/troubleshoot-helm-chart-issues).
-
-## Notable changes
-
-### 11.0.0
-
-The [Bitnami Shopware](https://github.com/bitnami/bitnami-docker-shopware) image was refactored and now the source code is published in GitHub in the [`rootfs`](https://github.com/bitnami/bitnami-docker-shopware/tree/master/5/debian-10/rootfs) folder of the container image.
-
-In addition, several new features have been implemented:
-
-- Multisite mode is now supported via `multisite.*` options.
-- Plugins can be installed and activated on the first deployment via the `shopwarePlugins` option.
-- Added support for limiting auto-updates to Shopware core via the `shopwareAutoUpdateLevel` option. In addition, auto-updates have been disabled by default. To update Shopware core, we recommend to swap the container image version for your deployment instead of using the built-in update functionality.
-
-To enable the new features, it is not possible to do it by upgrading an existing deployment. Instead, it is necessary to perform a fresh deploy.
-
-## Upgrading
-
-### To 12.0.0
-
-Shopware version was bumped to its latest major, `5.8.x`. Though no incompatibilities are expected while upgrading from previous versions, Shopware recommends backing up your application first.
-
-Site backups can be easily performed using tools such as [VaultPress](https://vaultpress.com/) or [All-in-One WP Migration](https://shopware.org/plugins/all-in-one-wp-migration/).
-
-### To 11.0.0
-
-The [Bitnami Shopware](https://github.com/bitnami/bitnami-docker-shopware) image was refactored and now the source code is published in GitHub in the [`rootfs`](https://github.com/bitnami/bitnami-docker-shopware/tree/master/5/debian-10/rootfs) folder of the container image.
-
-Compatibility is not guaranteed due to the amount of involved changes, however no breaking changes are expected.
-
-### To 10.0.0
-
-[On November 13, 2020, Helm v2 support was formally finished](https://github.com/helm/charts#status-of-the-project), this major version is the result of the required changes applied to the Helm Chart to be able to incorporate the different features added in Helm v3 and to be consistent with the Helm project itself regarding the Helm v2 EOL.
-
-[Learn more about this change and related upgrade considerations](https://docs.bitnami.com/kubernetes/apps/shopware/administration/upgrade-helm3/).
-
-#### Additional upgrade notes
-
-- MariaDB dependency version was bumped to a new major version that introduces several incompatibilities. Therefore, backwards compatibility is not guaranteed unless an external database is used. Check [MariaDB Upgrading Notes](https://github.com/bitnami/charts/tree/master/bitnami/mariadb#to-800) for more information.
-- If you want to upgrade to this version from a previous one installed with Helm v3, there are two alternatives:
-  - Install a new Shopware chart, and migrate your Shopware site using backup/restore tools such as [VaultPress](https://vaultpress.com/) or [All-in-One WP Migration](https://shopware.org/plugins/all-in-one-wp-migration/).
-  - Reuse the PVC used to hold the MariaDB data on your previous release. To do so, follow the instructions below (the following example assumes that the release name is `shopware`).
-
-> Warning: please create a backup of your database before running any of these actions. The steps below would be only valid if your application (e.g. any plugins or custom code) is compatible with MariaDB 10.5.
-
-Obtain the credentials and the name of the PVC used to hold the MariaDB data on your current release:
-
-```console
-$ export WORDPRESS_PASSWORD=$(kubectl get secret --namespace default shopware -o jsonpath="{.data.shopware-password}" | base64 --decode)
-$ export MARIADB_ROOT_PASSWORD=$(kubectl get secret --namespace default shopware-mariadb -o jsonpath="{.data.mariadb-root-password}" | base64 --decode)
-$ export MARIADB_PASSWORD=$(kubectl get secret --namespace default shopware-mariadb -o jsonpath="{.data.mariadb-password}" | base64 --decode)
-$ export MARIADB_PVC=$(kubectl get pvc -l app.kubernetes.io/instance=shopware,app.kubernetes.io/name=mariadb,app.kubernetes.io/component=primary -o jsonpath="{.items[0].metadata.name}")
-```
-
-Upgrade your release (maintaining the version) disabling MariaDB and scaling Shopware replicas to 0:
-
-```console
-$ helm upgrade shopware bitnami/shopware --set shopwarePassword=$WORDPRESS_PASSWORD --set replicaCount=0 --set mariadb.enabled=false --version 9.6.4
-```
-
-Finally, upgrade you release to `10.0.0` reusing the existing PVC, and enabling back MariaDB:
-
-```console
-$ helm upgrade shopware bitnami/shopware --set mariadb.primary.persistence.existingClaim=$MARIADB_PVC --set mariadb.auth.rootPassword=$MARIADB_ROOT_PASSWORD --set mariadb.auth.password=$MARIADB_PASSWORD --set shopwarePassword=$WORDPRESS_PASSWORD
-```
-
-You should see the lines below in MariaDB container logs:
-
-```console
-$ kubectl logs $(kubectl get pods -l app.kubernetes.io/instance=shopware,app.kubernetes.io/name=mariadb,app.kubernetes.io/component=primary -o jsonpath="{.items[0].metadata.name}")
-...
-mariadb 12:13:24.98 INFO  ==> Using persisted data
-mariadb 12:13:25.01 INFO  ==> Running mysql_upgrade
-...
-```
-
-### To 9.0.0
-
-The [Bitnami Shopware](https://github.com/bitnami/bitnami-docker-shopware) image was migrated to a "non-root" user approach. Previously the container ran as the `root` user and the Apache daemon was started as the `daemon` user. From now on, both the container and the Apache daemon run as user `1001`. You can revert this behavior by setting the parameters `securityContext.runAsUser`, and `securityContext.fsGroup` to `0`.
-Chart labels and Ingress configuration were also adapted to follow the Helm charts best practices.
-
-Consequences:
-
-- The HTTP/HTTPS ports exposed by the container are now `8080/8443` instead of `80/443`.
-- No writing permissions will be granted on `wp-config.php` by default.
-- Backwards compatibility is not guaranteed.
-
-To upgrade to `9.0.0`, it's recommended to install a new Shopware chart, and migrate your Shopware site using backup/restore tools such as [VaultPress](https://vaultpress.com/) or [All-in-One WP Migration](https://shopware.org/plugins/all-in-one-wp-migration/).
-
-### To 8.0.0
-
-Helm performs a lookup for the object based on its group (apps), version (v1), and kind (Deployment). Also known as its GroupVersionKind, or GVK. Changing the GVK is considered a compatibility breaker from Kubernetes' point of view, so you cannot "upgrade" those objects to the new GVK in-place. Earlier versions of Helm 3 did not perform the lookup correctly which has since been fixed to match the spec.
-
-In https://github.com/helm/charts/pulls/12642 the `apiVersion` of the deployment resources was updated to `apps/v1` in tune with the API's deprecated, resulting in compatibility breakage.
-
-This major version signifies this change.
-
-### To 3.0.0
-
-Backwards compatibility is not guaranteed unless you modify the labels used on the chart's deployments.
-Use the workaround below to upgrade from versions previous to `3.0.0`. The following example assumes that the release name is `shopware`:
-
-```console
-kubectl patch deployment shopware-shopware --type=json -p='[{"op": "remove", "path": "/spec/selector/matchLabels/chart"}]'
-kubectl delete statefulset shopware-mariadb --cascade=false
-```

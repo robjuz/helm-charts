@@ -53,7 +53,7 @@ To access your Shopware site from outside the cluster follow the steps below:
 3. Login with the following credentials below to see your blog:
 
   echo Username: {{ .Values.shopwareUsername }}
-  echo Password: $(kubectl get secret --namespace {{ .Release.Namespace }} {{ template "common.names.fullname" . }} -o jsonpath="{.data.shopware-password}" | base64 --decode)
+  echo Password: $(kubectl get secret --namespace {{ .Release.Namespace }} {{ template "common.names.fullname" . }} -o jsonpath="{.data.INSTALL_ADMIN_PASSWORD}" | base64 --decode)
 
 {{- if .Values.metrics.enabled }}
 

@@ -1,8 +1,8 @@
-{{- if .Values.autoscaling.enabled }}
+{{- if .Values.consumer.autoscaling.enabled }}
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ template "common.names.fullname" . }}
+  name: {{ printf "%s-consumer" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
   namespace: {{ .Release.Namespace | quote }}
   labels: {{- include "common.labels.standard" . | nindent 4 }}
     {{- if .Values.commonLabels }}
@@ -16,19 +16,13 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: {{ template "common.names.fullname" . }}
-  minReplicas: {{ .Values.autoscaling.minReplicas }}
-  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+  minReplicas: {{ .Values.consumer.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.consumer.autoscaling.maxReplicas }}
   metrics:
-    {{- if .Values.autoscaling.targetCPU }}
+    {{- if .Values.consumer.autoscaling.targetCPU }}
     - type: Resource
       resource:
         name: cpu
-        targetAverageUtilization: {{ .Values.autoscaling.targetCPU }}
-    {{- end }}
-    {{- if .Values.autoscaling.targetMemory }}
-    - type: Resource
-      resource:
-        name: memory
-        targetAverageUtilization: {{ .Values.autoscaling.targetMemory  }}
+        targetAverageUtilization: {{ .Values.consumer.autoscaling.targetCPU }}
     {{- end }}
 {{- end }}

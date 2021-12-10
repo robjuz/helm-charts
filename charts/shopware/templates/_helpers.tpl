@@ -44,15 +44,6 @@ Return the proper Docker Image Registry Secret Names
 {{- include "common.images.pullSecrets" (dict "images" (list .Values.image .Values.metrics.image .Values.volumePermissions.image) "global" .Values.global) -}}
 {{- end -}}
 
-{{/*
-Return true if a secret object should be created for Shopware configuration
-*/}}
-{{- define "shopware.createConfigSecret" -}}
-{{- if and .Values.shopwareConfiguration (not .Values.existingShopwareConfigurationSecret) }}
-    {{- true -}}
-{{- end -}}
-{{- end -}}
-
 
 {{/*
 Return the MariaDB Hostname
@@ -130,8 +121,6 @@ Return the MariaDB Secret Name
 {{- end -}}
 {{- end -}}
 
-
-
 {{/*
 Return the MariaDB URL
 */}}
@@ -139,8 +128,44 @@ Return the MariaDB URL
 mysql://{{ include "shopware.databaseUser" . }}:{{ include "shopware.databasePassword" . }}@{{ include "shopware.databaseHost" . }}/{{ include "shopware.databaseName" . }}
 {{- end }}
 
+
 {{/*
-Return the Memcached Hostname
+Return the ElasticSearch Hostname
+*/}}
+{{- define "shopware.elasticsearch.fullname" -}}
+{{- if .Values.elasticsearch.enabled -}}
+{{- printf "%s-%s-coordinating-only" .Release.Name "elasticsearch" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- printf "%s" .Values.externalElasticsearch.host -}}
+{{- end -}}
+
+{{- define "shopware.minio.fullname" -}}
+{{- if .Values.fullnameOverride -}}
+{{- printf "%s-minio" .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.nameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- printf "%s-minio" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s-minio" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "shopware.minio.endpoint" -}}
+{{- printf "http://%s:%d" (include "shopware.minio.fullname" .) (.Values.minio.service.ports.api | int)  -}}
+{{- end -}}
+
+{{- define "shopware.minio.url" -}}
+{{- if .Values.minio.url -}}
+{{- printf "%s" .Values.minio.url -}}
+{{- else -}}
+{{- printf "%s" .Values.shopwareAppUrl -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return the Redis Hostname
 */}}
 {{- define "shopware.cacheHost" -}}
 {{- if .Values.redis.enabled }}
@@ -153,7 +178,7 @@ Return the Memcached Hostname
 {{- end -}}
 
 {{/*
-Return the Memcached Port
+Return the Redis Port
 */}}
 {{- define "shopware.cachePort" -}}
 {{- if .Values.redis.enabled }}
@@ -186,7 +211,7 @@ Compile all warnings into a single message.
 */}}
 {{- define "shopware.validateValues" -}}
 {{- $messages := list -}}
-{{- $messages := append $messages (include "shopware.validateValues.htaccess" .) -}}
+{{- $messages := append $messages (include "shopware.validateValues.appUrl" .) -}}
 {{- $messages := append $messages (include "shopware.validateValues.database" .) -}}
 {{- $messages := without $messages "" -}}
 {{- $message := join "\n" $messages -}}
@@ -196,14 +221,12 @@ Compile all warnings into a single message.
 {{- end -}}
 
 {{/*
-Validate values of Shopware - htaccess configuration
+Validate values of Shopware - app url
 */}}
-{{- define "shopware.validateValues.htaccess" -}}
-{{- if and .Values.customHTAccessCM .Values.allowOverrideNone -}}
-shopware: customHTAccessCM
-    You are trying to use custom htaccess rules but Apache was configured
-    to prohibit overriding directives with htaccess files. To use this feature,
-    allow overriding Apache directives (--set allowOverrideNone=false).
+{{- define "shopware.validateValues.appUrl" -}}
+{{- if not .Values.shopwareAppUrl -}}
+shopware: shopwareAppUrl
+    You need to provide APP_URL (--set shopwareAppUrl=http://shopware.example.com).
 {{- end -}}
 {{- end -}}
 
@@ -221,6 +244,19 @@ shopware: database
 {{- end -}}
 {{- end -}}
 
+{{/* Validate values of Shopware - Elasticsearch */}}
+{{- define "shopware.validateValues.elasticsearch" -}}
+{{- if and (not .Values.mariadb.enabled) (or (empty .Values.externalDatabase.host) (empty .Values.externalDatabase.port) (empty .Values.externalDatabase.database)) -}}
+shopware: database
+   You disable the MariaDB installation but you did not provide the required parameters
+   to use an external database. To use an external database, please ensure you provide
+   (at least) the following values:
+
+       externalDatabase.host=DB_SERVER_HOST
+       externalDatabase.database=DB_NAME
+       externalDatabase.port=DB_SERVER_PORT
+{{- end -}}
+{{- end -}}
 
 {{- define "shopware.randomSecret" -}}
 {{- randAlphaNum 63 -}}{{- randNumeric 1 -}}
