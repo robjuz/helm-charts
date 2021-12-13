@@ -13,7 +13,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
 {{- define "shopware.redis.fullname" -}}
-{{- include "common.names.dependency.fullname" (dict "chartName" "memcached" "chartValues" .Values.redis "context" $) -}}
+{{- include "common.names.dependency.fullname" (dict "chartName" "redis-master" "chartValues" .Values.redis "context" $) -}}
 {{- end -}}
 
 {{/*
