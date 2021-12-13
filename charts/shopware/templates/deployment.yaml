@@ -173,13 +173,10 @@ spec:
         - name: metrics
           image: {{ template "shopware.metrics.image" . }}
           imagePullPolicy: {{ .Values.metrics.image.pullPolicy | quote }}
-          command:
-            - /bin/apache_exporter
-            - --scrape_uri
-            - http://status.localhost:8080/server-status/?auto
+          command: ['/usr/bin/exporter', '-nginx.scrape-uri', 'http://127.0.0.1:{{- default .Values.containerPorts.http .Values.metrics.port }}/status']
           ports:
             - name: metrics
-              containerPort: 9117
+              containerPort: 9113
           livenessProbe:
             httpGet:
               path: /metrics

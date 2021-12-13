@@ -100,32 +100,30 @@ shopwareAppSecret: ""
 ## @param mailerUrl Mailer URL
 ##
 mailerUrl: "null://localhost"
-shopware:
-  activePlugins: ""
-  httpCache:
-    enabled: true
-    defaultTtl: 7200
-  cache:
-    adapter: "redis"
-    host: "shopware-redis-master"
-    port: 6379
-    database: 0
-  session:
-    adapter: "redis"
-    host: "shopware-redis-master"
-    port: 6379
-    database: 1
-  php:
-    timeZone: "Europe/Berlin"
-    maxUploadSize: "128m"
-    maxExecutionTime: "300"
-    memoryLimit: "512m"
-    fpm:
-      pm: "dynamic"
-      maxChildren: "5"
-      startServers: "2"
-      minSpareServers: "1"
-      maxSpareServers: "3"
+## @param activePlugins Comma separated list of plugins that should be activated
+##
+activePlugins: ""
+## Shopware Http Cache config
+## @param httpCache.enabled Enable http cache
+## @param httpCache.defaultTtl Http cache default Time to live
+##
+httpCache:
+  enabled: true
+  defaultTtl: 7200
+## Shopware Cache config
+## @param cache.adapter Adapter to use for caching
+## @param cache.database Database to use for caching
+##
+cache:
+  adapter: "redis"
+  database: 0
+## Shopware Session config
+## @param cache.adapter Adapter to use for session
+## @param cache.database Database to use for session
+##
+session:
+  adapter: "redis"
+  database: 1
 
 taskRunner:
   enabled: true
@@ -172,6 +170,10 @@ taskRunner:
   ## NOTE: taskRunner.podAffinityPreset, taskRunner.podAntiAffinityPreset, and  taskRunner.nodeAffinityPreset will be ignored when it's set
   ##
   affinity: { }
+  ## @param taskRunner.nodeSelector Node labels for pod assignment
+  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: { }
 
 consumer:
   enabled: true
@@ -233,21 +235,17 @@ consumer:
   ## NOTE: consumer.podAffinityPreset, consumer.podAntiAffinityPreset, and  consumer.nodeAffinityPreset will be ignored when it's set
   ##
   affinity: { }
-
-
-
-
-
-
-
-
+  ## @param consumer.nodeSelector Node labels for pod assignment
+  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: { }
 
 
 ## @param extraEnvVars Array with extra environment variables to add to the Shopware container
 ## e.g:
 ## extraEnvVars:
-##   - name: FOO
-##     value: "bar"
+##   - name: TZ
+##     value: "Europe/Berlin"
 ##
 extraEnvVars: []
 
@@ -677,17 +675,17 @@ metrics:
   ##
   enabled: false
   ## Bitnami Apache Exporter image
-  ## ref: https://hub.docker.com/r/bitnami/apache-exporter/tags/
-  ## @param metrics.image.registry Apache Exporter image registry
-  ## @param metrics.image.repository Apache Exporter image repository
-  ## @param metrics.image.tag Apache Exporter image tag (immutable tags are recommended)
-  ## @param metrics.image.pullPolicy Apache Exporter image pull policy
-  ## @param metrics.image.pullSecrets Apache Exporter image pull secrets
+  ## ref: https://hub.docker.com/r/bitnami/nginx-exporter/tags/
+  ## @param metrics.image.registry Nginx Exporter image registry
+  ## @param metrics.image.repository Nginx Exporter image repository
+  ## @param metrics.image.tag Nginx Exporter image tag (immutable tags are recommended)
+  ## @param metrics.image.pullPolicy Nginx Exporter image pull policy
+  ## @param metrics.image.pullSecrets Nginx Exporter image pull secrets
   ##
   image:
     registry: docker.io
-    repository: bitnami/apache-exporter
-    tag: 0.10.1-debian-10-r49
+    repository: bitnami/nginx-exporter
+    tag: 0.9.0-debian-10-r242
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -710,7 +708,7 @@ metrics:
   service:
     ## @param metrics.service.port Metrics service port
     ##
-    port: 9117
+    port: 9113
     ## @param metrics.service.annotations [object] Additional custom annotations for Metrics service
     ##
     annotations:
@@ -843,18 +841,10 @@ externalCache:
 ## https://github.com/bitnami/charts/blob/master/bitnami/elasticsearch/values.yaml
 ##
 elasticsearch:
-  ## @param elasticsearch.enabled Whether to deploy a elasticsearch server
+  ## @param elasticsearch.enabled Whether to deploy an elasticsearch server
   ## To use an external server set this to false and configure the externalElasticsearch parameters
   ##
   enabled: true
-
-  ## @param elasticsearch.indexingEnabled
-  ##
-  indexingEnabled: false
-  ## @param elasticsearch.indexPrefix
-  ##
-  indexPrefix: ''
-
 
   ## @param elasticsearch.sysctlImage.enabled Enable kernel settings modifier image for Elasticsearch
   ##
@@ -881,9 +871,6 @@ externalElasticsearch:
   ## @param externalElasticsearch.host Host of the external elasticsearch server
   ##
   host: ""
-  ## @param externalElasticsearch.port Port of the external elasticsearch server
-  ##
-  port: ""
 
 
 minio:

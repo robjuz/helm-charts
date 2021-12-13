@@ -196,17 +196,6 @@ Return the Shopware Secret Name
 {{- end -}}
 
 {{/*
-Return the SMTP Secret Name
-*/}}
-{{- define "shopware.smtpSecretName" -}}
-{{- if .Values.smtpExistingSecret }}
-    {{- printf "%s" .Values.smtpExistingSecret -}}
-{{- else -}}
-    {{- printf "%s" (include "common.names.fullname" .) -}}
-{{- end -}}
-{{- end -}}
-
-{{/*
 Compile all warnings into a single message.
 */}}
 {{- define "shopware.validateValues" -}}
