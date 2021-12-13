@@ -1,35 +1,37 @@
-# Shopware
+# Shopware 6
 
-[Shopware](https://shopware.org/) is one of the most versatile open source content management systems on the market. A publishing platform for building blogs and websites.
+[Shopware 6](https://www.shopware.com/en/products/shopware-6/) offers all online merchants maximum flexibility, the freedom to grow and focus on the perfect customer experience. Shopware 6 is the ecommerce solution for all conceivable channels of the present and future.
 
 ## TL;DR
 
 ```console
-$ helm repo add bitnami https://charts.bitnami.com/bitnami
-$ helm install my-release bitnami/shopware
+$ helm repo add robjuz https://robjuz.github.io/helm-charts/
+$ helm install shopware robjuz/shopware
 ```
 
 ## Introduction
 
-This chart bootstraps a [Shopware](https://github.com/bitnami/bitnami-docker-shopware) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
+This chart bootstraps a [Shopware](https://github.com/shyim/shopware) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
 
-It also packages the [Bitnami MariaDB chart](https://github.com/bitnami/charts/tree/master/bitnami/mariadb) which is required for bootstrapping a MariaDB deployment for the database requirements of the Shopware application, and the [Bitnami Memcached chart](https://github.com/bitnami/charts/tree/master/bitnami/memcached) that can be used to cache database queries.
+It also packages the [Bitnami MariaDB chart](https://github.com/bitnami/charts/tree/master/bitnami/mariadb) which is required for bootstrapping a MariaDB deployment for the database requirements of the Shopware application, 
+the [Bitnami Elasticsearch chart](https://github.com/bitnami/charts/tree/master/bitnami/elasticsearch) that is used to indexing, 
+the [Bitnami Minio chart](https://github.com/bitnami/charts/tree/master/bitnami/minio) that is used to store documents, media, theme, asset and sitemap files
 
-Bitnami charts can be used with [Kubeapps](https://kubeapps.com/) for deployment and management of Helm Charts in clusters. This chart has been tested to work with NGINX Ingress, cert-manager, Fluentd and Prometheus on top of the [BKPR](https://kubeprod.io/).
+This chart has been tested to work with NGINX Ingress, cert-manager and Prometheus on top of the [k3s](https://k3s.io/).
 
 ## Prerequisites
 
-- Kubernetes 1.12+
+- Kubernetes 1.19+
 - Helm 3.1.0
 - PV provisioner support in the underlying infrastructure
-- ReadWriteMany volumes for deployment scaling
+- ReadWriteMany volumes for deployment scaling (only when installing additional plugins)
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release`:
+To install the chart with the release name `shopware`:
 
 ```console
-helm install my-release bitnami/shopware
+helm install shopware robjuz/shopware
 ```
 
 The command deploys Shopware on the Kubernetes cluster in the default configuration. The [Parameters](#parameters) section lists the parameters that can be configured during installation.
@@ -38,10 +40,10 @@ The command deploys Shopware on the Kubernetes cluster in the default configurat
 
 ## Uninstalling the Chart
 
-To uninstall/delete the `my-release` deployment:
+To uninstall/delete the `shopware` deployment:
 
 ```console
-helm delete my-release
+helm delete shopware
 ```
 
 The command removes all the Kubernetes components associated with the chart and deletes the release.
@@ -67,31 +69,33 @@ The command removes all the Kubernetes components associated with the chart and 
 | `commonLabels`           | Labels to add to all deployed objects                                                   | `{}`            |
 | `commonAnnotations`      | Annotations to add to all deployed objects                                              | `{}`            |
 | `clusterDomain`          | Kubernetes cluster domain name                                                          | `cluster.local` |
-| `extraDeploy`            | Array of extra objects to deploy with the release                                       | `[]`            |
-| `diagnosticMode.enabled` | Enable diagnostic mode (all probes will be disabled and the command will be overridden) | `false`         |
-| `diagnosticMode.command` | Command to override all containers in the deployment                                    | `["sleep"]`     |
-| `diagnosticMode.args`    | Args to override all containers in the deployment                                       | `["infinity"]`  |
 
 
 ### Shopware Image parameters
 
 | Name                | Description                                          | Value                |
 | ------------------- | ---------------------------------------------------- | -------------------- |
-| `image.registry`    | Shopware image registry                             | `docker.io`          |
-| `image.repository`  | Shopware image repository                           | `bitnami/shopware`  |
-| `image.tag`         | Shopware image tag (immutable tags are recommended) | `5.8.2-debian-10-r0` |
-| `image.pullPolicy`  | Shopware image pull policy                          | `IfNotPresent`       |
-| `image.pullSecrets` | Shopware image pull secrets                         | `[]`                 |
+| `image.registry`    | Shopware image registry                              | `docker.io`          |
+| `image.repository`  | Shopware image repository                            | `shyim/shopware`     |
+| `image.tag`         | Shopware image tag (immutable tags are recommended)  | `6.4.6.0`            |
+| `image.pullPolicy`  | Shopware image pull policy                           | `IfNotPresent`       |
+| `image.pullSecrets` | Shopware image pull secrets                          | `[]`                 |
 | `image.debug`       | Enable image debug mode                              | `false`              |
 
 
 ### Shopware Configuration parameters
 
-| Name                                   | Description                                                                           | Value              |
-| -------------------------------------- | ------------------------------------------------------------------------------------- | ------------------ |
-| `shopwareUsername`                    | Shopware username                                                                    | `user`             |
-| `shopwarePassword`                    | Shopware user password                                                               | `""`               |
-| `existingSecret`                       | Name of existing secret containing Shopware credentials                              | `""`               |
+| Name                                   | Description                                                                                   | Value              |
+| -------------------------------------- | --------------------------------------------------------------------------------------------- | ------------------ |
+| `shopwareUsername`                     | Shopware admin username                                                                       | `admin`            |
+| `shopwarePassword`                     | Shopware admin password (Defaults to a random 10-character alphanumeric string if not set )   | `""`               |
+| `shopwareLocale`                       | Shopware default language                                                                     | `de-DE`            |
+| `shopwareCurrency`                     | Shopware default currency                                                                     | `EUR`              |
+| `shopwareAppEnv`                       | Shopware environment                                                                          | `prod`             |
+| `shopwareInstanceId`                   | Shopware instance ID (Defaults to a random 64-character alphanumeric string if not set )      | `""`               |
+| `shopwareAppUrl`                       | Shopware URL                                                                                  | `""`               |
+| `shopwareAppSecret`                    | Shopware Secret (Defaults to a random 64-character alphanumeric string if not set )           | `""`               |
+
 | `shopwareEmail`                       | Shopware user email                                                                  | `user@example.com` |
 | `shopwareFirstName`                   | Shopware user first name                                                             | `FirstName`        |
 | `shopwareLastName`                    | Shopware user last name                                                              | `LastName`         |

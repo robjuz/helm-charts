@@ -88,9 +88,6 @@ shopwareCurrency: "EUR"
 ## @param shopwareAppEnv Shopware environment
 ##
 shopwareAppEnv: "prod"
-## @param shopwareDebug Shopware debug mode
-##
-shopwareDebug: "false"
 ## @param shopwareInstanceId Shopware instance ID
 ##
 shopwareInstanceId: ""
