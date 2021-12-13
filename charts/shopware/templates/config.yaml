@@ -22,25 +22,20 @@ data:
   SHOPWARE_ES_INDEXING_ENABLED: "true"
   SHOPWARE_ES_HOSTS: {{ template "shopware.elasticsearch.fullname" . }}
   {{- end }}
-
   SHOPWARE_HTTP_CACHE_ENABLED: {{ .Values.httpCache.enabled | quote }}
   SHOPWARE_HTTP_DEFAULT_TTL: {{ .Values.httpCache.defaultTtl | quote }}
-
   DISABLE_ADMIN_WORKER: {{ .Values.consumer.enabled | quote }}
-
   INSTALL_LOCALE: {{ .Values.shopwareLocale | quote }}
   INSTALL_CURRENCY: {{ .Values.shopwareCurrency | quote }}
   INSTALL_ADMIN_USERNAME: {{ .Values.shopwareUsername | quote }}
-
   CACHE_ADAPTER: {{ .Values.cache.adapter | quote }}
-  REDIS_CACHE_HOST: {{ template "shopware.cacheHost" . }}
-  REDIS_CACHE_PORT: {{ template "shopware.cachePort" . }}
+  REDIS_CACHE_HOST: {{ include "shopware.cacheHost" . }}
+  REDIS_CACHE_PORT: {{ include "shopware.cachePort" . | quote }}
   REDIS_CACHE_DATABASE: {{ .Values.cache.database | quote }}
   SESSION_ADAPTER: {{ .Values.session.adapter | quote }}
-  REDIS_SESSION_HOST: {{ template "shopware.cacheHost" . }}
-  REDIS_SESSION_PORT: {{ template "shopware.cachePort" . }}
+  REDIS_SESSION_HOST: {{ include "shopware.cacheHost" . }}
+  REDIS_SESSION_PORT: {{ include "shopware.cachePort" . | quote }}
   REDIS_SESSION_DATABASE: {{ .Values.session.database | quote }}
-
   {{- if .Values.activePlugins }}
   ACTIVE_PLUGINS: {{ .Values.activePlugins | quote }}
   {{- end }}
