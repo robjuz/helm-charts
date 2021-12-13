@@ -826,6 +826,11 @@ redis:
     ## @param redis.auth.enabled Enable password authentication
     ##
     enabled: false
+
+  master:
+    persistence:
+      enabled: true
+      size: 8Gi
 ## External Redis Configuration
 ## All of these values are only used if `redis.enabled=false`
 ##
@@ -855,6 +860,9 @@ elasticsearch:
   ##
   master:
     replicas: 1
+    persistence:
+      enabled: true
+      size: 8Gi
   ## Elasticsearch coordinating-only node parameters
   ## @param elasticsearch.coordinating.replicas Desired number of Elasticsearch coordinating-only nodes
   ##
@@ -865,6 +873,9 @@ elasticsearch:
   ##
   data:
     replicas: 1
+    persistence:
+      enabled: true
+      size: 8Gi
 ## External elasticsearch configuration
 ##
 externalElasticsearch:
@@ -881,5 +892,9 @@ minio:
   auth:
     rootUser: shopwareMinio
     rootPassword: shopwareMinioPassword
+
+  persistence:
+    enabled: true
+    size: 8Gi
 
   defaultBuckets: documents, media:public, theme:public, asset:public, sitemap:public

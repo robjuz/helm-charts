@@ -296,9 +296,9 @@ The command removes all the Kubernetes components associated with the chart and 
 | `mariadb.primary.persistence.size`         | Persistent Volume size                                                    | `8Gi`              |
 | `externalDatabase.host`                    | External Database server host                                             | `localhost`        |
 | `externalDatabase.port`                    | External Database server port                                             | `3306`             |
-| `externalDatabase.user`                    | External Database username                                                | `bn_shopware`      |
+| `externalDatabase.user`                    | External Database username                                                | `shopware`         |
 | `externalDatabase.password`                | External Database user password                                           | `""`               |
-| `externalDatabase.database`                | External Database database name                                           | `bitnami_shopware` |
+| `externalDatabase.database`                | External Database database name                                           | `shopware`         |
 | `externalDatabase.existingSecret`          | The name of an existing secret with database credentials                  | `""`               |
 | `redis.enabled`                            | Deploy a Redis server for caching                                         | `true`             |
 | `externalCache.host`                       | External cache server host                                                | `localhost`        |
@@ -336,20 +336,6 @@ helm install my-release -f values.yaml bitnami/shopware
 ### [Rolling VS Immutable tags](https://docs.bitnami.com/containers/how-to/understand-rolling-tags-containers/)
 
 It is strongly recommended to use immutable tags in a production environment. This ensures your deployment does not change automatically if the same tag is updated with a different image.
-
-Bitnami will release a new chart updating its containers if a new version of the main container, significant changes, or critical vulnerabilities exist.
-
-### Known limitations
-
-When performing admin operations that require activating the maintenance mode (such as updating a plugin or theme), it's activated in only one replica (see: [bug report](https://core.trac.shopware.org/ticket/50797)). This implies that WP could be attending requests on other replicas while performing admin operations, with unpredictable consequences.
-
-To avoid that, you can manually activate/deactivate the maintenance mode on every replica using the WP CLI. For instance, if you installed WP with three replicas, you can run the commands below to activate the maintenance mode in all of them (assuming that the release name is `shopware`):
-
-```console
-kubectl exec $(kubectl get pods -l app.kubernetes.io/name=shopware -o jsonpath='{.items[0].metadata.name}') -c shopware -- wp maintenance-mode activate
-kubectl exec $(kubectl get pods -l app.kubernetes.io/name=shopware -o jsonpath='{.items[1].metadata.name}') -c shopware -- wp maintenance-mode activate
-kubectl exec $(kubectl get pods -l app.kubernetes.io/name=shopware -o jsonpath='{.items[2].metadata.name}') -c shopware -- wp maintenance-mode activate
-```
 
 ### External database support
 
