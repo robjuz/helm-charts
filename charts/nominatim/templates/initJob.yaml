@@ -16,7 +16,8 @@ spec:
               name: data
           command:
             - curl
-            - https://www.nominatim.org/data/wikimedia-importance.sql.gz
+            - https://nominatim.org/data/wikimedia-importance.sql.gz
+            - -L
             - -o
             - wikimedia-importance.sql.gz
 {{- end }}
@@ -30,7 +31,8 @@ spec:
               name: data
           command:
             - curl
-            - https://www.nominatim.org/data/gb_postcode_data.sql.gz
+            - https://nominatim.org/data/gb_postcode_data.sql.gz
+            - -L
             - -o
             - gb_postcode_data.sql.gz
 {{- end }}
@@ -44,7 +46,8 @@ spec:
               name: data
           command:
             - curl
-            - https://www.nominatim.org/data/us_postcode_data.sql.gz
+            - https://nominatim.org/data/us_postcode_data.sql.gz
+            - -L
             - -o
             - us_postcode_data.sql.gz
 {{- end }}
