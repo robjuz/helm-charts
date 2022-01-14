@@ -29,6 +29,12 @@ nameOverride:
 ## @param fullnameOverride String to fully override common.names.fullname
 ##
 fullnameOverride:
+## @param commonLabels Labels to add to all deployed objects
+##
+commonLabels: {}
+## @param commonAnnotations Annotations to add to all deployed objects
+##
+commonAnnotations: {}
 
 ## @param kimaiAppSecret Secret used to encrypt session cookies (users will be logged out if you change it)
 ##
@@ -63,8 +69,44 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
+  ## @param service.type Shopware service type
+  ##
   type: ClusterIP
+  ## @param service.port Shopware service HTTP port
+  ##
   port: 80
+  ## Node ports to expose
+  ## @param service.nodePort Node port for HTTP
+  ## NOTE: choose port between <30000-32767>
+  ##
+  nodePort: ""
+  ## @param service.clusterIP Shopware service Cluster IP
+  ## e.g.:
+  ## clusterIP: None
+  ##
+  clusterIP: ""
+  ## @param service.loadBalancerIP Shopware service Load Balancer IP
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
+  ##
+  loadBalancerIP: ""
+  ## @param service.loadBalancerSourceRanges Shopware service Load Balancer sources
+  ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
+  ## e.g:
+  ## loadBalancerSourceRanges:
+  ##   - 10.10.10.0/24
+  ##
+  loadBalancerSourceRanges: []
+  ## @param service.externalTrafficPolicy Shopware service external traffic policy
+  ## ref http://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+  ##
+  externalTrafficPolicy: Cluster
+  ## @param service.annotations Additional custom annotations for Shopware service
+  ##
+  annotations: {}
+  ## @param service.extraPorts Extra port to expose on Shopware service
+  ##
+  extraPorts: []
+
 
 ingress:
   ## @param ingress.enabled Enable ingress record generation for WordPress

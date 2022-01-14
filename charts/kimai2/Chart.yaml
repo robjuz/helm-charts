@@ -2,7 +2,7 @@ apiVersion: v2
 name: kimai2
 description: A Helm chart for Kubernetes
 type: application
-version: 1.2.1
+version: 1.3.0
 appVersion: "apache-1.15.6-prod"
 
 dependencies:
