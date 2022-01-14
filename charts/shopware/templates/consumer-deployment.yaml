@@ -1,0 +1,120 @@
+{{- if .Values.consumer.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ printf "%s-consumer" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  annotations:
+    "helm.sh/hook": "post-install,post-upgrade"
+    "helm.sh/hook-weight": "30"
+  {{- if .Values.commonAnnotations }}
+  {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+      role: consumer
+  {{- if .Values.updateStrategy }}
+  strategy: {{- toYaml .Values.updateStrategy | nindent 4 }}
+  {{- end }}
+  {{- if not .Values.consumer.autoscaling.enabled }}
+  replicas: {{ .Values.consumer.replicaCount }}
+  {{- end }}
+  template:
+    metadata:
+      labels:
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
+        role: consumer
+        {{- if .Values.podLabels }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.podLabels "context" $) | nindent 8 }}
+        {{- end }}
+      {{- if or .Values.podAnnotations .Values.metrics.enabled }}
+      annotations:
+        {{- if .Values.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.podAnnotations "context" $) | nindent 8 }}
+        {{- end }}
+        {{- if .Values.metrics.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.metrics.podAnnotations "context" $) | nindent 8 }}
+        {{- end }}
+      {{- end }}
+    spec:
+      {{- include "shopware.imagePullSecrets" . | nindent 6 }}
+      {{- if .Values.schedulerName }}
+      schedulerName: {{ .Values.schedulerName | quote }}
+      {{- end }}
+      serviceAccountName: {{ .Values.serviceAccountName }}
+      {{- if .Values.consumer.affinity }}
+      affinity: {{- include "common.tplvalues.render" (dict "value" .Values.consumer.affinity "context" $) | nindent 8 }}
+      {{- else }}
+      affinity:
+        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.consumer.podAffinityPreset "context" $) | nindent 10 }}
+        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.consumer.podAntiAffinityPreset "context" $) | nindent 10 }}
+        nodeAffinity: {{- include "common.affinities.nodes" (dict "type" .Values.consumer.nodeAffinityPreset.type "key" .Values.consumer.nodeAffinityPreset.key "values" .Values.consumer.nodeAffinityPreset.values) | nindent 10 }}
+      {{- end }}
+      {{- if .Values.consumer.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.consumer.nodeSelector "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.tolerations "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.podSecurityContext.enabled }}
+      securityContext: {{- omit .Values.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: consumer
+          image: {{ template "shopware.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          command: ["bin/console"]
+          args: {{- include "common.tplvalues.render" (dict "value" .Values.consumer.command "context" $) | nindent 12 }}
+          {{- if .Values.containerSecurityContext.enabled }}
+          securityContext: {{- omit .Values.containerSecurityContext "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.containerSecurityContext.enabled }}
+          securityContext: {{- omit .Values.containerSecurityContext "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.extraEnvVars }}
+          env:{{- include "common.tplvalues.render" (dict "value" .Values.extraEnvVars "context" $) | nindent 12 }}
+          {{- end }}
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                - bin/console
+                - messenger:stop-workers
+          envFrom:
+            - configMapRef:
+                name: {{ template "common.names.fullname" . }}
+            - secretRef:
+                name: {{ template "common.names.fullname" . }}
+          {{- if .Values.consumer.resources }}
+          resources: {{- toYaml .Values.consumer.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+          - mountPath: /var/www/html/config/jwt/
+            name: shopware-jwt
+          - mountPath: /var/www/html/config/packages/
+            name: shopware-minio
+          - mountPath: /var/www/html/custom/plugins
+            name: shopware-plugins
+      volumes:
+        - name: shopware-jwt
+          secret:
+            secretName: {{ printf "%s-jwt" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
+        {{- if .Values.minio.enabled }}
+        - name: shopware-minio
+          configMap:
+            name: {{ printf "%s-minio" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
+        {{- end }}
+        - name: shopware-plugins
+        {{- if .Values.persistence.enabled}}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "common.names.fullname" .) }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
+{{- end }}

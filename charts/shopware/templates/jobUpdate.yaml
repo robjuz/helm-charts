@@ -20,16 +20,6 @@ spec:
       {{- if .Values.schedulerName }}
       schedulerName: {{ .Values.schedulerName | quote }}
       {{- end }}
-      affinity:
-        podAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: app.kubernetes.io/name
-                    operator: In
-                    values:
-                      - {{ include "common.names.name" . }}
-              topologyKey: "kubernetes.io/hostname"
       {{- if .Values.podSecurityContext.enabled }}
       securityContext: {{- omit .Values.podSecurityContext "enabled" | toYaml | nindent 8 }}
       {{- end }}
@@ -52,36 +42,27 @@ spec:
           volumeMounts:
             - mountPath: /var/www/html/config/jwt/
               name: shopware-jwt
-              readOnly: true
+            - mountPath: /var/www/html/config/packages/
+              name: shopware-minio
             - mountPath: /var/www/html/custom/plugins
-              name: shopware-data
-              subPath: plugins
-            - mountPath: /var/www/html/files
-              name: shopware-data
-              subPath: files
-            - mountPath: /var/www/html/public/theme
-              name: shopware-data
-              subPath: theme
-            - mountPath: /var/www/html/public/media
-              name: shopware-data
-              subPath: media
-            - mountPath: /var/www/html/public/bundles
-              name: shopware-data
-              subPath: bundles
-            - mountPath: /var/www/html/public/sitemap
-              name: shopware-data
-              subPath: sitemap
-            - mountPath: /var/www/html/public/thumbnail
-              name: shopware-data
-              subPath: thumbnail
+              name: shopware-plugins
       restartPolicy: OnFailure
       volumes:
         - name: shopware-jwt
           secret:
             secretName: {{ printf "%s-jwt" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
-        - name: shopware-data
+        {{- if .Values.minio.enabled }}
+        - name: shopware-minio
+          configMap:
+            name: {{ printf "%s-minio" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
+        {{- end }}
+        - name: shopware-plugins
+        {{- if .Values.persistence.enabled}}
           persistentVolumeClaim:
             claimName: {{ .Values.persistence.existingClaim | default (include "common.names.fullname" .) }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
         {{- if .Values.extraVolumes }}
         {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumes "context" $) | nindent 8 }}
         {{- end }}

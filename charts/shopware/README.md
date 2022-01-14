@@ -1,35 +1,37 @@
-# Shopware
+# Shopware 6
 
-[Shopware](https://shopware.org/) is one of the most versatile open source content management systems on the market. A publishing platform for building blogs and websites.
+[Shopware 6](https://www.shopware.com/en/products/shopware-6/) offers all online merchants maximum flexibility, the freedom to grow and focus on the perfect customer experience. Shopware 6 is the ecommerce solution for all conceivable channels of the present and future.
 
 ## TL;DR
 
 ```console
-$ helm repo add bitnami https://charts.bitnami.com/bitnami
-$ helm install my-release bitnami/shopware
+$ helm repo add robjuz https://robjuz.github.io/helm-charts/
+$ helm install shopware robjuz/shopware
 ```
 
 ## Introduction
 
-This chart bootstraps a [Shopware](https://github.com/bitnami/bitnami-docker-shopware) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
+This chart bootstraps a [Shopware](https://github.com/shyim/shopware) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
 
-It also packages the [Bitnami MariaDB chart](https://github.com/bitnami/charts/tree/master/bitnami/mariadb) which is required for bootstrapping a MariaDB deployment for the database requirements of the Shopware application, and the [Bitnami Memcached chart](https://github.com/bitnami/charts/tree/master/bitnami/memcached) that can be used to cache database queries.
+It also packages the [Bitnami MariaDB chart](https://github.com/bitnami/charts/tree/master/bitnami/mariadb) which is required for bootstrapping a MariaDB deployment for the database requirements of the Shopware application, 
+the [Bitnami Elasticsearch chart](https://github.com/bitnami/charts/tree/master/bitnami/elasticsearch) that is used to indexing, 
+the [Bitnami Minio chart](https://github.com/bitnami/charts/tree/master/bitnami/minio) that is used to store documents, media, theme, asset and sitemap files
 
-Bitnami charts can be used with [Kubeapps](https://kubeapps.com/) for deployment and management of Helm Charts in clusters. This chart has been tested to work with NGINX Ingress, cert-manager, Fluentd and Prometheus on top of the [BKPR](https://kubeprod.io/).
+This chart has been tested to work with NGINX Ingress, cert-manager and Prometheus on top of the [k3s](https://k3s.io/).
 
 ## Prerequisites
 
-- Kubernetes 1.12+
+- Kubernetes 1.19+
 - Helm 3.1.0
 - PV provisioner support in the underlying infrastructure
-- ReadWriteMany volumes for deployment scaling
+- ReadWriteMany volumes for deployment scaling (only when installing external plugins)
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release`:
+To install the chart with the release name `shopware`:
 
 ```console
-helm install my-release bitnami/shopware
+helm install shopware robjuz/shopware
 ```
 
 The command deploys Shopware on the Kubernetes cluster in the default configuration. The [Parameters](#parameters) section lists the parameters that can be configured during installation.
@@ -38,10 +40,10 @@ The command deploys Shopware on the Kubernetes cluster in the default configurat
 
 ## Uninstalling the Chart
 
-To uninstall/delete the `my-release` deployment:
+To uninstall/delete the `shopware` deployment:
 
 ```console
-helm delete my-release
+helm delete shopware
 ```
 
 The command removes all the Kubernetes components associated with the chart and deletes the release.
@@ -51,7 +53,7 @@ The command removes all the Kubernetes components associated with the chart and 
 ### Global parameters
 
 | Name                      | Description                                     | Value |
-| ------------------------- | ----------------------------------------------- | ----- |
+|---------------------------|-------------------------------------------------|-------|
 | `global.imageRegistry`    | Global Docker image registry                    | `""`  |
 | `global.imagePullSecrets` | Global Docker registry secret names as an array | `[]`  |
 | `global.storageClass`     | Global StorageClass for Persistent Volume(s)    | `""`  |
@@ -59,99 +61,67 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ### Common parameters
 
-| Name                     | Description                                                                             | Value           |
-| ------------------------ | --------------------------------------------------------------------------------------- | --------------- |
-| `kubeVersion`            | Override Kubernetes version                                                             | `""`            |
-| `nameOverride`           | String to partially override common.names.fullname                                      | `""`            |
-| `fullnameOverride`       | String to fully override common.names.fullname                                          | `""`            |
-| `commonLabels`           | Labels to add to all deployed objects                                                   | `{}`            |
-| `commonAnnotations`      | Annotations to add to all deployed objects                                              | `{}`            |
-| `clusterDomain`          | Kubernetes cluster domain name                                                          | `cluster.local` |
-| `extraDeploy`            | Array of extra objects to deploy with the release                                       | `[]`            |
-| `diagnosticMode.enabled` | Enable diagnostic mode (all probes will be disabled and the command will be overridden) | `false`         |
-| `diagnosticMode.command` | Command to override all containers in the deployment                                    | `["sleep"]`     |
-| `diagnosticMode.args`    | Args to override all containers in the deployment                                       | `["infinity"]`  |
+| Name                | Description                                        | Value           |
+|---------------------|----------------------------------------------------|-----------------|
+| `kubeVersion`       | Override Kubernetes version                        | `""`            |
+| `nameOverride`      | String to partially override common.names.fullname | `""`            |
+| `fullnameOverride`  | String to fully override common.names.fullname     | `""`            |
+| `commonLabels`      | Labels to add to all deployed objects              | `{}`            |
+| `commonAnnotations` | Annotations to add to all deployed objects         | `{}`            |
+| `clusterDomain`     | Kubernetes cluster domain name                     | `cluster.local` |
 
 
 ### Shopware Image parameters
 
-| Name                | Description                                          | Value                |
-| ------------------- | ---------------------------------------------------- | -------------------- |
-| `image.registry`    | Shopware image registry                             | `docker.io`          |
-| `image.repository`  | Shopware image repository                           | `bitnami/shopware`  |
-| `image.tag`         | Shopware image tag (immutable tags are recommended) | `5.8.2-debian-10-r0` |
-| `image.pullPolicy`  | Shopware image pull policy                          | `IfNotPresent`       |
-| `image.pullSecrets` | Shopware image pull secrets                         | `[]`                 |
-| `image.debug`       | Enable image debug mode                              | `false`              |
+| Name                | Description                                         | Value            |
+|---------------------|-----------------------------------------------------|------------------|
+| `image.registry`    | Shopware image registry                             | `docker.io`      |
+| `image.repository`  | Shopware image repository                           | `shyim/shopware` |
+| `image.tag`         | Shopware image tag (immutable tags are recommended) | `6.4.6.0`        |
+| `image.pullPolicy`  | Shopware image pull policy                          | `IfNotPresent`   |
+| `image.pullSecrets` | Shopware image pull secrets                         | `[]`             |
+| `image.debug`       | Enable image debug mode                             | `false`          |
 
 
 ### Shopware Configuration parameters
 
-| Name                                   | Description                                                                           | Value              |
-| -------------------------------------- | ------------------------------------------------------------------------------------- | ------------------ |
-| `shopwareUsername`                    | Shopware username                                                                    | `user`             |
-| `shopwarePassword`                    | Shopware user password                                                               | `""`               |
-| `existingSecret`                       | Name of existing secret containing Shopware credentials                              | `""`               |
-| `shopwareEmail`                       | Shopware user email                                                                  | `user@example.com` |
-| `shopwareFirstName`                   | Shopware user first name                                                             | `FirstName`        |
-| `shopwareLastName`                    | Shopware user last name                                                              | `LastName`         |
-| `shopwareBlogName`                    | Blog name                                                                             | `User's Blog!`     |
-| `shopwareTablePrefix`                 | Prefix to use for Shopware database tables                                           | `wp_`              |
-| `shopwareScheme`                      | Scheme to use to generate Shopware URLs                                              | `http`             |
-| `shopwareSkipInstall`                 | Skip wizard installation                                                              | `false`            |
-| `shopwareExtraConfigContent`          | Add extra content to the default wp-config.php file                                   | `""`               |
-| `shopwareConfiguration`               | The content for your custom wp-config.php file (advanced feature)                     | `""`               |
-| `existingShopwareConfigurationSecret` | The name of an existing secret with your custom wp-config.php file (advanced feature) | `""`               |
-| `shopwareConfigureCache`              | Enable W3 Total Cache plugin and configure cache settings                             | `false`            |
-| `shopwareAutoUpdateLevel`             | Level of auto-updates to allow. Allowed values: `major`, `minor` or `none`.           | `none`             |
-| `shopwarePlugins`                     | Array of plugins to install and activate. Can be specified as `all` or `none`.        | `none`             |
-| `apacheConfiguration`                  | The content for your custom httpd.conf file (advanced feature)                        | `""`               |
-| `existingApacheConfigurationConfigMap` | The name of an existing secret with your custom httpd.conf file (advanced feature)    | `""`               |
-| `customPostInitScripts`                | Custom post-init.d user scripts                                                       | `{}`               |
-| `smtpHost`                             | SMTP server host                                                                      | `""`               |
-| `smtpPort`                             | SMTP server port                                                                      | `""`               |
-| `smtpUser`                             | SMTP username                                                                         | `""`               |
-| `smtpPassword`                         | SMTP user password                                                                    | `""`               |
-| `smtpProtocol`                         | SMTP protocol                                                                         | `""`               |
-| `smtpExistingSecret`                   | The name of an existing secret with SMTP credentials                                  | `""`               |
-| `allowEmptyPassword`                   | Allow the container to be started with blank passwords                                | `true`             |
-| `allowOverrideNone`                    | Configure Apache to prohibit overriding directives with htaccess files                | `false`            |
-| `htaccessPersistenceEnabled`           | Persist custom changes on htaccess files                                              | `false`            |
-| `customHTAccessCM`                     | The name of an existing ConfigMap with custom htaccess rules                          | `""`               |
-| `command`                              | Override default container command (useful when using custom images)                  | `[]`               |
-| `args`                                 | Override default container args (useful when using custom images)                     | `[]`               |
-| `extraEnvVars`                         | Array with extra environment variables to add to the Shopware container              | `[]`               |
-| `extraEnvVarsCM`                       | Name of existing ConfigMap containing extra env vars                                  | `""`               |
-| `extraEnvVarsSecret`                   | Name of existing Secret containing extra env vars                                     | `""`               |
-
-
-### Shopware Multisite Configuration parameters
-
-| Name                            | Description                                                                                                                        | Value       |
-| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `multisite.enable`              | Whether to enable Shopware Multisite configuration.                                                                               | `false`     |
-| `multisite.host`                | Shopware Multisite hostname/address. This value is mandatory when enabling Multisite mode.                                        | `""`        |
-| `multisite.networkType`         | Shopware Multisite network type to enable. Allowed values: `subfolder`, `subdirectory` or `subdomain`.                            | `subdomain` |
-| `multisite.enableNipIoRedirect` | Whether to enable IP address redirection to nip.io wildcard DNS. Useful when running on an IP address with subdomain network type. | `false`     |
+| Name                   | Description                                                                                 | Value              |
+|------------------------|---------------------------------------------------------------------------------------------|--------------------|
+| `shopwareUsername`     | Shopware admin username                                                                     | `admin`            |
+| `shopwarePassword`     | Shopware admin password (Defaults to a random 10-character alphanumeric string if not set ) | `""`               |
+| `shopwareLocale`       | Shopware default language                                                                   | `de-DE`            |
+| `shopwareCurrency`     | Shopware default currency                                                                   | `EUR`              |
+| `shopwareAppEnv`       | Shopware environment                                                                        | `prod`             |
+| `shopwareInstanceId`   | Shopware instance ID (Defaults to a random 64-character alphanumeric string if not set )    | `""`               |
+| `shopwareAppUrl`       | Shopware URL                                                                                | `""`               |
+| `shopwareAppSecret`    | Shopware Secret (Defaults to a random 64-character alphanumeric string if not set )         | `""`               |
+| `mailerUrl`            | Mailer URL                                                                                  | `null://localhost` |
+| `activePlugins`        | Comma separated list of plugins that should be activated                                    | `""`               |
+| `httpCache.enabled`    | Enable http cache                                                                           | `true`             |
+| `httpCache.defaultTtl` | Http cache default Time to live                                                             | `7200`             |
+| `cache.adapter`        | Adapter to use for caching                                                                  | `redis`            |
+| `cache.database`       | Database to use for caching                                                                 | `0`                |
+| `session.adapter`      | Adapter to use for session                                                                  | `redis`            |
+| `session.database`     | Database to use for session                                                                 | `1`                |
 
 
 ### Shopware deployment parameters
 
 | Name                                    | Description                                                                               | Value           |
-| --------------------------------------- | ----------------------------------------------------------------------------------------- | --------------- |
-| `replicaCount`                          | Number of Shopware replicas to deploy                                                    | `1`             |
-| `updateStrategy.type`                   | Shopware deployment strategy type                                                        | `RollingUpdate` |
-| `updateStrategy.rollingUpdate`          | Shopware deployment rolling update configuration parameters                              | `{}`            |
+|-----------------------------------------|-------------------------------------------------------------------------------------------|-----------------|
+| `replicaCount`                          | Number of Shopware replicas to deploy                                                     | `1`             |
+| `updateStrategy.type`                   | Shopware deployment strategy type                                                         | `RollingUpdate` |
+| `updateStrategy.rollingUpdate`          | Shopware deployment rolling update configuration parameters                               | `{}`            |
 | `schedulerName`                         | Alternate scheduler                                                                       | `""`            |
 | `serviceAccountName`                    | ServiceAccount name                                                                       | `default`       |
-| `hostAliases`                           | Shopware pod host aliases                                                                | `[]`            |
-| `extraVolumes`                          | Optionally specify extra list of additional volumes for Shopware pods                    | `[]`            |
-| `extraVolumeMounts`                     | Optionally specify extra list of additional volumeMounts for Shopware container(s)       | `[]`            |
-| `extraContainerPorts`                   | Optionally specify extra list of additional ports for Shopware container(s)              | `[]`            |
-| `sidecars`                              | Add additional sidecar containers to the Shopware pod                                    | `[]`            |
-| `initContainers`                        | Add additional init containers to the Shopware pods                                      | `[]`            |
-| `podLabels`                             | Extra labels for Shopware pods                                                           | `{}`            |
-| `podAnnotations`                        | Annotations for Shopware pods                                                            | `{}`            |
+| `hostAliases`                           | Shopware pod host aliases                                                                 | `[]`            |
+| `extraVolumes`                          | Optionally specify extra list of additional volumes for Shopware pods                     | `[]`            |
+| `extraVolumeMounts`                     | Optionally specify extra list of additional volumeMounts for Shopware container(s)        | `[]`            |
+| `extraContainerPorts`                   | Optionally specify extra list of additional ports for Shopware container(s)               | `[]`            |
+| `sidecars`                              | Add additional sidecar containers to the Shopware pod                                     | `[]`            |
+| `initContainers`                        | Add additional init containers to the Shopware pods                                       | `[]`            |
+| `podLabels`                             | Extra labels for Shopware pods                                                            | `{}`            |
+| `podAnnotations`                        | Annotations for Shopware pods                                                             | `{}`            |
 | `podAffinityPreset`                     | Pod affinity preset. Ignored if `affinity` is set. Allowed values: `soft` or `hard`       | `""`            |
 | `podAntiAffinityPreset`                 | Pod anti-affinity preset. Ignored if `affinity` is set. Allowed values: `soft` or `hard`  | `soft`          |
 | `nodeAffinityPreset.type`               | Node affinity preset type. Ignored if `affinity` is set. Allowed values: `soft` or `hard` | `""`            |
@@ -160,15 +130,15 @@ The command removes all the Kubernetes components associated with the chart and 
 | `affinity`                              | Affinity for pod assignment                                                               | `{}`            |
 | `nodeSelector`                          | Node labels for pod assignment                                                            | `{}`            |
 | `tolerations`                           | Tolerations for pod assignment                                                            | `[]`            |
-| `resources.limits`                      | The resources limits for the Shopware container                                          | `{}`            |
-| `resources.requests`                    | The requested resources for the Shopware container                                       | `{}`            |
-| `containerPorts.http`                   | Shopware HTTP container port                                                             | `8080`          |
-| `containerPorts.https`                  | Shopware HTTPS container port                                                            | `8443`          |
-| `podSecurityContext.enabled`            | Enabled Shopware pods' Security Context                                                  | `true`          |
-| `podSecurityContext.fsGroup`            | Set Shopware pod's Security Context fsGroup                                              | `1001`          |
-| `containerSecurityContext.enabled`      | Enabled Shopware containers' Security Context                                            | `true`          |
-| `containerSecurityContext.runAsUser`    | Set Shopware container's Security Context runAsUser                                      | `1001`          |
-| `containerSecurityContext.runAsNonRoot` | Set Shopware container's Security Context runAsNonRoot                                   | `true`          |
+| `resources.limits`                      | The resources limits for the Shopware container                                           | `{}`            |
+| `resources.requests`                    | The requested resources for the Shopware container                                        | `{}`            |
+| `containerPorts.http`                   | Shopware HTTP container port                                                              | `8080`          |
+| `containerPorts.https`                  | Shopware HTTPS container port                                                             | `8443`          |
+| `podSecurityContext.enabled`            | Enabled Shopware pods' Security Context                                                   | `true`          |
+| `podSecurityContext.fsGroup`            | Set Shopware pod's Security Context fsGroup                                               | `1001`          |
+| `containerSecurityContext.enabled`      | Enabled Shopware containers' Security Context                                             | `true`          |
+| `containerSecurityContext.runAsUser`    | Set Shopware container's Security Context runAsUser                                       | `1001`          |
+| `containerSecurityContext.runAsNonRoot` | Set Shopware container's Security Context runAsNonRoot                                    | `true`          |
 | `livenessProbe.enabled`                 | Enable livenessProbe                                                                      | `true`          |
 | `livenessProbe.initialDelaySeconds`     | Initial delay seconds for livenessProbe                                                   | `120`           |
 | `livenessProbe.periodSeconds`           | Period seconds for livenessProbe                                                          | `10`            |
@@ -184,28 +154,61 @@ The command removes all the Kubernetes components associated with the chart and 
 | `customLivenessProbe`                   | Custom livenessProbe that overrides the default one                                       | `{}`            |
 | `customReadinessProbe`                  | Custom readinessProbe that overrides the default one                                      | `{}`            |
 
+### Shopware Task Runner deployment parameters
+
+| Name                                      | Description                                                                               | Value           |
+|-------------------------------------------|-------------------------------------------------------------------------------------------|-----------------|
+| `taskRunner.enabled`                      | Deploy Task Runner                                                                        | `true`          |
+| `taskRunner.replicaCount`                 | Number of Task Runner replicas to deploy                                                  | `1`             |
+| `taskRunner.hostAliases`                  | Shopware pod host aliases                                                                 | `[]`            |
+| `taskRunner.podLabels`                    | Extra labels for Shopware pods                                                            | `{}`            |
+| `taskRunner.podAnnotations`               | Annotations for Shopware pods                                                             | `{}`            |
+| `taskRunner.podAffinityPreset`            | Pod affinity preset. Ignored if `affinity` is set. Allowed values: `soft` or `hard`       | `""`            |
+| `taskRunner.podAntiAffinityPreset`        | Pod anti-affinity preset. Ignored if `affinity` is set. Allowed values: `soft` or `hard`  | `soft`          |
+| `taskRunner.nodeAffinityPreset.type`      | Node affinity preset type. Ignored if `affinity` is set. Allowed values: `soft` or `hard` | `""`            |
+| `taskRunner.nodeAffinityPreset.key`       | Node label key to match. Ignored if `affinity` is set                                     | `""`            |
+| `taskRunner.nodeAffinityPreset.values`    | Node label values to match. Ignored if `affinity` is set                                  | `[]`            |
+| `taskRunner.affinity`                     | Affinity for pod assignment                                                               | `{}`            |
+| `taskRunner.nodeSelector`                 | Node labels for pod assignment                                                            | `{}`            |
+
+### Shopware Consumer deployment parameters
+
+| Name                                    | Description                                                                               | Value           |
+|-----------------------------------------|-------------------------------------------------------------------------------------------|-----------------|
+| `consumer.enabled`                      | Deploy Task Runner                                                                        | `true`          |
+| `consumer.replicaCount`                 | Number of Task Runner replicas to deploy                                                  | `2`             |
+| `consumer.podLabels`                    | Extra labels for Shopware pods                                                            | `{}`            |
+| `consumer.podAnnotations`               | Annotations for Shopware pods                                                             | `{}`            |
+| `consumer.podAffinityPreset`            | Pod affinity preset. Ignored if `affinity` is set. Allowed values: `soft` or `hard`       | `""`            |
+| `consumer.podAntiAffinityPreset`        | Pod anti-affinity preset. Ignored if `affinity` is set. Allowed values: `soft` or `hard`  | `soft`          |
+| `consumer.nodeAffinityPreset.type`      | Node affinity preset type. Ignored if `affinity` is set. Allowed values: `soft` or `hard` | `""`            |
+| `consumer.nodeAffinityPreset.key`       | Node label key to match. Ignored if `affinity` is set                                     | `""`            |
+| `consumer.nodeAffinityPreset.values`    | Node label values to match. Ignored if `affinity` is set                                  | `[]`            |
+| `consumer.affinity`                     | Affinity for pod assignment                                                               | `{}`            |
+| `consumer.nodeSelector`                 | Node labels for pod assignment                                                            | `{}`            |
+
 
 ### Traffic Exposure Parameters
 
 | Name                               | Description                                                                                                                      | Value                    |
-| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
-| `service.type`                     | Shopware service type                                                                                                           | `LoadBalancer`           |
-| `service.port`                     | Shopware service HTTP port                                                                                                      | `80`                     |
-| `service.httpsPort`                | Shopware service HTTPS port                                                                                                     | `443`                    |
+|------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|--------------------------|
+| `service.type`                     | Shopware service type                                                                                                            | `LoadBalancer`           |
+| `service.port`                     | Shopware service HTTP port                                                                                                       | `80`                     |
+| `service.httpsPort`                | Shopware service HTTPS port                                                                                                      | `443`                    |
 | `service.httpsTargetPort`          | Target port for HTTPS                                                                                                            | `https`                  |
 | `service.nodePorts.http`           | Node port for HTTP                                                                                                               | `""`                     |
 | `service.nodePorts.https`          | Node port for HTTPS                                                                                                              | `""`                     |
-| `service.clusterIP`                | Shopware service Cluster IP                                                                                                     | `""`                     |
-| `service.loadBalancerIP`           | Shopware service Load Balancer IP                                                                                               | `""`                     |
-| `service.loadBalancerSourceRanges` | Shopware service Load Balancer sources                                                                                          | `[]`                     |
-| `service.externalTrafficPolicy`    | Shopware service external traffic policy                                                                                        | `Cluster`                |
-| `service.annotations`              | Additional custom annotations for Shopware service                                                                              | `{}`                     |
-| `service.extraPorts`               | Extra port to expose on Shopware service                                                                                        | `[]`                     |
-| `ingress.enabled`                  | Enable ingress record generation for Shopware                                                                                   | `false`                  |
+| `service.clusterIP`                | Shopware service Cluster IP                                                                                                      | `""`                     |
+| `service.loadBalancerIP`           | Shopware service Load Balancer IP                                                                                                | `""`                     |
+| `service.loadBalancerSourceRanges` | Shopware service Load Balancer sources                                                                                           | `[]`                     |
+| `service.externalTrafficPolicy`    | Shopware service external traffic policy                                                                                         | `Cluster`                |
+| `service.annotations`              | Additional custom annotations for Shopware service                                                                               | `{}`                     |
+| `service.extraPorts`               | Extra port to expose on Shopware service                                                                                         | `[]`                     |
+| `ingress.enabled`                  | Enable ingress record generation for Shopware                                                                                    | `false`                  |
 | `ingress.pathType`                 | Ingress path type                                                                                                                | `ImplementationSpecific` |
 | `ingress.apiVersion`               | Force Ingress API version (automatically detected if not set)                                                                    | `""`                     |
 | `ingress.ingressClassName`         | IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)                                                    | `""`                     |
-| `ingress.hostname`                 | Default host for the ingress record                                                                                              | `shopware.local`        |
+| `ingress.hostname`                 | Default host for the ingress record                                                                                              | `shopware.local`         |
 | `ingress.path`                     | Default path for the ingress record                                                                                              | `/`                      |
 | `ingress.annotations`              | Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations. | `{}`                     |
 | `ingress.tls`                      | Enable TLS configuration for the host defined at `ingress.hostname` parameter                                                    | `false`                  |
@@ -218,11 +221,10 @@ The command removes all the Kubernetes components associated with the chart and 
 ### Persistence Parameters
 
 | Name                                          | Description                                                                                     | Value                   |
-| --------------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------- |
+|-----------------------------------------------|-------------------------------------------------------------------------------------------------|-------------------------|
 | `persistence.enabled`                         | Enable persistence using Persistent Volume Claims                                               | `true`                  |
 | `persistence.storageClass`                    | Persistent Volume storage class                                                                 | `""`                    |
 | `persistence.accessModes`                     | Persistent Volume access modes                                                                  | `[]`                    |
-| `persistence.accessMode`                      | Persistent Volume access mode (DEPRECATED: use `persistence.accessModes` instead)               | `ReadWriteOnce`         |
 | `persistence.size`                            | Persistent Volume size                                                                          | `10Gi`                  |
 | `persistence.dataSource`                      | Custom PVC data source                                                                          | `{}`                    |
 | `persistence.existingClaim`                   | The name of an existing PVC to use for persistence                                              | `""`                    |
@@ -239,65 +241,70 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ### Other Parameters
 
-| Name                       | Description                                                    | Value   |
-| -------------------------- | -------------------------------------------------------------- | ------- |
-| `pdb.create`               | Enable a Pod Disruption Budget creation                        | `false` |
-| `pdb.minAvailable`         | Minimum number/percentage of pods that should remain scheduled | `1`     |
-| `pdb.maxUnavailable`       | Maximum number/percentage of pods that may be made unavailable | `""`    |
-| `autoscaling.enabled`      | Enable Horizontal POD autoscaling for Shopware                | `false` |
-| `autoscaling.minReplicas`  | Minimum number of Shopware replicas                           | `1`     |
-| `autoscaling.maxReplicas`  | Maximum number of Shopware replicas                           | `11`    |
-| `autoscaling.targetCPU`    | Target CPU utilization percentage                              | `50`    |
-| `autoscaling.targetMemory` | Target Memory utilization percentage                           | `50`    |
+| Name                               | Description                                                    | Value   |
+|------------------------------------|----------------------------------------------------------------|---------|
+| `pdb.create`                       | Enable a Pod Disruption Budget creation                        | `false` |
+| `pdb.minAvailable`                 | Minimum number/percentage of pods that should remain scheduled | `1`     |
+| `pdb.maxUnavailable`               | Maximum number/percentage of pods that may be made unavailable | `""`    |
+| `autoscaling.enabled`              | Enable Horizontal POD autoscaling for Shopware                 | `false` |
+| `autoscaling.minReplicas`          | Minimum number of Shopware replicas                            | `1`     |
+| `autoscaling.maxReplicas`          | Maximum number of Shopware replicas                            | `11`    |
+| `autoscaling.targetCPU`            | Target CPU utilization percentage                              | `50`    |
+| `autoscaling.targetMemory`         | Target Memory utilization percentage                           | `50`    |
+| `consumer.autoscaling.enabled`     | Enable Horizontal POD autoscaling for Shopware Consumer        | `false` |
+| `consumer.autoscaling.minReplicas` | Minimum number of Shopware Consumer replicas                   | `1`     |
+| `consumer.autoscaling.maxReplicas` | Maximum number of Shopware Consumer replicas                   | `11`    |
+| `consumer.autoscaling.targetCPU`   | Target CPU utilization percentage                              | `50`    |
 
 
 ### Metrics Parameters
 
-| Name                                      | Description                                                                  | Value                     |
-| ----------------------------------------- | ---------------------------------------------------------------------------- | ------------------------- |
-| `metrics.enabled`                         | Start a sidecar prometheus exporter to expose metrics                        | `false`                   |
-| `metrics.image.registry`                  | Apache Exporter image registry                                               | `docker.io`               |
-| `metrics.image.repository`                | Apache Exporter image repository                                             | `bitnami/apache-exporter` |
-| `metrics.image.tag`                       | Apache Exporter image tag (immutable tags are recommended)                   | `0.10.1-debian-10-r49`    |
-| `metrics.image.pullPolicy`                | Apache Exporter image pull policy                                            | `IfNotPresent`            |
-| `metrics.image.pullSecrets`               | Apache Exporter image pull secrets                                           | `[]`                      |
-| `metrics.resources.limits`                | The resources limits for the Prometheus exporter container                   | `{}`                      |
-| `metrics.resources.requests`              | The requested resources for the Prometheus exporter container                | `{}`                      |
-| `metrics.service.port`                    | Metrics service port                                                         | `9117`                    |
-| `metrics.service.annotations`             | Additional custom annotations for Metrics service                            | `{}`                      |
-| `metrics.serviceMonitor.enabled`          | Create ServiceMonitor Resource for scraping metrics using PrometheusOperator | `false`                   |
-| `metrics.serviceMonitor.namespace`        | The namespace in which the ServiceMonitor will be created                    | `""`                      |
-| `metrics.serviceMonitor.interval`         | The interval at which metrics should be scraped                              | `30s`                     |
-| `metrics.serviceMonitor.scrapeTimeout`    | The timeout after which the scrape is ended                                  | `""`                      |
-| `metrics.serviceMonitor.relabellings`     | Metrics relabellings to add to the scrape endpoint                           | `[]`                      |
-| `metrics.serviceMonitor.honorLabels`      | Labels to honor to add to the scrape endpoint                                | `false`                   |
-| `metrics.serviceMonitor.additionalLabels` | Additional custom labels for the ServiceMonitor                              | `{}`                      |
+| Name                                      | Description                                                                  | Value                    |
+|-------------------------------------------|------------------------------------------------------------------------------|--------------------------|
+| `metrics.enabled`                         | Start a sidecar prometheus exporter to expose metrics                        | `false`                  |
+| `metrics.image.registry`                  | Apache Exporter image registry                                               | `docker.io`              |
+| `metrics.image.repository`                | Apache Exporter image repository                                             | `bitnami/nginx-exporter` |
+| `metrics.image.tag`                       | Apache Exporter image tag (immutable tags are recommended)                   | `0.9.0-debian-10-r242`   |
+| `metrics.image.pullPolicy`                | Apache Exporter image pull policy                                            | `IfNotPresent`           |
+| `metrics.image.pullSecrets`               | Apache Exporter image pull secrets                                           | `[]`                     |
+| `metrics.resources.limits`                | The resources limits for the Prometheus exporter container                   | `{}`                     |
+| `metrics.resources.requests`              | The requested resources for the Prometheus exporter container                | `{}`                     |
+| `metrics.service.port`                    | Metrics service port                                                         | `9113`                   |
+| `metrics.service.annotations`             | Additional custom annotations for Metrics service                            | `{}`                     |
+| `metrics.serviceMonitor.enabled`          | Create ServiceMonitor Resource for scraping metrics using PrometheusOperator | `false`                  |
+| `metrics.serviceMonitor.namespace`        | The namespace in which the ServiceMonitor will be created                    | `""`                     |
+| `metrics.serviceMonitor.interval`         | The interval at which metrics should be scraped                              | `30s`                    |
+| `metrics.serviceMonitor.scrapeTimeout`    | The timeout after which the scrape is ended                                  | `""`                     |
+| `metrics.serviceMonitor.relabellings`     | Metrics relabellings to add to the scrape endpoint                           | `[]`                     |
+| `metrics.serviceMonitor.honorLabels`      | Labels to honor to add to the scrape endpoint                                | `false`                  |
+| `metrics.serviceMonitor.additionalLabels` | Additional custom labels for the ServiceMonitor                              | `{}`                     |
 
 
 ### Database Parameters
 
-| Name                                       | Description                                                               | Value               |
-| ------------------------------------------ | ------------------------------------------------------------------------- | ------------------- |
-| `mariadb.enabled`                          | Deploy a MariaDB server to satisfy the applications database requirements | `true`              |
-| `mariadb.architecture`                     | MariaDB architecture. Allowed values: `standalone` or `replication`       | `standalone`        |
-| `mariadb.auth.rootPassword`                | MariaDB root password                                                     | `""`                |
+| Name                                       | Description                                                               | Value              |
+|--------------------------------------------|---------------------------------------------------------------------------|--------------------|
+| `mariadb.enabled`                          | Deploy a MariaDB server to satisfy the applications database requirements | `true`             |
+| `mariadb.architecture`                     | MariaDB architecture. Allowed values: `standalone` or `replication`       | `standalone`       |
+| `mariadb.auth.rootPassword`                | MariaDB root password                                                     | `""`               |
 | `mariadb.auth.database`                    | MariaDB custom database                                                   | `bitnami_shopware` |
 | `mariadb.auth.username`                    | MariaDB custom user name                                                  | `bn_shopware`      |
-| `mariadb.auth.password`                    | MariaDB custom user password                                              | `""`                |
-| `mariadb.primary.persistence.enabled`      | Enable persistence on MariaDB using PVC(s)                                | `true`              |
-| `mariadb.primary.persistence.storageClass` | Persistent Volume storage class                                           | `""`                |
-| `mariadb.primary.persistence.accessModes`  | Persistent Volume access modes                                            | `[]`                |
-| `mariadb.primary.persistence.size`         | Persistent Volume size                                                    | `8Gi`               |
-| `externalDatabase.host`                    | External Database server host                                             | `localhost`         |
-| `externalDatabase.port`                    | External Database server port                                             | `3306`              |
-| `externalDatabase.user`                    | External Database username                                                | `bn_shopware`      |
-| `externalDatabase.password`                | External Database user password                                           | `""`                |
-| `externalDatabase.database`                | External Database database name                                           | `bitnami_shopware` |
-| `externalDatabase.existingSecret`          | The name of an existing secret with database credentials                  | `""`                |
-| `memcached.enabled`                        | Deploy a Memcached server for caching database queries                    | `false`             |
-| `memcached.service.port`                   | Memcached service port                                                    | `11211`             |
-| `externalCache.host`                       | External cache server host                                                | `localhost`         |
-| `externalCache.port`                       | External cache server port                                                | `11211`             |
+| `mariadb.auth.password`                    | MariaDB custom user password                                              | `""`               |
+| `mariadb.primary.persistence.enabled`      | Enable persistence on MariaDB using PVC(s)                                | `true`             |
+| `mariadb.primary.persistence.storageClass` | Persistent Volume storage class                                           | `""`               |
+| `mariadb.primary.persistence.accessModes`  | Persistent Volume access modes                                            | `[]`               |
+| `mariadb.primary.persistence.size`         | Persistent Volume size                                                    | `8Gi`              |
+| `externalDatabase.host`                    | External Database server host                                             | `localhost`        |
+| `externalDatabase.port`                    | External Database server port                                             | `3306`             |
+| `externalDatabase.user`                    | External Database username                                                | `shopware`         |
+| `externalDatabase.password`                | External Database user password                                           | `""`               |
+| `externalDatabase.database`                | External Database database name                                           | `shopware`         |
+| `externalDatabase.existingSecret`          | The name of an existing secret with database credentials                  | `""`               |
+| `redis.enabled`                            | Deploy a Redis server for caching                                         | `true`             |
+| `externalCache.host`                       | External cache server host                                                | `localhost`        |
+| `externalCache.port`                       | External cache server port                                                | `6379`             |
+| `elasticsearch.enabled`                    | Deploy a Elasticsearch server for indexing                                | `true`             |
+| `externalElasticsearch.host`               | External Elasticsearch host                                               | `""`               |
 
 
 The above parameters map to the env variables defined in [bitnami/shopware](http://github.com/bitnami/bitnami-docker-shopware). For more information please refer to the [bitnami/shopware](http://github.com/bitnami/bitnami-docker-shopware) image documentation.
@@ -307,7 +314,7 @@ Specify each parameter using the `--set key=value[,key=value]` argument to `helm
 ```console
 helm install my-release \
   --set shopwareUsername=admin \
-  --set shopwarePassword=password \
+  --set shopwarePassword=shopware \
   --set mariadb.auth.rootPassword=secretpassword \
     bitnami/shopware
 ```
@@ -330,20 +337,6 @@ helm install my-release -f values.yaml bitnami/shopware
 
 It is strongly recommended to use immutable tags in a production environment. This ensures your deployment does not change automatically if the same tag is updated with a different image.
 
-Bitnami will release a new chart updating its containers if a new version of the main container, significant changes, or critical vulnerabilities exist.
-
-### Known limitations
-
-When performing admin operations that require activating the maintenance mode (such as updating a plugin or theme), it's activated in only one replica (see: [bug report](https://core.trac.shopware.org/ticket/50797)). This implies that WP could be attending requests on other replicas while performing admin operations, with unpredictable consequences.
-
-To avoid that, you can manually activate/deactivate the maintenance mode on every replica using the WP CLI. For instance, if you installed WP with three replicas, you can run the commands below to activate the maintenance mode in all of them (assuming that the release name is `shopware`):
-
-```console
-kubectl exec $(kubectl get pods -l app.kubernetes.io/name=shopware -o jsonpath='{.items[0].metadata.name}') -c shopware -- wp maintenance-mode activate
-kubectl exec $(kubectl get pods -l app.kubernetes.io/name=shopware -o jsonpath='{.items[1].metadata.name}') -c shopware -- wp maintenance-mode activate
-kubectl exec $(kubectl get pods -l app.kubernetes.io/name=shopware -o jsonpath='{.items[2].metadata.name}') -c shopware -- wp maintenance-mode activate
-```
-
 ### External database support
 
 You may want to have Shopware connect to an external database rather than installing one inside your cluster. Typical reasons for this are to use a managed database service, or to share a common database server for all your applications. To achieve this, the chart allows you to specify credentials for an external database with the [`externalDatabase` parameter](#database-parameters). You should also disable the MariaDB installation with the `mariadb.enabled` option. Here is an example:
@@ -359,38 +352,41 @@ externalDatabase.port=3306
 
 Refer to the [documentation on using an external database with Shopware](https://docs.bitnami.com/kubernetes/apps/shopware/configuration/use-external-database/) and the [tutorial on integrating Shopware with a managed cloud database](https://docs.bitnami.com/tutorials/secure-shopware-kubernetes-managed-database-ssl-upgrades/) for more information.
 
-### Memcached
+### Redis
 
-This chart provides support for using Memcached to cache database queries and objects improving the website performance. To enable this feature, set `shopwareConfigureCache` and `memcached.enabled` parameters to `true`.
+This chart provides support for using Redis to cache objects improving the website performance. To enable this feature, set `cache.adapter` and `redis.enabled` parameters to `true`.
 
-When this features is enabled, a Memcached server will be deployed in your K8s cluster using the Bitnami Memcached chart and the [W3 Total Cache](https://shopware.org/plugins/w3-total-cache/) plugin will be activated and configured to use the Memcached server for database caching.
+When this feature is enabled, a Redis server will be deployed in your K8s cluster using the Bitnami Redis chart
 
-It is also possible to use an external cache server rather than installing one inside your cluster. To achieve this, the chart allows you to specify credentials for an external cache server with the [`externalCache` parameter](#database-parameters). You should also disable the Memcached installation with the `memcached.enabled` option. Here is an example:
+It is also possible to use an external cache server rather than installing one inside your cluster. To achieve this, the chart allows you to specify credentials for an external cache server with the [`externalCache` parameter](#database-parameters). You should also disable the Redis installation with the `redis.enabled` option. Here is an example:
 
 ```console
-shopwareConfigureCache=true
-memcached.enabled=false
+redis.enabled=false
 externalCache.host=myexternalcachehost
-externalCache.port=11211
+externalCache.port=6379
+```
+### Elasticsearch
+
+This chart provides support for using Elasticsearch to index products improving the website performance. To enable this feature `elasticsearch.enabled` parameters to `true`.
+
+When this feature is enabled, a Elasticsearch server will be deployed in your K8s cluster using the Bitnami Elasticsearch chart
+
+It is also possible to use an external Elasticsearch server rather than installing one inside your cluster. To achieve this, the chart allows you to specify credentials for an external Elasticsearch server with the [`externalElasticsearch` parameter](#database-parameters). You should also disable the Redis installation with the `elasticsearch.enabled` option. Here is an example:
+
+```console
+elasticsearch.enabled=false
+externalElasticsearch.host=myexternalcachehost
 ```
 
 ### Ingress
 
 This chart provides support for Ingress resources. If an Ingress controller, such as [nginx-ingress](https://kubeapps.com/charts/stable/nginx-ingress) or [traefik](https://kubeapps.com/charts/stable/traefik), that Ingress controller can be used to serve Shopware.
 
-To enable Ingress integration, set `ingress.enabled` to `true`. The `ingress.hostname` property can be used to set the host name. The `ingress.tls` parameter can be used to add the TLS configuration for this host. It is also possible to have more than one host, with a separate TLS configuration for each host. [Learn more about configuring and using Ingress](https://docs.bitnami.com/kubernetes/apps/shopware/configuration/configure-ingress/).
+To enable Ingress integration, set `ingress.enabled` to `true`. The `ingress.hostname` property can be used to set the host name. The `ingress.tls` parameter can be used to add the TLS configuration for this host. It is also possible to have more than one host, with a separate TLS configuration for each host.
 
 ### TLS secrets
 
 The chart also facilitates the creation of TLS secrets for use with the Ingress controller, with different options for certificate management. [Learn more about TLS secrets](https://docs.bitnami.com/kubernetes/apps/shopware/administration/enable-tls/).
-
-### `.htaccess` files
-
-For performance and security reasons, it is a good practice to configure Apache with the `AllowOverride None` directive. Instead of using `.htaccess` files, Apache will load the same directives at boot time. These directives are located in `/opt/bitnami/shopware/shopware-htaccess.conf`.
-
-By default, the container image includes all the default `.htaccess` files in Shopware (together with the default plugins). To enable this feature, install the chart with the value `allowOverrideNone=yes`.
-
-[Learn more about working with `.htaccess` files](https://docs.bitnami.com/kubernetes/apps/shopware/configuration/understand-htaccess/).
 
 ## Persistence
 
@@ -403,13 +399,10 @@ If you encounter errors when working with persistent volumes, refer to our [trou
 In case you want to add extra environment variables (useful for advanced operations like custom init scripts), you can use the `extraEnvVars` property.
 
 ```yaml
-shopware:
-  extraEnvVars:
-    - name: LOG_LEVEL
-      value: error
+extraEnvVars:
+  - name: LOG_LEVEL
+    value: error
 ```
-
-Alternatively, you can use a ConfigMap or a Secret with the environment variables. To do so, use the `extraEnvVarsCM` or the `extraEnvVarsSecret` values.
 
 ### Sidecars
 
@@ -420,112 +413,3 @@ If additional containers are needed in the same pod as Shopware (such as additio
 This chart allows you to set your custom affinity using the `affinity` parameter. Find more information about Pod affinity in the [kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity).
 
 As an alternative, use one of the preset configurations for pod affinity, pod anti-affinity, and node affinity available at the [bitnami/common](https://github.com/bitnami/charts/tree/master/bitnami/common#affinities) chart. To do so, set the `podAffinityPreset`, `podAntiAffinityPreset`, or `nodeAffinityPreset` parameters.
-
-## Troubleshooting
-
-Find more information about how to deal with common errors related to Bitnami's Helm charts in [this troubleshooting guide](https://docs.bitnami.com/general/how-to/troubleshoot-helm-chart-issues).
-
-## Notable changes
-
-### 11.0.0
-
-The [Bitnami Shopware](https://github.com/bitnami/bitnami-docker-shopware) image was refactored and now the source code is published in GitHub in the [`rootfs`](https://github.com/bitnami/bitnami-docker-shopware/tree/master/5/debian-10/rootfs) folder of the container image.
-
-In addition, several new features have been implemented:
-
-- Multisite mode is now supported via `multisite.*` options.
-- Plugins can be installed and activated on the first deployment via the `shopwarePlugins` option.
-- Added support for limiting auto-updates to Shopware core via the `shopwareAutoUpdateLevel` option. In addition, auto-updates have been disabled by default. To update Shopware core, we recommend to swap the container image version for your deployment instead of using the built-in update functionality.
-
-To enable the new features, it is not possible to do it by upgrading an existing deployment. Instead, it is necessary to perform a fresh deploy.
-
-## Upgrading
-
-### To 12.0.0
-
-Shopware version was bumped to its latest major, `5.8.x`. Though no incompatibilities are expected while upgrading from previous versions, Shopware recommends backing up your application first.
-
-Site backups can be easily performed using tools such as [VaultPress](https://vaultpress.com/) or [All-in-One WP Migration](https://shopware.org/plugins/all-in-one-wp-migration/).
-
-### To 11.0.0
-
-The [Bitnami Shopware](https://github.com/bitnami/bitnami-docker-shopware) image was refactored and now the source code is published in GitHub in the [`rootfs`](https://github.com/bitnami/bitnami-docker-shopware/tree/master/5/debian-10/rootfs) folder of the container image.
-
-Compatibility is not guaranteed due to the amount of involved changes, however no breaking changes are expected.
-
-### To 10.0.0
-
-[On November 13, 2020, Helm v2 support was formally finished](https://github.com/helm/charts#status-of-the-project), this major version is the result of the required changes applied to the Helm Chart to be able to incorporate the different features added in Helm v3 and to be consistent with the Helm project itself regarding the Helm v2 EOL.
-
-[Learn more about this change and related upgrade considerations](https://docs.bitnami.com/kubernetes/apps/shopware/administration/upgrade-helm3/).
-
-#### Additional upgrade notes
-
-- MariaDB dependency version was bumped to a new major version that introduces several incompatibilities. Therefore, backwards compatibility is not guaranteed unless an external database is used. Check [MariaDB Upgrading Notes](https://github.com/bitnami/charts/tree/master/bitnami/mariadb#to-800) for more information.
-- If you want to upgrade to this version from a previous one installed with Helm v3, there are two alternatives:
-  - Install a new Shopware chart, and migrate your Shopware site using backup/restore tools such as [VaultPress](https://vaultpress.com/) or [All-in-One WP Migration](https://shopware.org/plugins/all-in-one-wp-migration/).
-  - Reuse the PVC used to hold the MariaDB data on your previous release. To do so, follow the instructions below (the following example assumes that the release name is `shopware`).
-
-> Warning: please create a backup of your database before running any of these actions. The steps below would be only valid if your application (e.g. any plugins or custom code) is compatible with MariaDB 10.5.
-
-Obtain the credentials and the name of the PVC used to hold the MariaDB data on your current release:
-
-```console
-$ export WORDPRESS_PASSWORD=$(kubectl get secret --namespace default shopware -o jsonpath="{.data.shopware-password}" | base64 --decode)
-$ export MARIADB_ROOT_PASSWORD=$(kubectl get secret --namespace default shopware-mariadb -o jsonpath="{.data.mariadb-root-password}" | base64 --decode)
-$ export MARIADB_PASSWORD=$(kubectl get secret --namespace default shopware-mariadb -o jsonpath="{.data.mariadb-password}" | base64 --decode)
-$ export MARIADB_PVC=$(kubectl get pvc -l app.kubernetes.io/instance=shopware,app.kubernetes.io/name=mariadb,app.kubernetes.io/component=primary -o jsonpath="{.items[0].metadata.name}")
-```
-
-Upgrade your release (maintaining the version) disabling MariaDB and scaling Shopware replicas to 0:
-
-```console
-$ helm upgrade shopware bitnami/shopware --set shopwarePassword=$WORDPRESS_PASSWORD --set replicaCount=0 --set mariadb.enabled=false --version 9.6.4
-```
-
-Finally, upgrade you release to `10.0.0` reusing the existing PVC, and enabling back MariaDB:
-
-```console
-$ helm upgrade shopware bitnami/shopware --set mariadb.primary.persistence.existingClaim=$MARIADB_PVC --set mariadb.auth.rootPassword=$MARIADB_ROOT_PASSWORD --set mariadb.auth.password=$MARIADB_PASSWORD --set shopwarePassword=$WORDPRESS_PASSWORD
-```
-
-You should see the lines below in MariaDB container logs:
-
-```console
-$ kubectl logs $(kubectl get pods -l app.kubernetes.io/instance=shopware,app.kubernetes.io/name=mariadb,app.kubernetes.io/component=primary -o jsonpath="{.items[0].metadata.name}")
-...
-mariadb 12:13:24.98 INFO  ==> Using persisted data
-mariadb 12:13:25.01 INFO  ==> Running mysql_upgrade
-...
-```
-
-### To 9.0.0
-
-The [Bitnami Shopware](https://github.com/bitnami/bitnami-docker-shopware) image was migrated to a "non-root" user approach. Previously the container ran as the `root` user and the Apache daemon was started as the `daemon` user. From now on, both the container and the Apache daemon run as user `1001`. You can revert this behavior by setting the parameters `securityContext.runAsUser`, and `securityContext.fsGroup` to `0`.
-Chart labels and Ingress configuration were also adapted to follow the Helm charts best practices.
-
-Consequences:
-
-- The HTTP/HTTPS ports exposed by the container are now `8080/8443` instead of `80/443`.
-- No writing permissions will be granted on `wp-config.php` by default.
-- Backwards compatibility is not guaranteed.
-
-To upgrade to `9.0.0`, it's recommended to install a new Shopware chart, and migrate your Shopware site using backup/restore tools such as [VaultPress](https://vaultpress.com/) or [All-in-One WP Migration](https://shopware.org/plugins/all-in-one-wp-migration/).
-
-### To 8.0.0
-
-Helm performs a lookup for the object based on its group (apps), version (v1), and kind (Deployment). Also known as its GroupVersionKind, or GVK. Changing the GVK is considered a compatibility breaker from Kubernetes' point of view, so you cannot "upgrade" those objects to the new GVK in-place. Earlier versions of Helm 3 did not perform the lookup correctly which has since been fixed to match the spec.
-
-In https://github.com/helm/charts/pulls/12642 the `apiVersion` of the deployment resources was updated to `apps/v1` in tune with the API's deprecated, resulting in compatibility breakage.
-
-This major version signifies this change.
-
-### To 3.0.0
-
-Backwards compatibility is not guaranteed unless you modify the labels used on the chart's deployments.
-Use the workaround below to upgrade from versions previous to `3.0.0`. The following example assumes that the release name is `shopware`:
-
-```console
-kubectl patch deployment shopware-shopware --type=json -p='[{"op": "remove", "path": "/spec/selector/matchLabels/chart"}]'
-kubectl delete statefulset shopware-mariadb --cascade=false
-```

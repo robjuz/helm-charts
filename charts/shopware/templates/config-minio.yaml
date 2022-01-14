@@ -1,0 +1,80 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ printf "%s-minio" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+  {{- if .Values.commonLabels }}
+  {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+  {{- end }}
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+data:
+  storage.yml: |-
+    shopware:
+      filesystem:
+        private:
+          type: "amazon-s3"
+          config:
+            bucket: "documents"
+            endpoint: {{ include "shopware.minio.endpoint" . }}
+            use_path_style_endpoint: true
+            region: 'local'
+            credentials:
+              key: {{ .Values.minio.auth.rootUser }}
+              secret: {{ .Values.minio.auth.rootPassword }}
+            options:
+              visibility: "private"
+        public:
+          type: "amazon-s3"
+          url: {{ printf "%s/media" (include "shopware.minio.url" .) }}
+          config:
+            bucket: "media"
+            endpoint: {{ include "shopware.minio.endpoint" . }}
+            use_path_style_endpoint: true
+            region: 'local'
+            credentials:
+              key: {{ .Values.minio.auth.rootUser }}
+              secret: {{ .Values.minio.auth.rootPassword }}
+            options:
+              visibility: "public"
+        theme:
+          type: "amazon-s3"
+          url: {{ printf "%s/theme" (include "shopware.minio.url" .) }}
+          config:
+            bucket: "theme"
+            endpoint: {{ include "shopware.minio.endpoint" . }}
+            use_path_style_endpoint: true
+            region: 'local'
+            credentials:
+              key: {{ .Values.minio.auth.rootUser }}
+              secret: {{ .Values.minio.auth.rootPassword }}
+            options:
+              visibility: "public"
+        asset:
+          type: "amazon-s3"
+          url: {{ printf "%s/asset" (include "shopware.minio.url" .) }}
+          config:
+            bucket: "asset"
+            endpoint: {{ include "shopware.minio.endpoint" . }}
+            use_path_style_endpoint: true
+            region: 'local'
+            credentials:
+              key: {{ .Values.minio.auth.rootUser }}
+              secret: {{ .Values.minio.auth.rootPassword }}
+            options:
+              visibility: "public"
+        sitemap:
+          type: "amazon-s3"
+          url: {{ printf "%s/sitemap" (include "shopware.minio.url" .) }}
+          config:
+            bucket: "sitemap"
+            endpoint: {{ include "shopware.minio.endpoint" . }}
+            use_path_style_endpoint: true
+            region: 'local'
+            credentials:
+              key: {{ .Values.minio.auth.rootUser }}
+              secret: {{ .Values.minio.auth.rootPassword }}
+            options:
+              visibility: "public"

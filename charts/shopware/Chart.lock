@@ -4,15 +4,15 @@ dependencies:
   version: 9.8.1
 - name: redis
   repository: https://charts.bitnami.com/bitnami
-  version: 15.6.3
+  version: 15.6.4
 - name: elasticsearch
   repository: https://charts.bitnami.com/bitnami
-  version: 17.3.6
+  version: 17.5.0
 - name: minio
   repository: https://charts.bitnami.com/bitnami
-  version: 9.2.2
+  version: 9.2.5
 - name: common
   repository: https://charts.bitnami.com/bitnami
   version: 1.10.3
-digest: sha256:1ab3ba72aacf37ababa4b1c4177d0b05db4bfb1ec7492d70f4e34b8a16e910ae
-generated: "2021-12-02T11:54:58.097282292+01:00"
+digest: sha256:7e0de68e41b3e64d716ec0c4c2c14c72f49a73ee79731a41ab2a8db79bc561b9
+generated: "2021-12-13T21:42:18.827447663+01:00"

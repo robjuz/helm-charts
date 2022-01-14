@@ -1,4 +1,4 @@
-apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "common.names.fullname" . }}
@@ -28,16 +28,13 @@ spec:
         {{- if .Values.podLabels }}
         {{- include "common.tplvalues.render" (dict "value" .Values.podLabels "context" $) | nindent 8 }}
         {{- end }}
-      {{- if or .Values.podAnnotations .Values.metrics.enabled (include "shopware.createConfigSecret" .) }}
+      {{- if or .Values.podAnnotations .Values.metrics.enabled }}
       annotations:
         {{- if .Values.podAnnotations }}
         {{- include "common.tplvalues.render" (dict "value" .Values.podAnnotations "context" $) | nindent 8 }}
         {{- end }}
         {{- if .Values.metrics.podAnnotations }}
         {{- include "common.tplvalues.render" (dict "value" .Values.metrics.podAnnotations "context" $) | nindent 8 }}
-        {{- end }}
-        {{- if (include "shopware.createConfigSecret" .) }}
-        checksum/config-secret: {{ include (print $.Template.BasePath "/config-secret.yaml") . | sha256sum }}
         {{- end }}
       {{- end }}
     spec:
@@ -176,13 +173,10 @@ spec:
         - name: metrics
           image: {{ template "shopware.metrics.image" . }}
           imagePullPolicy: {{ .Values.metrics.image.pullPolicy | quote }}
-          command:
-            - /bin/apache_exporter
-            - --scrape_uri
-            - http://status.localhost:8080/server-status/?auto
+          command: ['/usr/bin/exporter', '-nginx.scrape-uri', 'http://127.0.0.1:{{- default .Values.containerPorts.http .Values.metrics.port }}/status']
           ports:
             - name: metrics
-              containerPort: 9117
+              containerPort: 9113
           livenessProbe:
             httpGet:
               path: /metrics
@@ -200,29 +194,12 @@ spec:
           {{- end }}
           {{- end }}
           volumeMounts:
-          - mountPath: /var/www/html/config/jwt/
-            name: shopware-jwt
-          - mountPath: /var/www/html/custom/plugins
-            name: shopware-data
-            subPath: plugins
-          - mountPath: /var/www/html/files
-            name: shopware-data
-            subPath: files
-          - mountPath: /var/www/html/public/theme
-            name: shopware-data
-            subPath: theme
-          - mountPath: /var/www/html/public/media
-            name: shopware-data
-            subPath: media
-          - mountPath: /var/www/html/public/bundles
-            name: shopware-data
-            subPath: bundles
-          - mountPath: /var/www/html/public/sitemap
-            name: shopware-data
-            subPath: sitemap
-          - mountPath: /var/www/html/public/thumbnail
-            name: shopware-data
-            subPath: thumbnail
+            - mountPath: /var/www/html/config/jwt/
+              name: shopware-jwt
+            - mountPath: /var/www/html/config/packages/
+              name: shopware-minio
+            - mountPath: /var/www/html/custom/plugins
+              name: shopware-plugins
         {{- if .Values.sidecars }}
         {{- include "common.tplvalues.render" (dict "value" .Values.sidecars "context" $) | nindent 8 }}
         {{- end }}
@@ -230,9 +207,18 @@ spec:
         - name: shopware-jwt
           secret:
             secretName: {{ printf "%s-jwt" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
-        - name: shopware-data
+        {{- if .Values.minio.enabled }}
+        - name: shopware-minio
+          configMap:
+            name: {{ printf "%s-minio" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
+        {{- end }}
+        - name: shopware-plugins
+        {{- if .Values.persistence.enabled}}
           persistentVolumeClaim:
             claimName: {{ .Values.persistence.existingClaim | default (include "common.names.fullname" .) }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
         {{- if .Values.extraVolumes }}
         {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumes "context" $) | nindent 8 }}
         {{- end }}

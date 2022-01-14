@@ -1,0 +1,114 @@
+{{- if .Values.taskRunner.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ printf "%s-task-runner" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  annotations:
+    "helm.sh/hook": "post-install,post-upgrade"
+    "helm.sh/hook-weight": "30"
+  {{- if .Values.commonAnnotations }}
+  {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+      role: task-runner
+  replicas: {{ .Values.taskRunner.replicaCount }}
+  template:
+    metadata:
+      labels:
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
+        role: task-runner
+        {{- if .Values.podLabels }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.podLabels "context" $) | nindent 8 }}
+        {{- end }}
+      {{- if .Values.podAnnotations }}
+      annotations:
+        {{- include "common.tplvalues.render" (dict "value" .Values.podAnnotations "context" $) | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- include "shopware.imagePullSecrets" . | nindent 6 }}
+      {{- if .Values.schedulerName }}
+      schedulerName: {{ .Values.schedulerName | quote }}
+      {{- end }}
+      serviceAccountName: {{ .Values.serviceAccountName }}
+      {{- if .Values.taskRunner.affinity }}
+      affinity: {{- include "common.tplvalues.render" (dict "value" .Values.taskRunner.affinity "context" $) | nindent 8 }}
+      {{- else }}
+      affinity:
+        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.taskRunner.podAffinityPreset "context" $) | nindent 10 }}
+        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.taskRunner.podAntiAffinityPreset "context" $) | nindent 10 }}
+        nodeAffinity: {{- include "common.affinities.nodes" (dict "type" .Values.taskRunner.nodeAffinityPreset.type "key" .Values.taskRunner.nodeAffinityPreset.key "values" .Values.taskRunner.nodeAffinityPreset.values) | nindent 10 }}
+      {{- end }}
+      {{- if .Values.taskRunner.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.taskRunner.nodeSelector "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.tolerations "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.podSecurityContext.enabled }}
+      securityContext: {{- omit .Values.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      {{- end }}
+      restartPolicy: Always
+      containers:
+        - name: task-runner
+          image: {{ template "shopware.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          command: [ "bin/console" ]
+          args: {{- include "common.tplvalues.render" (dict "value" .Values.taskRunner.command "context" $) | nindent 12 }}
+          {{- if .Values.containerSecurityContext.enabled }}
+          securityContext: {{- omit .Values.containerSecurityContext "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.containerSecurityContext.enabled }}
+          securityContext: {{- omit .Values.containerSecurityContext "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.extraEnvVars }}
+          env: {{- include "common.tplvalues.render" (dict "value" .Values.extraEnvVars "context" $) | nindent 12 }}
+          {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ template "common.names.fullname" . }}
+            - secretRef:
+                name: {{ template "common.names.fullname" . }}
+          {{- if .Values.taskRunner.resources }}
+          resources: {{- toYaml .Values.taskRunner.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - mountPath: /var/www/html/config/jwt/
+              name: shopware-jwt
+            - mountPath: /var/www/html/config/packages/
+              name: shopware-minio
+            - mountPath: /var/www/html/custom/plugins
+              name: shopware-plugins
+      volumes:
+        - name: shopware-jwt
+          secret:
+            secretName: {{ printf "%s-jwt" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
+        {{- if .Values.minio.enabled }}
+        - name: shopware-minio
+          configMap:
+            name: {{ printf "%s-minio" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
+        {{- end }}
+      volumes:
+        - name: shopware-jwt
+          secret:
+            secretName: {{ printf "%s-jwt" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
+        {{- if .Values.minio.enabled }}
+        - name: shopware-minio
+          configMap:
+            name: {{ printf "%s-minio" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
+        {{- end }}
+        - name: shopware-plugins
+        {{- if .Values.persistence.enabled}}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "common.names.fullname" .) }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
+{{- end }}

@@ -13,14 +13,31 @@
       "form": true,
       "description": "Defaults to a random 10-character alphanumeric string if not set"
     },
-    "shopwareEmail": {
+    "shopwareLocale": {
       "type": "string",
-      "title": "Admin email",
+      "title": "Default language",
       "form": true
     },
-    "shopwareBlogName": {
+    "shopwareCurrency": {
       "type": "string",
-      "title": "Blog Name",
+      "title": "Default currency",
+      "form": true
+    },
+    "shopwareInstanceId": {
+      "type": "string",
+      "title": "Instance ID",
+      "form": true,
+      "description": "Unique Identifier for the Store: Can be generated with `openssl rand -hex 32`"
+    },
+    "shopwareAppSecret": {
+      "type": "string",
+      "title": "Secret",
+      "form": true,
+      "description": "Can be generated with `openssl rand -hex 32`"
+    },
+    "mailerUrl": {
+      "type": "string",
+      "title": "Mailer URL",
       "form": true
     },
     "persistence": {
