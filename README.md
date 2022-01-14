@@ -14,5 +14,6 @@ $ helm install my-release robjuz/<chart>
 
 ## Available charts
 
-* [Kimai 2](charts/kimai2/README.md)
-* [Nominatim](charts/nominatim/README.md)
+* Kimai 2 (kimai2)
+* Nominatim (nominatim)
+* Shopware 6 (shopware)
