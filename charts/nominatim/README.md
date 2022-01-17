@@ -1,6 +1,8 @@
 # Nominatim
 
-[Nominatim](https://Nominatim.org/)  is a free & open source timetracker. It tracks work time and prints out a summary of your activities on demand. Yearly, monthly, daily, by customer, by project … Its simplicity is its strength.
+[Nominatim](https://Nominatim.org/) is a tool (an API) to search OSM data by name and address and to generate synthetic addresses of OSM points (reverse geocoding).
+
+
 
 ## TL;DR
 
