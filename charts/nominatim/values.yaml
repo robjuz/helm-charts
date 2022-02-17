@@ -35,6 +35,7 @@ nominatimInitialize:
   importGB_Postcode: false
   importUS_Postcode: false
   importStyle: full
+  # customStyleUrl: https://raw.githubusercontent.com/david-mart/Nominatim/master/settings/import-street.style
   threads: 16
 
 nominatimReplications:
