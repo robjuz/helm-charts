@@ -122,6 +122,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | `nominatimInitialize.importGB_Postcode`    | If external GB postcodes should be imported                   | `false`               |
 | `nominatimInitialize.importUS_Postcode`    | If external US postcodes should be imported                   | `false`               |
 | `nominatimInitialize.importStyle`          | Nominatim import style                                        | `full`                |
+| `nominatimInitialize.customStyleUrl`       | Custom import style file URL                                  | `nil`                 |
 | `nominatimInitialize.threads`              | The number of thread used by the import                       | `16`                  |
 
 ### Nominatim Replication Configuration parameters
@@ -216,6 +217,11 @@ This chart provides support for Ingress resources. If an Ingress controller, suc
 
 To enable Ingress integration, set `ingress.enabled` to `true`. The `ingress.hostname` property can be used to set the host name. The `ingress.tls` parameter can be used to add the TLS configuration for this host.
 
+### Custom Import Style
+
+If none of the [default styles](https://nominatim.org/release-docs/latest/admin/Import/#filtering-imported-data) satisfies your needs, you can provide your [customized style file](https://nominatim.org/release-docs/latest/customize/Import-Styles/) by setting the `nominatimInitialize.customStyleUrl` value.
+
+Make sure the file is publicly available for init job to download it. [Example](https://raw.githubusercontent.com/osm-search/Nominatim/master/settings/import-street.style)
 ### TLS secrets
 
 The chart also facilitates the creation of TLS secrets for use with the Ingress controller, with different options for certificate management.

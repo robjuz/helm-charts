@@ -7,6 +7,21 @@ spec:
   template:
     spec:
       initContainers:
+{{- if .Values.nominatimInitialize.customStyleUrl }}
+        - name: download-custom-style
+          image: curlimages/curl
+          workingDir: /nominatim
+          volumeMounts:
+            - mountPath: /nominatim
+              name: data
+          command:
+            - curl
+            - {{ .Values.nominatimInitialize.customStyleUrl }}
+            - -L
+            - -o
+            - custom.style
+{{- end }}
+
 {{- if .Values.nominatimInitialize.importWikipedia }}
         - name: download-wikipedia
           image: curlimages/curl
@@ -86,8 +101,13 @@ spec:
           workingDir: /nominatim
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
+            {{- if .Values.nominatimInitialize.customStyleUrl }}
+            - name: NOMINATIM_IMPORT_STYLE
+              value: /nominatim/custom.style
+            {{- else }}
             - name: NOMINATIM_IMPORT_STYLE
               value: {{ .Values.nominatimInitialize.importStyle }}
+            {{- end }}
             - name: NOMINATIM_DATABASE_DSN
               value: {{ include "nominatim.databaseUrl" . }}
             - name: NOMINATIM_DATABASE_MODULE_PATH
