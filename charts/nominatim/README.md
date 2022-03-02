@@ -21,7 +21,7 @@ This chart has been tested to work with NGINX Ingress and cert-manager on top of
 
 ## Prerequisites
 
-- Kubernetes 1.12+
+- Kubernetes 1.12+ (ingress requires 1.19+)
 - Helm 3.1.0
 - PV provisioner support in the underlying infrastructure
 - ReadWriteMany volumes for deployment scaling and flatnode support
