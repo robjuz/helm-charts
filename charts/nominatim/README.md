@@ -13,7 +13,7 @@ helm install nominatim robjuz/nominatim
 
 ## Introduction
 
-This chart bootstraps a [Nominatim](https://github.com/tobybatch/Nominatim2) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
+This chart bootstraps a [Nominatim](https://nominatim.org/) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
 
 It also packages a customized [Bitnami PostgreSQL chart](https://github.com/bitnami/charts/tree/master/bitnami/postgresql) with build nominatim module which is required for bootstrapping a PostgreSQL deployment for the database requirements of the Nominatim application.
 
