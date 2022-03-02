@@ -90,6 +90,8 @@ spec:
             value: {{ include "nominatim.databaseUser" . }}
           - name: PGPASSWORD
             value: {{ include "nominatim.databasePassword" . }}
+          - name: PGDATABASE
+            value: postgres
           command:
             - psql
             - -c
