@@ -155,7 +155,13 @@ ingress:
 resources:
   limits:
     memory: 150Mi
-    cpu: 1000m
+    cpu: 100m
+
+cron:
+  resources:
+    limits:
+      memory: 150Mi
+      cpu: 30m
 
 nodeSelector: {}
 
