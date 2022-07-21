@@ -121,7 +121,7 @@ Add environment variables to configure database values
 {{- end -}}
 
 {{/*
-Create the database URL. For the time being, this supports only an integrated MySQL
+Create the database URL.
 */}}
 {{- define "nominatim.databaseUrl" -}}
 pgsql:host={{ include "nominatim.databaseHost" . }};port={{ include "nominatim.databasePort" . }};user={{ include "nominatim.databaseUser" . }};password={{ include "nominatim.databasePassword" . }};dbname={{ include "nominatim.databaseName" . }}

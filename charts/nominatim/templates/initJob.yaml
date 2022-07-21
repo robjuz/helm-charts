@@ -46,10 +46,10 @@ spec:
               name: data
           command:
             - curl
-            - https://nominatim.org/data/gb_postcode_data.sql.gz
+            - https://www.nominatim.org/data/gb_postcodes.csv.gz
             - -L
             - -o
-            - gb_postcode_data.sql.gz
+            - gb_postcodes.csv.gz
 {{- end }}
 
 {{- if .Values.nominatimInitialize.importUS_Postcode }}
@@ -61,10 +61,10 @@ spec:
               name: data
           command:
             - curl
-            - https://nominatim.org/data/us_postcode_data.sql.gz
+            - https://www.nominatim.org/data/us_postcodes.csv.gz
             - -L
             - -o
-            - us_postcode_data.sql.gz
+            - us_postcodes.csv.gz
 {{- end }}
 
         - name: download-pbf
@@ -90,6 +90,8 @@ spec:
             value: {{ include "nominatim.databaseUser" . }}
           - name: PGPASSWORD
             value: {{ include "nominatim.databasePassword" . }}
+          - name: PGDATABASE
+            value: postgres
           command:
             - psql
             - -c
