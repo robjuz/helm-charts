@@ -29,5 +29,5 @@ dependencies:
     repository: https://charts.bitnami.com/bitnami
   - name: postgresql
     version: 10.5.3
-    repository: https://charts.bitnami.com/bitnami
+    repository: "file://./charts/postgresql"
     condition: postgresql.enabled
