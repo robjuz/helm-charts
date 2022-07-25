@@ -87,7 +87,7 @@ Add environment variables to configure database values
 
 {{- define "nominatim.databasePort" -}}
 {{- if .Values.postgresql.enabled }}
-    {{- printf "5432" -}}
+    {{- printf "%d" (.Values.postgresql.service.port | int ) -}}
 {{- else -}}
     {{- printf "%d" (.Values.externalDatabase.port | int ) -}}
 {{- end -}}
@@ -96,7 +96,7 @@ Add environment variables to configure database values
 
 {{- define "nominatim.databaseName" -}}
 {{- if .Values.postgresql.enabled }}
-    {{- printf "%s" .Values.externalDatabase.database -}}
+    {{- printf "%s" .Values.postgresql.postgresqlDatabase -}}
 {{- else -}}
     {{- printf "%s" .Values.externalDatabase.database -}}
 {{- end -}}
@@ -105,7 +105,7 @@ Add environment variables to configure database values
 
 {{- define "nominatim.databaseUser" -}}
 {{- if .Values.postgresql.enabled }}
-    {{- printf "postgres" -}}
+    {{- printf "%s" .Values.postgresql.postgresqlUsername -}}
 {{- else -}}
     {{- printf "%s" .Values.externalDatabase.user -}}
 {{- end -}}

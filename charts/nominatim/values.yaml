@@ -174,9 +174,8 @@ postgresql:
     tag: latest
 
   postgresqlPostgresPassword: nominatim
-  postgresqlUsername: www-data
+  postgresqlUsername: nominatim
   postgresqlPassword: nominatim
-#  postgresqlDatabase: nominatim
 
   persistence:
     size: 500Gi
@@ -184,8 +183,6 @@ postgresql:
   postgresqlExtendedConf: {}
 
 externalDatabase:
-  enabled: false
-
   ## @param externalDatabase.host External Database server host
   ##
   host: localhost
@@ -198,6 +195,3 @@ externalDatabase:
   ## @param externalDatabase.password External Database user password
   ##
   password: ""
-  ## @param externalDatabase.database External Database database name
-  ##
-  database: nominatim

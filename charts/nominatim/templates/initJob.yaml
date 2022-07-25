@@ -84,19 +84,18 @@ spec:
         - name: clear-database
           image: postgres
           env:
-          - name: PGHOST
-            value: {{ include "nominatim.databaseHost" . }}
-          - name: PGUSER
-            value: {{ include "nominatim.databaseUser" . }}
-          - name: PGPASSWORD
-            value: {{ include "nominatim.databasePassword" . }}
-          - name: PGDATABASE
-            value: postgres
+            - name: PGHOST
+              value: {{ include "nominatim.databaseHost" . }}
+            - name: PGUSER
+              value: {{ include "nominatim.databaseUser" . }}
+            - name: PGPASSWORD
+              value: {{ include "nominatim.databasePassword" . }}
+            - name: PGDATABASE
+              value: postgres
           command:
             - psql
             - -c
             - "DROP DATABASE IF EXISTS {{ include "nominatim.databaseName" . }}"
-
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -122,6 +121,8 @@ spec:
               value: {{ .Values.nominatimReplications.enabled | quote }}
             - name: THREADS
               value: {{ .Values.nominatimInitialize.threads | quote }}
+            - name: NOMINATIM_DATABASE_WEBUSER
+              value: {{ include "nominatim.databaseUser" . }}
           command:
             - /bin/bash
             - -ec

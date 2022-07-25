@@ -175,19 +175,19 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ### Database Parameters
 
-| Name                                     | Description                                                                  | Value                         |
-| ---------------------------------------- | ---------------------------------------------------------------------------- | ----------------------------- |
-| `postgresql.enabled`                     | Deploy a PostgreSQL server to satisfy the applications database requirements | `true`                        |
-| `postgresql.image.repository`            | PostgreSQL image repository                                                  | `robjuz/postgresql-nominatim` |
-| `postgresql.image.tag`                   | PostgreSQL image tag                                                         | `latest`                      |
-| `postgresql.postgresqlPostgresPassword`  | PostgreSQL root password                                                     | `nominatim`                   |
-| `postgresql.postgresqlUsername`          | PostgreSQL read-only user (this should be not changed)                       | `www-data`                    |
-| `postgresql.postgresqlPassword`          | PostgreSQL database password                                                 | `nominatim`                   |
-| `postgresql.postgresqlDatabase`          | PostgreSQL database name                                                     | `nominatim`                   |
-| `postgresql.persistence.enabled`         | Enable persistence on PostgreSQL using PVC(s)                                | `true`                        |
-| `postgresql.persistence.storageClass`    | Persistent Volume storage class                                              | `nil`                         |
-| `postgresql.persistence.accessModes`     | Persistent Volume access modes                                            | `[ReadWriteOnce]`                |
-| `postgresql.persistence.size`            | Persistent Volume size                                                    | `500Gi`                          |
+| Name                                    | Description                                                                  | Value                         |
+|-----------------------------------------|------------------------------------------------------------------------------|-------------------------------|
+| `postgresql.enabled`                    | Deploy a PostgreSQL server to satisfy the applications database requirements | `true`                        |
+| `postgresql.image.repository`           | PostgreSQL image repository                                                  | `robjuz/postgresql-nominatim` |
+| `postgresql.image.tag`                  | PostgreSQL image tag                                                         | `latest`                      |
+| `postgresql.postgresqlPostgresPassword` | PostgreSQL root password                                                     | `nominatim`                   |
+| `postgresql.postgresqlUsername`         | PostgreSQL read-only user                                                    | `nominatim`                   |
+| `postgresql.postgresqlPassword`         | PostgreSQL database password                                                 | `nominatim`                   |
+| `postgresql.postgresqlDatabase`         | PostgreSQL database name                                                     | `nominatim`                   |
+| `postgresql.persistence.enabled`        | Enable persistence on PostgreSQL using PVC(s)                                | `true`                        |
+| `postgresql.persistence.storageClass`   | Persistent Volume storage class                                              | `nil`                         |
+| `postgresql.persistence.accessModes`    | Persistent Volume access modes                                               | `[ReadWriteOnce]`             |
+| `postgresql.persistence.size`           | Persistent Volume size                                                       | `500Gi`                       |
 
 ## Configuration and installation details
 
