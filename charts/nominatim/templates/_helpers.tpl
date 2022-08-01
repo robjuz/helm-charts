@@ -95,26 +95,36 @@ Add environment variables to configure database values
 
 
 {{- define "nominatim.databaseName" -}}
-{{- if .Values.postgresql.enabled }}
-    {{- printf "%s" .Values.postgresql.postgresqlDatabase -}}
-{{- else -}}
-    {{- printf "%s" .Values.externalDatabase.database -}}
-{{- end -}}
+{{- "nominatim" -}}
 {{- end -}}
 
-
-{{- define "nominatim.databaseUser" -}}
+{{- define "nominatim.databaseRoot" -}}
 {{- if .Values.postgresql.enabled }}
-    {{- printf "%s" .Values.postgresql.postgresqlUsername -}}
+    {{- "postgres" -}}
 {{- else -}}
     {{- printf "%s" .Values.externalDatabase.user -}}
 {{- end -}}
 {{- end -}}
 
+{{- define "nominatim.databaseUser" -}}
+{{- if .Values.postgresql.enabled }}
+    {{- printf "%s" .Values.postgresql.auth.password -}}
+{{- else -}}
+    {{- printf "%s" .Values.externalDatabase.user -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "nominatim.databaseRootPassword" -}}
+{{- if .Values.postgresql.enabled }}
+    {{- printf "%s" .Values.postgresql.auth.postgresPassword -}}
+{{- else -}}
+    {{- printf "%s" .Values.externalDatabase.password -}}
+{{- end -}}
+{{- end -}}
 
 {{- define "nominatim.databasePassword" -}}
 {{- if .Values.postgresql.enabled }}
-    {{- printf "%s" .Values.postgresql.postgresqlPassword -}}
+    {{- printf "%s" .Values.postgresql.auth.password -}}
 {{- else -}}
     {{- printf "%s" .Values.externalDatabase.password -}}
 {{- end -}}
@@ -125,10 +135,6 @@ Create the database URL.
 */}}
 {{- define "nominatim.databaseUrl" -}}
 pgsql:host={{ include "nominatim.databaseHost" . }};port={{ include "nominatim.databasePort" . }};user={{ include "nominatim.databaseUser" . }};password={{ include "nominatim.databasePassword" . }};dbname={{ include "nominatim.databaseName" . }}
-{{- end }}
-
-{{- define "nominatim.databaseDSN" -}}
-postgresql://{{ include "nominatim.databaseUser" . }}:{{ include "nominatim.databasePassword" . }}@{{ include "nominatim.databaseHost" . }}:{{ include "nominatim.databasePort" . }}
 {{- end }}
 
 {{- define "nominatim.containerPort" -}}

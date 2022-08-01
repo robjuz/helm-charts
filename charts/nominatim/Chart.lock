@@ -4,6 +4,6 @@ dependencies:
   version: 1.16.1
 - name: postgresql
   repository: file://./charts/postgresql
-  version: 10.5.3
-digest: sha256:ecab36f96ff918547930acfff02c24b24038ce5d62c3695b8ebc0efa9ce2f74f
-generated: "2022-07-23T20:16:48.764395623+02:00"
+  version: 11.6.20
+digest: sha256:d2b1fc6efd22597f0fd61d37754221afa8760c677cf43dc0042a6634acdc90e1
+generated: "2022-08-01T21:12:20.375114015+02:00"

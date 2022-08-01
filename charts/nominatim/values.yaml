@@ -171,11 +171,13 @@ postgresql:
   image:
     registry:
     repository: robjuz/postgresql-nominatim
-    tag: latest
+    tag: 14.4.0-4.0.1
 
-  postgresqlPostgresPassword: nominatim
-  postgresqlUsername: nominatim
-  postgresqlPassword: nominatim
+  auth:
+    postgresPassword: nominatim
+    username: nominatim
+    password: nominatim
+
 
   persistence:
     size: 500Gi

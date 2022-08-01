@@ -82,20 +82,20 @@ spec:
             - data.osm.pbf
 
         - name: clear-database
-          image: postgres
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           env:
             - name: PGHOST
               value: {{ include "nominatim.databaseHost" . }}
             - name: PGUSER
-              value: {{ include "nominatim.databaseUser" . }}
+              value: {{ include "nominatim.databaseRoot" . }}
             - name: PGPASSWORD
-              value: {{ include "nominatim.databasePassword" . }}
+              value: {{ include "nominatim.databaseRootPassword" . }}
             - name: PGDATABASE
               value: postgres
           command:
             - psql
             - -c
-            - "DROP DATABASE IF EXISTS {{ include "nominatim.databaseName" . }}"
+            - "DROP DATABASE IF EXISTS nominatim"
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
