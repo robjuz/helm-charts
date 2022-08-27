@@ -43,9 +43,6 @@ nominatimReplications:
   enabled: false
   replicationUrl: https://download.geofabrik.de/europe/germany/sachsen-updates/
 
-nominatim:
-  databaseModulePath: /bitnami
-
 nominatimUi:
   enabled: true
   version: 3.2.1
@@ -169,10 +166,6 @@ flatnode:
 
 postgresql:
   enabled: true
-  image:
-    registry:
-    repository: robjuz/postgresql-nominatim
-    tag: 14.4.0-4.0.1
 
   auth:
     postgresPassword: nominatim

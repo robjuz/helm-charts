@@ -45,8 +45,6 @@ spec:
             {{- end }}
             - name: NOMINATIM_DATABASE_DSN
               value: {{ include "nominatim.databaseUrl" . }}
-            - name: NOMINATIM_DATABASE_MODULE_PATH
-              value: {{ .Values.nominatim.databaseModulePath }}
             - name: NOMINATIM_REPLICATION_URL
               value: {{ .Values.nominatimReplications.replicationUrl }}
           command:

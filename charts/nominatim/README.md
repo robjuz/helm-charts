@@ -137,13 +137,6 @@ The command removes all the Kubernetes components associated with the chart and 
 | `nominatimReplications.enabled`            | enable/disable replication      | `false `             |
 | `nominatimReplications.replicationUrl`     | URL with update information     | `https://download.geofabrik.de/europe/germany/sachsen-updates/` |
 
-### Nominatim Configuration parameters
-
-| Name                                       | Description                      | Value                |
-| ----------------------------------- | ------------------------------- | -------------------- |
-| `nominatim.projectDir`              | Nominatim Project Directory     | `/nominatim `             |
-| `nominatim.databaseModulePath`      | Path on the database server there the nominatim module can be found   | `/bitnami` |
-
 ### Nominatim deployment parameters
 
 | Name                                    | Description                                                | Value           |

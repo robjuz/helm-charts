@@ -96,8 +96,6 @@ spec:
             {{- end }}
             - name: NOMINATIM_DATABASE_DSN
               value: {{ include "nominatim.databaseUrl" . }}
-            - name: NOMINATIM_DATABASE_MODULE_PATH
-              value: {{ .Values.nominatim.databaseModulePath }}
             {{- if .Values.flatnode.enabled }}
             - name: NOMINATIM_FLATNODE_FILE
               value: /nominatim/flatnode/flatnode.file
@@ -113,6 +111,7 @@ spec:
             - -ec
             - |
               nominatim import --osm-file data.osm.pbf --threads $THREADS
+              nominatim nominatim index --threads $THREADS
               nominatim admin --check-database
 
               if [ "$REPLICATION_ENABLED" = "true" ]; then
