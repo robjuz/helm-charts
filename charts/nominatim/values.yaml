@@ -43,6 +43,9 @@ nominatimReplications:
   enabled: false
   replicationUrl: https://download.geofabrik.de/europe/germany/sachsen-updates/
 
+nominatim:
+  extraEnv: []
+
 nominatimUi:
   enabled: true
   version: 3.2.1
