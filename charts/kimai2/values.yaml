@@ -36,6 +36,11 @@ commonLabels: {}
 ##
 commonAnnotations: {}
 
+## @param existingSecret Use existing secret for password details
+## You can use an existingSecret for the kimaiAppSecret, kimaiAdminPassword and kimaiMailerUrl,
+## these will be ignored and picked up from the secret.
+##
+existingSecret: ""
 ## @param kimaiAppSecret Secret used to encrypt session cookies (users will be logged out if you change it)
 ##
 kimaiAppSecret: change_this_to_something_unique
@@ -60,7 +65,8 @@ podAnnotations: {}
 podSecurityContext:
   fsGroup: 33
 
-securityContext: {}
+securityContext:
+  {}
   # capabilities:
   #   drop:
   #   - ALL
@@ -107,7 +113,6 @@ service:
   ##
   extraPorts: []
 
-
 ingress:
   ## @param ingress.enabled Enable ingress record generation for WordPress
   ##
@@ -149,7 +154,7 @@ ingress:
   ##       ...
   ##       -----END CERTIFICATE-----
   ##
-  secrets: [ ]
+  secrets: []
 
 resources:
   requests:
