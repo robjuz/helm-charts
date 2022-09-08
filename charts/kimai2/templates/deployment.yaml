@@ -46,7 +46,7 @@ spec:
               value: {{ .Values.kimaiMailerFrom }}
             {{- if .Values.kimaiTrustedProxies }}
             - name: TRUSTED_PROXIES
-              value: 
+              value: {{ .Values.kimaiTrustedProxies }}
             {{- end }}
           envFrom:
             - secretRef:
