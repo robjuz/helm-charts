@@ -59,7 +59,7 @@ kimaiMailerUrl: null://localhost
 ## @param kimaiMailerFrom Application specific “from” address for all emails
 ##
 kimaiMailerFrom: kimai@example.com
-## @param kimaiTrustedProxies to Access Controll Kubernetes LoadBalancer
+## @param kimaiTrustedProxies to Access Control Kubernetes LoadBalancer
 ##
 kimaiTrustedProxies: ""
 
