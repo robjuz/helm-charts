@@ -44,6 +44,10 @@ spec:
               value: localhost,{{ .Values.ingress.hostname }}
             - name: MAILER_FROM
               value: {{ .Values.kimaiMailerFrom }}
+            {{- if .Values.kimaiTrustedProxies }}
+            - name: TRUSTED_PROXIES
+              value: 
+            {{- end }}
           envFrom:
             - secretRef:
                 name: {{ include "kimai2.name" . }}-secret
