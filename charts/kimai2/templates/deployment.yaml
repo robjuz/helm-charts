@@ -41,7 +41,7 @@ spec:
             - name: APP_ENV
               value: {{ .Values.kimaiEnvironment }}
             - name: TRUSTED_HOSTS
-              value: localhost,{{ .Values.ingress.hostname }}
+              value: localhost,{{ .Values.ingress.hostname }},{{ .Values.ingress.ip }}
             - name: MAILER_FROM
               value: {{ .Values.kimaiMailerFrom }}
             {{- if .Values.kimaiTrustedProxies }}
