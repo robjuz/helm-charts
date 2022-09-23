@@ -7,6 +7,11 @@ spec:
   template:
     spec:
       initContainers:
+        - name: wait-for-db
+          image: willwill/wait-for-it
+          args:
+            - {{ include "nominatim.databaseHost" . }}:{{ include "nominatim.databasePort" . }}
+
 {{- if .Values.nominatimInitialize.customStyleUrl }}
         - name: download-custom-style
           image: curlimages/curl
@@ -111,7 +116,7 @@ spec:
             - -ec
             - |
               nominatim import --osm-file data.osm.pbf --threads $THREADS
-              nominatim nominatim index --threads $THREADS
+              nominatim index --threads $THREADS
               nominatim admin --check-database
 
               if [ "$REPLICATION_ENABLED" = "true" ]; then
