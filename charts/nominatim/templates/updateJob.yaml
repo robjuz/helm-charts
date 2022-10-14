@@ -3,8 +3,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "nominatim.fullname" . }}-updates
-  labels:
-    app.kubernetes.io/name: {{ include "nominatim.name" . }}-updates
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
 spec:
   selector:
     matchLabels:

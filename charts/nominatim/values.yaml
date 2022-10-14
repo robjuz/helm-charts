@@ -25,8 +25,21 @@ image:
   tag: ""
 
 imagePullSecrets: []
+## @param nameOverride String to partially override common.names.fullname template (will maintain the release name)
+##
 nameOverride: ""
+## @param fullnameOverride String to fully override common.names.fullname template
+##
 fullnameOverride: ""
+## @param namespaceOverride String to fully override common.names.namespace
+##
+namespaceOverride: ""
+## @param commonAnnotations Common annotations to add to all Nominatim resources (sub-charts are not considered). Evaluated as a template
+##
+commonAnnotations: {}
+## @param commonLabels Common labels to add to all Nominatim resources (sub-charts are not considered). Evaluated as a template
+##
+commonLabels: {}
 
 nominatimInitialize:
   enabled: false
@@ -75,8 +88,58 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
+  ## @param service.type Nominatim K8s service type
+  ##
   type: ClusterIP
+
+  ## @param service.port Nominatim K8s service port
+  ##
   port: 80
+
+  ## @param service.nodePort Nominatim K8s service node port
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport
+  ##
+  nodePort:
+
+  ## @param service.clusterIP Nominatim K8s service clusterIP IP
+  ## e.g:
+  ## clusterIP: None
+  ##
+  clusterIP: ""
+
+   ## @param service.loadBalancerIP Nominatim loadBalancerIP if service type is `LoadBalancer`
+  ## Set the LoadBalancer service type to internal only
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer
+  ##
+  loadBalancerIP: ""
+  ## @param service.externalTrafficPolicy Enable client source IP preservation
+  ## ref https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+  ##
+  externalTrafficPolicy: Cluster
+  ## @param service.loadBalancerSourceRanges Addresses that are allowed when Nominatim service is LoadBalancer
+  ## https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
+  ## E.g.
+  ## loadBalancerSourceRanges:
+  ##   - 10.10.10.0/24
+  ##
+  loadBalancerSourceRanges: []
+  ## @param service.extraPorts Extra ports to expose (normally used with the `sidecar` value)
+  ##
+  extraPorts: []
+  ## @param service.annotations Additional custom annotations for Nominatim service
+  ##
+  annotations: {}
+  ## @param service.sessionAffinity Session Affinity for Kubernetes service, can be "None" or "ClientIP"
+  ## If "ClientIP", consecutive client requests will be directed to the same Pod
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies
+  ##
+  sessionAffinity: None
+  ## @param service.sessionAffinityConfig Additional settings for the sessionAffinity
+  ## sessionAffinityConfig:
+  ##   clientIP:
+  ##     timeoutSeconds: 300
+  ##
+  sessionAffinityConfig: {}
 
 ingress:
   ## @param ingress.enabled Enable ingress record generation for nominatim

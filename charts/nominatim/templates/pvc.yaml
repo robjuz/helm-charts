@@ -3,10 +3,8 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: {{ include "nominatim.fullname" . }}
-  namespace: {{ .Release.Namespace | quote }}
-  labels:
-    app.kubernetes.io/part-of: {{ include "nominatim.name" . }}
-    app.kubernetes.io/name: {{ include "nominatim.name" . }}-postgresql
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
 spec:
   accessModes:
     {{- range .Values.flatnode.accessModes }}
