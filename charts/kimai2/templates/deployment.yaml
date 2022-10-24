@@ -64,7 +64,7 @@ spec:
               httpHeaders:
               - name: Host
                 value: localhost
-            periodSeconds: 10
+            periodSeconds: 30
           readinessProbe:
             httpGet:
               path: /en/login
@@ -72,7 +72,8 @@ spec:
               httpHeaders:
                 - name: Host
                   value: localhost
-            periodSeconds: 10
+            periodSeconds: 30
+            initialDelaySeconds: 30
           {{- if .Values.resources }}
           resources: {{- toYaml .Values.resources | nindent 12 }}
           {{- end }}
