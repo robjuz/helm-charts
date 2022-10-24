@@ -49,7 +49,7 @@ spec:
               value: {{ .Values.kimaiTrustedProxies }}
             {{- end }}
             - name: memory_limit
-              value: {{ .Values.php.memory_limit }}
+              value: {{ .Values.php.memory_limit | quote }}
           envFrom:
             - secretRef:
                 name: {{ include "kimai2.name" . }}-secret
