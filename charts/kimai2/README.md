@@ -68,12 +68,19 @@ The command removes all the Kubernetes components associated with the chart and 
 
 | Name                                   | Description                                        | Value                              |
 | -------------------------------------- | -------------------------------------------------- | ---------------------------------- |
+| `existingSecret`                       | Use existing secret for password details           | `""`                               |
 | `kimaiAppSecret`                       | Secret used to encrypt session cookies             | `change_this_to_something_unique`  |
 | `kimaiAdminEmail`                      | Email for the superadmin account                   | `admin@kimai.local`                |
 | `kimaiAdminPassword`                   | Password for the superadmin account                | `changemeplease`                   |
 | `kimaiEnvironment`                     | Kimai environment name                             | `prod`                             |
 | `kimaiMailerUrl`                       | SMTP connection for emails                         | `null://localhost`                 |
 | `kimaiMailerFrom`                      | Application specific “from” address for all emails | `kimai@example.com`                |
+
+### PHP Configuration parameters
+
+| Name                                   | Description                                          | Value                              |
+| -------------------------------------- | ---------------------------------------------------- | ---------------------------------- |
+| `php.memory_limit`                     | The max. amount of memory a script may consume in MB | `128`                              |
 
 ### Kimai deployment parameters
 

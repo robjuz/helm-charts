@@ -63,6 +63,11 @@ kimaiMailerFrom: kimai@example.com
 ##
 kimaiTrustedProxies: ""
 
+php:
+  ## @param php.memory_limit Set the max. amount of memory a script may consume in MB
+  ##
+  memory_limit: 128
+
 podAnnotations: {}
 
 podSecurityContext:
