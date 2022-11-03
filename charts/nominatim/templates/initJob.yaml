@@ -8,6 +8,8 @@ metadata:
 spec:
   template:
     spec:
+      securityContext:
+        fsGroup: 2000
       initContainers:
         - name: wait-for-db
           image: willwill/wait-for-it
@@ -154,5 +156,10 @@ spec:
           emptyDir:
             medium: Memory
         - name: data
+          {{- if .Values.datapvc.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.datapvc.existingClaim | default (printf "%s-data" (include "nominatim.fullname" .)) }}
+          {{- else }}
           emptyDir: {}
+          {{- end }}
 {{- end }}

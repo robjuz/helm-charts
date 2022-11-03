@@ -1,0 +1,17 @@
+{{- if and .Values.datapvc.enabled (not .Values.datapvc.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "nominatim.fullname" . }}-data
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+spec:
+  accessModes:
+    {{- range .Values.datapvc.accessModes }}
+    - {{ . | quote }}
+      {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.datapvc.size | quote }}
+  {{- include "common.storage.class" (dict "persistence" .Values.datapvc "global" .Values.global) | nindent 2 }}
+{{- end}}
