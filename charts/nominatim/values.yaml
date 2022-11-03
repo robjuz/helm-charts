@@ -58,6 +58,8 @@ nominatimReplications:
 
 nominatim:
   extraEnv: []
+  # setDatabaseDSN: set to false to allow providing the database DSN via extraEnv
+  setDatabaseDSN: true
 
 nominatimUi:
   enabled: true

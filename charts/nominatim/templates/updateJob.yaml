@@ -20,8 +20,13 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           workingDir: /nominatim
           env:
+            {{- if .Values.nominatim.extraEnv }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.nominatim.extraEnv "context" $) | nindent 12 }}
+            {{- end }}
+            {{- if .Values.nominatim.setDatabaseDSN }}
             - name: NOMINATIM_DATABASE_DSN
               value: {{ include "nominatim.databaseUrl" . }}
+            {{- end }}
             - name: NOMINATIM_REPLICATION_URL
               value: {{ .Values.nominatimReplications.replicationUrl }}
             - name: NOMINATIM_IMPORT_STYLE

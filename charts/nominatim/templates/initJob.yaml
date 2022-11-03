@@ -94,6 +94,13 @@ spec:
           workingDir: /nominatim
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
+            {{- if .Values.nominatim.extraEnv }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.nominatim.extraEnv "context" $) | nindent 12 }}
+            {{- end }}
+            {{- if .Values.nominatim.setDatabaseDSN }}
+            - name: NOMINATIM_DATABASE_DSN
+              value: {{ include "nominatim.databaseUrl" . }}
+            {{- end }}
             {{- if .Values.nominatimInitialize.customStyleUrl }}
             - name: NOMINATIM_IMPORT_STYLE
               value: /nominatim/custom.style
@@ -101,8 +108,6 @@ spec:
             - name: NOMINATIM_IMPORT_STYLE
               value: {{ .Values.nominatimInitialize.importStyle }}
             {{- end }}
-            - name: NOMINATIM_DATABASE_DSN
-              value: {{ include "nominatim.databaseUrl" . }}
             {{- if .Values.flatnode.enabled }}
             - name: NOMINATIM_FLATNODE_FILE
               value: /nominatim/flatnode/flatnode.file
