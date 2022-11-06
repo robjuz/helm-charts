@@ -3,7 +3,7 @@
 ##
 replicaCount: 1
 ## @param updateStrategy.type Kimai deployment strategy type
-## @param updateStrategy.rollingUpdate WordPress deployment rolling update configuration parameters
+## @param updateStrategy.rollingUpdate Kimai deployment rolling update configuration parameters
 ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
 ## NOTE: Set it to `Recreate` if you use a PV that cannot be mounted on multiple pods
 ## e.g:
@@ -82,6 +82,102 @@ securityContext:
   # runAsNonRoot: true
   # runAsUser: 1000
 
+## Configure extra options for Kimai containers' liveness, readiness and startup probes
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+## @param livenessProbe.enabled Enable livenessProbe on Kimai containers
+## @skip livenessProbe.httpGet
+## @param livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+## @param livenessProbe.periodSeconds Period seconds for livenessProbe
+## @param livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+## @param livenessProbe.failureThreshold Failure threshold for livenessProbe
+## @param livenessProbe.successThreshold Success threshold for livenessProbe
+##
+livenessProbe:
+  enabled: true
+  httpGet:
+    path: /en/login
+    port: http
+    ## If using an HTTPS-terminating load-balancer, the probes may need to behave
+    ## like the balancer to prevent HTTP 302 responses. According to the Kubernetes
+    ## docs, 302 should be considered "successful", but this issue on GitHub
+    ## (https://github.com/kubernetes/kubernetes/issues/47893) shows that it isn't.
+    ## E.g.
+    ## httpHeaders:
+    ## - name: X-Forwarded-Proto
+    ##   value: https
+    ##
+    httpHeaders: []
+  initialDelaySeconds: 120
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 6
+  successThreshold: 1
+## @param readinessProbe.enabled Enable readinessProbe on Kimai containers
+## @skip readinessProbe.httpGet
+## @param readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
+## @param readinessProbe.periodSeconds Period seconds for readinessProbe
+## @param readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
+## @param readinessProbe.failureThreshold Failure threshold for readinessProbe
+## @param readinessProbe.successThreshold Success threshold for readinessProbe
+##
+readinessProbe:
+  enabled: true
+  httpGet:
+    path: /en/login
+    port: http
+    ## If using an HTTPS-terminating load-balancer, the probes may need to behave
+    ## like the balancer to prevent HTTP 302 responses. According to the Kubernetes
+    ## docs, 302 should be considered "successful", but this issue on GitHub
+    ## (https://github.com/kubernetes/kubernetes/issues/47893) shows that it isn't.
+    ## E.g.
+    ## httpHeaders:
+    ## - name: X-Forwarded-Proto
+    ##   value: https
+    ##
+    httpHeaders: []
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 6
+  successThreshold: 1
+## @param startupProbe.enabled Enable startupProbe on Kimai containers
+## @skip startupProbe.httpGet
+## @param startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
+## @param startupProbe.periodSeconds Period seconds for startupProbe
+## @param startupProbe.timeoutSeconds Timeout seconds for startupProbe
+## @param startupProbe.failureThreshold Failure threshold for startupProbe
+## @param startupProbe.successThreshold Success threshold for startupProbe
+##
+startupProbe:
+  enabled: false
+  httpGet:
+    path: /en/login
+    port: http>e
+    ## If using an HTTPS-terminating load-balancer, the probes may need to behave
+    ## like the balancer to prevent HTTP 302 responses. According to the Kubernetes
+    ## docs, 302 should be considered "successful", but this issue on GitHub
+    ## (https://github.com/kubernetes/kubernetes/issues/47893) shows that it isn't.
+    ## E.g.
+    ## httpHeaders:
+    ## - name: X-Forwarded-Proto
+    ##   value: https
+    ##
+    httpHeaders: []
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 6
+  successThreshold: 1
+## @param customLivenessProbe Custom livenessProbe that overrides the default one
+##
+customLivenessProbe: {}
+## @param customReadinessProbe Custom readinessProbe that overrides the default one
+##
+customReadinessProbe: {}
+## @param customStartupProbe Custom startupProbe that overrides the default one
+##
+customStartupProbe: {}
+
 service:
   ## @param service.type Shopware service type
   ##
@@ -122,7 +218,7 @@ service:
   extraPorts: []
 
 ingress:
-  ## @param ingress.enabled Enable ingress record generation for WordPress
+  ## @param ingress.enabled Enable ingress record generation for Kimai
   ##
   enabled: false
   ## @param ingress.certManager Add the corresponding annotations for cert-manager integration
