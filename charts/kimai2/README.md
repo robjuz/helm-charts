@@ -50,77 +50,97 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ### Common parameters
 
-| Name                | Description                                        | Value           |
-| ------------------- | -------------------------------------------------- | --------------- |
-| `nameOverride`      | String to partially override common.names.fullname | `nil`           |
-| `fullnameOverride`  | String to fully override common.names.fullname     | `nil`           |
+| Name               | Description                                        | Value |
+|--------------------|----------------------------------------------------|-------|
+| `nameOverride`     | String to partially override common.names.fullname | `nil` |
+| `fullnameOverride` | String to fully override common.names.fullname     | `nil` |
 
 ### Kimai Image parameters
 
-| Name                | Description                                          | Value                 |
-| ------------------- | ---------------------------------------------------- | --------------------- |
-| `image.repository`  | Kimai image repository                               | `kimai/kimai2`        |
-| `image.tag`         | Kimai image tag (immutable tags are recommended)     | `apache` |
-| `image.pullPolicy`  | Kimai image pull policy                              | `IfNotPresent`        |
-| `imagePullSecrets`  | Kimai image pull secrets                             | `[]`                  |
+| Name               | Description                                      | Value          |
+|--------------------|--------------------------------------------------|----------------|
+| `image.repository` | Kimai image repository                           | `kimai/kimai2` |
+| `image.tag`        | Kimai image tag (immutable tags are recommended) | `apache`       |
+| `image.pullPolicy` | Kimai image pull policy                          | `IfNotPresent` |
+| `imagePullSecrets` | Kimai image pull secrets                         | `[]`           |
 
 ### Kimai Configuration parameters
 
-| Name                                   | Description                                        | Value                              |
-| -------------------------------------- | -------------------------------------------------- | ---------------------------------- |
-| `existingSecret`                       | Use existing secret for password details           | `""`                               |
-| `kimaiAppSecret`                       | Secret used to encrypt session cookies             | `change_this_to_something_unique`  |
-| `kimaiAdminEmail`                      | Email for the superadmin account                   | `admin@kimai.local`                |
-| `kimaiAdminPassword`                   | Password for the superadmin account                | `changemeplease`                   |
-| `kimaiEnvironment`                     | Kimai environment name                             | `prod`                             |
-| `kimaiMailerUrl`                       | SMTP connection for emails                         | `null://localhost`                 |
-| `kimaiMailerFrom`                      | Application specific “from” address for all emails | `kimai@example.com`                |
+| Name                 | Description                                        | Value                             |
+|----------------------|----------------------------------------------------|-----------------------------------|
+| `existingSecret`     | Use existing secret for password details           | `""`                              |
+| `kimaiAppSecret`     | Secret used to encrypt session cookies             | `change_this_to_something_unique` |
+| `kimaiAdminEmail`    | Email for the superadmin account                   | `admin@kimai.local`               |
+| `kimaiAdminPassword` | Password for the superadmin account                | `changemeplease`                  |
+| `kimaiEnvironment`   | Kimai environment name                             | `prod`                            |
+| `kimaiMailerUrl`     | SMTP connection for emails                         | `null://localhost`                |
+| `kimaiMailerFrom`    | Application specific “from” address for all emails | `kimai@example.com`               |
 
 ### PHP Configuration parameters
 
-| Name                                   | Description                                          | Value                              |
-| -------------------------------------- | ---------------------------------------------------- | ---------------------------------- |
-| `php.memory_limit`                     | The max. amount of memory a script may consume in MB | `128`                              |
+| Name               | Description                                          | Value |
+|--------------------|------------------------------------------------------|-------|
+| `php.memory_limit` | The max. amount of memory a script may consume in MB | `128` |
 
 ### Kimai deployment parameters
 
-| Name                                    | Description                                                | Value           |
-| --------------------------------------- | -----------------------------------------------------------| --------------- |
-| `replicaCount`                          | Number of Kimai replicas to deploy                         | `1`             |
-| `updateStrategy.type`                   | Kimai deployment strategy type                             | `RollingUpdate` |
-| `updateStrategy.rollingUpdate`          | Kimai deployment rolling update configuration parameters   | `{}`            |
-| `schedulerName`                         | Alternate scheduler                                        | `nil`           |
-| `serviceAccountName`                    | ServiceAccount name                                        | `default`       |
-| `hostAliases`                           | Kimai pod host aliases                                     | `[]`            |
-| `podAnnotations`                        | Annotations for Kimai pods                                 | `{}`            |
+| Name                                 | Description                                              | Value           |
+|--------------------------------------|----------------------------------------------------------|-----------------|
+| `replicaCount`                       | Number of Kimai replicas to deploy                       | `1`             |
+| `updateStrategy.type`                | Kimai deployment strategy type                           | `RollingUpdate` |
+| `updateStrategy.rollingUpdate`       | Kimai deployment rolling update configuration parameters | `{}`            |
+| `schedulerName`                      | Alternate scheduler                                      | `nil`           |
+| `serviceAccountName`                 | ServiceAccount name                                      | `default`       |
+| `hostAliases`                        | Kimai pod host aliases                                   | `[]`            |
+| `podAnnotations`                     | Annotations for Kimai pods                               | `{}`            |
+| `livenessProbe.enabled`              | Enable livenessProbe on Kimai containers                 | `true`          |
+| `livenessProbe.initialDelaySeconds`  | Initial delay seconds for livenessProbe                  | `120`           |
+| `livenessProbe.periodSeconds`        | Period seconds for livenessProbe                         | `10`            |
+| `livenessProbe.timeoutSeconds`       | Timeout seconds for livenessProbe                        | `5`             |
+| `livenessProbe.failureThreshold`     | Failure threshold for livenessProbe                      | `6`             |
+| `livenessProbe.successThreshold`     | Success threshold for livenessProbe                      | `1`             |
+| `readinessProbe.enabled`             | Enable readinessProbe on Kimai containers                | `true`          |
+| `readinessProbe.initialDelaySeconds` | Initial delay seconds for readinessProbe                 | `30`            |
+| `readinessProbe.periodSeconds`       | Period seconds for readinessProbe                        | `10`            |
+| `readinessProbe.timeoutSeconds`      | Timeout seconds for readinessProbe                       | `5`             |
+| `readinessProbe.failureThreshold`    | Failure threshold for readinessProbe                     | `6`             |
+| `readinessProbe.successThreshold`    | Success threshold for readinessProbe                     | `1`             |
+| `startupProbe.enabled`               | Enable startupProbe on Kimai containers                  | `false`         |
+| `startupProbe.initialDelaySeconds`   | Initial delay seconds for startupProbe                   | `30`            |
+| `startupProbe.periodSeconds`         | Period seconds for startupProbe                          | `10`            |
+| `startupProbe.timeoutSeconds`        | Timeout seconds for startupProbe                         | `5`             |
+| `startupProbe.failureThreshold`      | Failure threshold for startupProbe                       | `6`             |
+| `startupProbe.successThreshold`      | Success threshold for startupProbe                       | `1`             |
+| `customLivenessProbe`                | Custom livenessProbe that overrides the default one      | `{}`            |
+| `customReadinessProbe`               | Custom readinessProbe that overrides the default one     | `{}`            |
 
 ### Traffic Exposure Parameters
 
-| Name                               | Description                                                                      | Value          |
-| ---------------------------------- | ---------------------------------------------------------------------------------| -------------- |
-| `service.type`                     | Kimai service type                                                               | `ClusterIP`    |
-| `service.port`                     | Kimai service HTTP port                                                          | `80`           |
-| `ingress.enabled`                  | Enable ingress record generation for Kimai                                       | `false`        |
-| `ingress.certManager`              | Add the corresponding annotations for cert-manager integration                   | `false`        |
-| `ingress.hostname`                 | Default host for the ingress record                                              | `kimai.local`  |
-| `ingress.annotations`              | Additional custom annotations for the ingress record                             | `{}`           |
-| `ingress.tls`                      | Enable TLS configuration for the host defined at `ingress.hostname` parameter    | `false`        |
-| `ingress.secrets`                  | Custom TLS certificates as secrets                                               | `[]`           |
+| Name                  | Description                                                                   | Value         |
+|-----------------------|-------------------------------------------------------------------------------|---------------|
+| `service.type`        | Kimai service type                                                            | `ClusterIP`   |
+| `service.port`        | Kimai service HTTP port                                                       | `80`          |
+| `ingress.enabled`     | Enable ingress record generation for Kimai                                    | `false`       |
+| `ingress.certManager` | Add the corresponding annotations for cert-manager integration                | `false`       |
+| `ingress.hostname`    | Default host for the ingress record                                           | `kimai.local` |
+| `ingress.annotations` | Additional custom annotations for the ingress record                          | `{}`          |
+| `ingress.tls`         | Enable TLS configuration for the host defined at `ingress.hostname` parameter | `false`       |
+| `ingress.secrets`     | Custom TLS certificates as secrets                                            | `[]`          |
 
 ### Persistence Parameters
 
-| Name                                          | Description                                                | Value             |
-| --------------------------------------------- | -----------------------------------------------------------| ----------------- |
-| `persistence.enabled`                         | Enable persistence using Persistent Volume Claims          | `true`            |
-| `persistence.storageClass`                    | Persistent Volume storage class                            | `nil`             |
-| `persistence.accessModes`                     | Persistent Volume access modes                             | `[ReadWriteOnce]` |
-| `persistence.size`                            | Persistent Volume size                                     | `4Gi`             |
-| `persistence.existingClaim`                   | The name of an existing PVC to use for persistence         | `nil`             |
+| Name                        | Description                                        | Value             |
+|-----------------------------|----------------------------------------------------|-------------------|
+| `persistence.enabled`       | Enable persistence using Persistent Volume Claims  | `true`            |
+| `persistence.storageClass`  | Persistent Volume storage class                    | `nil`             |
+| `persistence.accessModes`   | Persistent Volume access modes                     | `[ReadWriteOnce]` |
+| `persistence.size`          | Persistent Volume size                             | `4Gi`             |
+| `persistence.existingClaim` | The name of an existing PVC to use for persistence | `nil`             |
 
 ### Database Parameters
 
 | Name                                       | Description                                                               | Value             |
-| ------------------------------------------ | ------------------------------------------------------------------------- | ----------------- |
+|--------------------------------------------|---------------------------------------------------------------------------|-------------------|
 | `mariadb.enabled`                          | Deploy a MariaDB server to satisfy the applications database requirements | `true`            |
 | `mariadb.architecture`                     | MariaDB architecture. Allowed values: `standalone` or `replication`       | `standalone`      |
 | `mariadb.auth.rootPassword`                | MariaDB root password                                                     | `changeme`        |

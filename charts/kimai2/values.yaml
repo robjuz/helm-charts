@@ -106,7 +106,9 @@ livenessProbe:
     ## - name: X-Forwarded-Proto
     ##   value: https
     ##
-    httpHeaders: []
+    httpHeaders:
+      - name: Host
+        value: localhost
   initialDelaySeconds: 120
   periodSeconds: 10
   timeoutSeconds: 5
@@ -134,7 +136,9 @@ readinessProbe:
     ## - name: X-Forwarded-Proto
     ##   value: https
     ##
-    httpHeaders: []
+    httpHeaders:
+      - name: Host
+        value: localhost
   initialDelaySeconds: 30
   periodSeconds: 10
   timeoutSeconds: 5
@@ -162,7 +166,9 @@ startupProbe:
     ## - name: X-Forwarded-Proto
     ##   value: https
     ##
-    httpHeaders: []
+    httpHeaders:
+      - name: Host
+        value: localhost
   initialDelaySeconds: 30
   periodSeconds: 10
   timeoutSeconds: 5
