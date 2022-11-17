@@ -1412,4 +1412,23 @@ entries:
     urls:
     - https://github.com/robjuz/helm-charts/releases/download/shopware-1.0.0/shopware-1.0.0.tgz
     version: 1.0.0
-generated: "2022-11-07T18:32:29.836592221Z"
+  unpubd:
+  - apiVersion: v2
+    appVersion: 0.0.5
+    created: "2022-11-17T08:31:54.595755461Z"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      version: 1.x.x
+    - condition: mongodb.enabled
+      name: mongodb
+      repository: https://charts.bitnami.com/bitnami
+      version: 13.x.x
+    description: A Helm chart for Kubernetes
+    digest: 3f0116d8aa7395c626d77e63806926739935b52e14a4d33adda709041bcf3145
+    name: unpubd
+    type: application
+    urls:
+    - https://github.com/robjuz/helm-charts/releases/download/unpubd-1.0.0/unpubd-1.0.0.tgz
+    version: 1.0.0
+generated: "2022-11-17T08:31:54.595936665Z"
