@@ -55,7 +55,7 @@ spec:
               value: {{ .Values.tz }}
           ports:
             - name: http
-              containerPort: 8001
+              containerPort: 8080
               protocol: TCP
           {{- if .Values.customLivenessProbe }}
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.customLivenessProbe "context" $) | nindent 12 }}
