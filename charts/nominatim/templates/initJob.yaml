@@ -144,6 +144,10 @@ spec:
               subPath: flatnode
             {{- end }}
       restartPolicy: OnFailure
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       volumes:
         {{- if  .Values.flatnode.enabled }}
         - name: flatnode
