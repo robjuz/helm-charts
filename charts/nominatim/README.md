@@ -55,7 +55,7 @@ To improve the import speed you can set additional PostgreSQL params
           checkpoint_timeout = 10min
           checkpoint_completion_target = 0.9
           fsync = off
-          fullPageWrites = off
+          full_page_writes = off
 ```
 
 To install the chart with the release name `nominatim`:
