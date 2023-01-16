@@ -183,10 +183,10 @@ The command removes all the Kubernetes components associated with the chart and 
 | `postgresql.primary.persistence.storageClass` | Persistent Volume storage class                                              | `nil`                         |
 | `postgresql.primary.persistence.accessModes`  | Persistent Volume access modes                                               | `[ReadWriteOnce]`             |
 | `postgresql.primary.persistence.size`         | Persistent Volume size                                                       | `500Gi`                       |
- | `externalDatase.host`                         | External PostgreSQL host (ignored if `postgresql.enabled = true`)            | localhost                     |
- | `externalDatase.port`                         | External PostgreSQL post (ignored if `postgresql.enabled = true`)            | 5432                          |
- | `externalDatase.user`                         | External PostgreSQL user (ignored if `postgresql.enabled = true`)            | nominatim                     |
- | `externalDatase.password`                     | External PostgreSQL password (ignored if `postgresql.enabled = true`)        | ""                            |
+| `externalDatabase.host`                       | External PostgreSQL host (ignored if `postgresql.enabled = true`)            | localhost                     |
+| `externalDatabase.port`                       | External PostgreSQL post (ignored if `postgresql.enabled = true`)            | 5432                          |
+| `externalDatabase.user`                       | External PostgreSQL user (ignored if `postgresql.enabled = true`)            | nominatim                     |
+| `externalDatabase.password`                   | External PostgreSQL password (ignored if `postgresql.enabled = true`)        | ""                            |
 ## Configuration and installation details
 
 ### Flatnode support
