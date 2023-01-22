@@ -265,3 +265,24 @@ externalDatabase:
   ## @param externalDatabase.password External Database user password
   ##
   password: ""
+
+datapvc:
+  ## @param datapvc.enabled Enable using Persistent Volume Claims for the data volume used in initJob
+  ##
+  enabled: false
+  ## @param datapvc.storageClass Persistent Volume storage class
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is set, choosing the default provisioner
+  ##
+  storageClass:
+  ## @param datapvc.accessModes [array] Persistent Volume access modes
+  ##
+  accessModes:
+    - ReadWriteOnce
+  ## @param datapvc.size Persistent Volume size
+  ##
+  size: 100Gi
+  ## @param datapvc.existingClaim The name of an existing PVC to use for persistence
+  ##
+  existingClaim:

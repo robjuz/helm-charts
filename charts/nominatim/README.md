@@ -171,6 +171,19 @@ The command removes all the Kubernetes components associated with the chart and 
 | `flatnode.size`                            | Persistent Volume size                                     | `100Gi`             |
 | `flatnode.existingClaim`                   | The name of an existing PVC to use for flatnode            | `nil`             |
 
+
+### Data PVC Parameters
+
+
+| Name                                          | Description                                                | Value             |
+| --------------------------------------------- | -----------------------------------------------------------| ----------------- |
+| `datapvc.enabled`                         | Enable Data persistence using Persistent Volume Claims             | `false`            |
+| `datapvc.storageClass`                    | Persistent Volume storage class                            | `nil`             |
+| `datapvc.accessModes`                     | Persistent Volume access modes                             | `[ReadWriteMany]` |
+| `datapvc.size`                            | Persistent Volume size                                     | `100Gi`             |
+| `datapvc.existingClaim`                   | The name of an existing PVC            | `nil`             |
+
+
 ### Database Parameters
 
 | Name                                          | Description                                                                  | Value                         |
@@ -194,6 +207,11 @@ The command removes all the Kubernetes components associated with the chart and 
 When importing large extracts (Europe/Planet) the usage of flatnode is recommended. 
 Using flatnode with replication enabled requires the usage of a ReadWriteMany volume, because the flatnode file needs to be shared within the pods.
 This also applies when scaling the nominatim deployment.
+
+### PVC For data
+
+When importing large extracts (Europe/Planet) there data needed to be downloaded are quite big. If you server has not enought disk space to store the data, you can use a dedicated PV for this.
+
 
 ### External database support
 
