@@ -1,15 +1,15 @@
 apiVersion: v2
-name: kimai2
+name: unpubd
 description: A Helm chart for Kubernetes
 type: application
-version: 2.0.0
-appVersion: "apache-1.30.1-prod"
+version: 1.0.1
+appVersion: "0.0.5"
 
 dependencies:
   - name: common
     version: 1.x.x
     repository: https://charts.bitnami.com/bitnami
-  - name: mariadb
+  - name: mongodb
     repository: https://charts.bitnami.com/bitnami
-    version: 11.x.x
-    condition: mariadb.enabled
+    version: 13.x.x
+    condition: mongodb.enabled

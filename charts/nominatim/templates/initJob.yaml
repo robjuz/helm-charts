@@ -134,6 +134,13 @@ spec:
                   nominatim freeze
                 fi
               fi;
+              
+              echo "Import job done. Warming up database indices."
+              
+              nominatim admin --warm
+              
+              echo "Warming finished."
+              echo "Initialization finished. Please continue with step 2 now."
 
           volumeMounts:
             - mountPath: /nominatim

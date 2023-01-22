@@ -4,12 +4,12 @@ metadata:
   name: {{ include "common.names.fullname" . }}
   namespace: {{ .Release.Namespace | quote }}
   labels:
-    {{- include "kimai2.labels" . | nindent 4 }}
+    {{- include "unpubd.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "kimai2.selectorLabels" . | nindent 6 }}
+      {{- include "unpubd.selectorLabels" . | nindent 6 }}
 
   {{- if .Values.updateStrategy }}
   strategy: {{- toYaml .Values.updateStrategy | nindent 4 }}
@@ -21,7 +21,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "kimai2.selectorLabels" . | nindent 8 }}
+        {{- include "unpubd.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -36,26 +36,26 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            - name: ADMINMAIL
-              value: {{ .Values.kimaiAdminEmail }}
-            - name: APP_ENV
-              value: {{ .Values.kimaiEnvironment }}
-            - name: TRUSTED_HOSTS
-              value: localhost,{{ .Values.ingress.hostname }}
-            - name: MAILER_FROM
-              value: {{ .Values.kimaiMailerFrom }}
-            {{- if .Values.kimaiTrustedProxies }}
-            - name: TRUSTED_PROXIES
-              value: {{ .Values.kimaiTrustedProxies }}
-            {{- end }}
-            - name: memory_limit
-              value: {{ .Values.php.memory_limit | quote }}
-          envFrom:
-            - secretRef:
-                name: {{ include "kimai2.name" . }}-secret
+            - name: UNPUBD_PORT
+              value: '8080'
+            - name: MONGO_HOST
+              value: {{ include "unpubd.databaseHost" . | quote }}
+            - name: MONGO_PORT
+              value: {{ include "unpubd.databasePort" . | quote }}
+            - name: MONGO_DATABASE
+              value: {{ include "unpubd.databaseName" . | quote }}
+            - name: MONGO_ROOT_USERNAME
+              value: {{ include "unpubd.databaseRootUser" . | quote }}
+            - name: MONGO_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "unpubd.databaseSecretName" . }}
+                  key: mongodb-root-password
+            - name: TZ
+              value: {{ .Values.tz }}
           ports:
             - name: http
-              containerPort: 8001
+              containerPort: 8080
               protocol: TCP
           {{- if .Values.customLivenessProbe }}
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.customLivenessProbe "context" $) | nindent 12 }}
@@ -75,14 +75,6 @@ spec:
           {{- if .Values.resources }}
           resources: {{- toYaml .Values.resources | nindent 12 }}
           {{- end }}
-          volumeMounts:
-            - mountPath: /opt/kimai/var
-              name: kimai-data
-            {{- if .Values.configuration }}
-            - name: config
-              mountPath: /opt/kimai/config/packages/local.yaml
-              subPath: local.yaml
-      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -95,16 +87,3 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      volumes:
-        - name: kimai-data
-          {{- if  .Values.persistence.enabled}}
-          persistentVolumeClaim:
-            claimName: {{ .Values.persistence.existingClaim | default (include "common.names.fullname" .) }}
-          {{- else }}
-          emptyDir: {}
-          {{- end }}
-        {{- if .Values.configuration }}
-        - name: config
-          configMap:
-            name: {{ include "kimai2.name" . }}-config
-        {{- end }}

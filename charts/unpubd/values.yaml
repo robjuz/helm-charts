@@ -1,9 +1,9 @@
-## @param replicaCount Number of Kimai replicas to deploy
+## @param replicaCount Number of Unpubd replicas to deploy
 ## NOTE: ReadWriteMany PVC(s) are required if replicaCount > 1
 ##
 replicaCount: 1
-## @param updateStrategy.type Kimai deployment strategy type
-## @param updateStrategy.rollingUpdate Kimai deployment rolling update configuration parameters
+## @param updateStrategy.type Unpubd deployment strategy type
+## @param updateStrategy.rollingUpdate Unpubd deployment rolling update configuration parameters
 ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
 ## NOTE: Set it to `Recreate` if you use a PV that cannot be mounted on multiple pods
 ## e.g:
@@ -14,15 +14,23 @@ replicaCount: 1
 ##    maxUnavailable: 25%
 ##
 updateStrategy:
-  type: Recreate
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 25%
+    maxUnavailable: 25%
 
 image:
-  repository: kimai/kimai2
+  repository: noojee/unpubd
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
 imagePullSecrets: []
+
+## @param tz String to time zone setting
+##
+tz: 'Europe/Berlin'
+
 ## @param nameOverride String to partially override common.names.fullname
 ##
 nameOverride:
@@ -35,38 +43,6 @@ commonLabels: {}
 ## @param commonAnnotations Annotations to add to all deployed objects
 ##
 commonAnnotations: {}
-
-## @param existingSecret Use existing secret for password details
-## You can use an existingSecret for the kimaiAppSecret, kimaiAdminPassword and kimaiMailerUrl,
-## these will be ignored and picked up from the secret.
-##
-existingSecret: ""
-## @param kimaiAppSecret Secret used to encrypt session cookies (users will be logged out if you change it)
-##
-kimaiAppSecret: change_this_to_something_unique
-## @param kimaiAdminEmail Email for the superadmin account
-##
-kimaiAdminEmail: admin@kimai.local
-## @param kimaiAdminPassword Password for the superadmin account
-##
-kimaiAdminPassword: changemeplease
-## @param kimaiEnvironment Kimai environment name
-##
-kimaiEnvironment: prod
-## @param kimaiMailerUrl Smtp connection for emails
-##
-kimaiMailerUrl: null://localhost
-## @param kimaiMailerFrom Application specific “from” address for all emails
-##
-kimaiMailerFrom: kimai@example.com
-## @param kimaiTrustedProxies to Access Control Kubernetes LoadBalancer
-##
-kimaiTrustedProxies: ""
-
-php:
-  ## @param php.memory_limit Set the max. amount of memory a script may consume in MB
-  ##
-  memory_limit: 128
 
 podAnnotations: {}
 
@@ -82,9 +58,9 @@ securityContext:
   # runAsNonRoot: true
   # runAsUser: 1000
 
-## Configure extra options for Kimai containers' liveness, readiness and startup probes
+## Configure extra options for Unpubd containers' liveness, readiness and startup probes
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
-## @param livenessProbe.enabled Enable livenessProbe on Kimai containers
+## @param livenessProbe.enabled Enable livenessProbe on Unpubd containers
 ## @skip livenessProbe.httpGet
 ## @param livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
 ## @param livenessProbe.periodSeconds Period seconds for livenessProbe
@@ -95,7 +71,7 @@ securityContext:
 livenessProbe:
   enabled: true
   httpGet:
-    path: /en/login
+    path: /
     port: http
     ## If using an HTTPS-terminating load-balancer, the probes may need to behave
     ## like the balancer to prevent HTTP 302 responses. According to the Kubernetes
@@ -106,15 +82,12 @@ livenessProbe:
     ## - name: X-Forwarded-Proto
     ##   value: https
     ##
-    httpHeaders:
-      - name: Host
-        value: localhost
   initialDelaySeconds: 120
   periodSeconds: 10
   timeoutSeconds: 5
   failureThreshold: 6
   successThreshold: 1
-## @param readinessProbe.enabled Enable readinessProbe on Kimai containers
+## @param readinessProbe.enabled Enable readinessProbe on Unpubd containers
 ## @skip readinessProbe.httpGet
 ## @param readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
 ## @param readinessProbe.periodSeconds Period seconds for readinessProbe
@@ -125,7 +98,7 @@ livenessProbe:
 readinessProbe:
   enabled: true
   httpGet:
-    path: /en/login
+    path: /
     port: http
     ## If using an HTTPS-terminating load-balancer, the probes may need to behave
     ## like the balancer to prevent HTTP 302 responses. According to the Kubernetes
@@ -136,15 +109,12 @@ readinessProbe:
     ## - name: X-Forwarded-Proto
     ##   value: https
     ##
-    httpHeaders:
-      - name: Host
-        value: localhost
   initialDelaySeconds: 30
   periodSeconds: 10
   timeoutSeconds: 5
   failureThreshold: 6
   successThreshold: 1
-## @param startupProbe.enabled Enable startupProbe on Kimai containers
+## @param startupProbe.enabled Enable startupProbe on Unpubd containers
 ## @skip startupProbe.httpGet
 ## @param startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
 ## @param startupProbe.periodSeconds Period seconds for startupProbe
@@ -155,8 +125,8 @@ readinessProbe:
 startupProbe:
   enabled: false
   httpGet:
-    path: /en/login
-    port: http>e
+    path: /
+    port: http
     ## If using an HTTPS-terminating load-balancer, the probes may need to behave
     ## like the balancer to prevent HTTP 302 responses. According to the Kubernetes
     ## docs, 302 should be considered "successful", but this issue on GitHub
@@ -166,9 +136,6 @@ startupProbe:
     ## - name: X-Forwarded-Proto
     ##   value: https
     ##
-    httpHeaders:
-      - name: Host
-        value: localhost
   initialDelaySeconds: 30
   periodSeconds: 10
   timeoutSeconds: 5
@@ -224,7 +191,7 @@ service:
   extraPorts: []
 
 ingress:
-  ## @param ingress.enabled Enable ingress record generation for Kimai
+  ## @param ingress.enabled Enable ingress record generation for Unpubd
   ##
   enabled: false
   ## @param ingress.certManager Add the corresponding annotations for cert-manager integration
@@ -236,7 +203,7 @@ ingress:
   annotations: {}
   ## @param ingress.hostname Default host for the ingress record
   ##
-  hostname: kimai.local
+  hostname: unpubd.local
   ## @param ingress.tls Enable TLS configuration for the host defined at `ingress.hostname` parameter
   ## TLS certificates will be retrieved from a TLS secret with name: `{{- printf "%s-tls" .Values.ingress.hostname }}`
   ## You can:
@@ -254,7 +221,7 @@ ingress:
   ## Please see README.md for more information
   ## e.g:
   ## secrets:
-  ##   - name: kimai.local-tls
+  ##   - name: unpubd.local-tls
   ##     key: |-
   ##       -----BEGIN RSA PRIVATE KEY-----
   ##       ...
@@ -268,22 +235,16 @@ ingress:
 
 resources:
   requests:
-    cpu: 100m
+    cpu: 10m
   limits:
-    memory: 256Mi
-    cpu: 500m
+    memory: 128Mi
+    cpu: 100m
 
 nodeSelector: {}
 
 tolerations: []
 
 affinity: {}
-
-configuration: |-
-  monolog:
-      handlers:
-          main:
-              path: php://stderr
 
 persistence:
   ## @param persistence.enabled Enable persistence using Persistent Volume Claims
@@ -306,48 +267,48 @@ persistence:
   ##
   existingClaim:
 
-## MariaDB chart configuration
-## ref: https://github.com/bitnami/charts/blob/master/bitnami/mariadb/values.yaml
+## MongoDB chart configuration
+## ref: https://github.com/bitnami/charts/blob/master/bitnami/mongodb/values.yaml
 ##
-mariadb:
-  ## @param mariadb.enabled Deploy a MariaDB server to satisfy the applications database requirements
+mongodb:
+  ## @param MongoDB.enabled Deploy a MongoDB server to satisfy the applications database requirements
   ## To use an external database set this to false and configure the `externalDatabase.*` parameters
   ##
   enabled: true
-  ## @param mariadb.architecture MariaDB architecture. Allowed values: `standalone` or `replication`
+  ## @param MongoDB.architecture MongoDB architecture. Allowed values: `standalone` or `replication`
   ##
   architecture: standalone
-  ## MariaDB Authentication parameters
-  ## @param mariadb.auth.rootPassword MariaDB root password
-  ## @param mariadb.auth.database MariaDB custom database
-  ## @param mariadb.auth.username MariaDB custom user name
-  ## @param mariadb.auth.password MariaDB custom user password
-  ## ref: https://github.com/bitnami/bitnami-docker-mariadb#setting-the-root-password-on-first-run
-  ##      https://github.com/bitnami/bitnami-docker-mariadb/blob/master/README.md#creating-a-database-on-first-run
-  ##      https://github.com/bitnami/bitnami-docker-mariadb/blob/master/README.md#creating-a-database-user-on-first-run
+  ## MongoDB Authentication parameters
+  ## @param MongoDB.auth.rootPassword MongoDB root password
+  ## @param MongoDB.auth.database MongoDB custom database
+  ## @param MongoDB.auth.username MongoDB custom user name
+  ## @param MongoDB.auth.password MongoDB custom user password
+  ## ref: https://github.com/bitnami/bitnami-docker-mongodb#setting-the-root-user-and-password-on-first-run
+  ##      https://github.com/bitnami/bitnami-docker-mongodb#creating-a-user-and-database-on-first-run
   auth:
-    rootPassword: changeme
-    database: kimai
-    username: kimai
-    password: kimai
-  ## MariaDB Primary configuration
+    rootPassword: unpubd_root_password
+    database: unpubd
+    username: unpubd
+    password: unpubd
+
+  ## Enable persistence using Persistent Volume Claims
+  ## ref: https://kubernetes.io/docs/user-guide/persistent-volumes/
   ##
-  primary:
-    ## MariaDB Primary Persistence parameters
-    ## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
-    ## @param mariadb.primary.persistence.enabled Enable persistence on MariaDB using PVC(s)
-    ## @param mariadb.primary.persistence.storageClass Persistent Volume storage class
-    ## @param mariadb.primary.persistence.accessModes [array] Persistent Volume access modes
-    ## @param mariadb.primary.persistence.size Persistent Volume size
+  persistence:
+    ## @param mongodb.persistence.enabled Enable MongoDB(&reg;) data persistence using PVC
     ##
-    persistence:
-      enabled: true
-      storageClass:
-      accessModes:
-        - ReadWriteOnce
-      size: 4Gi
+    enabled: true
+    ## @param mongodb.persistence.storageClass PVC Storage Class for MongoDB(&reg;) data volume
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ## set, choosing the default provisioner.
+    ##
+    storageClass: ""
+    size: 1Gi
+
 ## External Database Configuration
-## All of these values are only used if `mariadb.enabled=false`
+## All of these values are only used if `MongoDB.enabled=false`
 ##
 externalDatabase:
   enabled: false
@@ -357,13 +318,22 @@ externalDatabase:
   host: localhost
   ## @param externalDatabase.port External Database server port
   ##
-  port: 3306
+  port: 27017
   ## @param externalDatabase.user External Database username
   ##
-  user: kimai
+  user: unpubd
+  ## @param externalDatabase.password External Database user password
+  ##
+  rootUser: root
   ## @param externalDatabase.password External Database user password
   ##
   password: ""
   ## @param externalDatabase.database External Database database name
   ##
-  database: kimai
+  database: unpubd
+
+  ## @param externalDatabase.existingSecret The name of an existing secret with database credentials. Evaluated as a template
+  ## NOTE: Must contain key `mongodb-passwords`
+  ## NOTE: When it's set, the `externalDatabase.password` parameter is ignored
+  ##
+  existingSecret: ""
