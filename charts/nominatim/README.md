@@ -41,7 +41,7 @@ To improve the import speed you can set additional PostgreSQL params
 ```yaml
   nominatimInitialize:
     enabled: true
-  
+
   postgresql:
     primary:
         extendedConfiguration: |
@@ -66,7 +66,7 @@ helm upgrade --install nominatim robjuz/nominatim -f values.yaml
 
 ### App deployment
 
-You need to set ```nominatimInitialize.enabled: false``` 
+You need to set ```nominatimInitialize.enabled: false```
 
 You also should remove the ```postgresqlExtendedConf```
 
@@ -124,6 +124,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | `nominatimInitialize.enabled`              | enable/disable init job                                       | `false `             |
 | `nominatimInitialize.pbfUrl`               | URL of the pbf file to import                                 | `https://download.geofabrik.de/europe/germany/sachsen-latest.osm.pbf` |
 | `nominatimInitialize.importWikipedia`      | If additional Wikipedia/Wikidata rankings should be imported  | `false`               |
+| `nominatimInitialize.wikipediaUrl`         | Wikipedia/Wikidata rankings file URL                          | `https://nominatim.org/data/wikimedia-importance.sql.gz`              |
 | `nominatimInitialize.importGB_Postcode`    | If external GB postcodes should be imported                   | `false`               |
 | `nominatimInitialize.importUS_Postcode`    | If external US postcodes should be imported                   | `false`               |
 | `nominatimInitialize.importStyle`          | Nominatim import style                                        | `full`                |
@@ -204,7 +205,7 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ### Flatnode support
 
-When importing large extracts (Europe/Planet) the usage of flatnode is recommended. 
+When importing large extracts (Europe/Planet) the usage of flatnode is recommended.
 Using flatnode with replication enabled requires the usage of a ReadWriteMany volume, because the flatnode file needs to be shared within the pods.
 This also applies when scaling the nominatim deployment.
 

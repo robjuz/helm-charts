@@ -51,6 +51,7 @@ nominatimInitialize:
   # customStyleUrl: https://raw.githubusercontent.com/david-mart/Nominatim/master/settings/import-street.style
   threads: 16
   freeze: false
+  wikipediaUrl: https://nominatim.org/data/wikimedia-importance.sql.gz
 
 nominatimReplications:
   enabled: false
