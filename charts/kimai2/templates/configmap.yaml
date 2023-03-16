@@ -1,4 +1,4 @@
-{{- if .Values.configuration }}
+{{- if or .Values.configuration .Values.phpConfig }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -7,6 +7,13 @@ metadata:
   labels: {{- include "common.labels.standard" . | nindent 4 }}
     app.kubernetes.io/component: primary
 data:
+  {{- if .Values.configuration }}
   local.yaml: |-
     {{ .Values.configuration | nindent 4 }}
-    {{- end -}}
+  {{- end -}}
+  {{- if .Values.phpConfig }}
+  php.ini: |-
+    {{ .Values.phpConfig | nindent 4 }}
+  {{- end -}}
+{{- end -}}
+

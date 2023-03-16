@@ -367,3 +367,18 @@ externalDatabase:
   ## @param externalDatabase.database External Database database name
   ##
   database: kimai
+
+## overrides /usr/local/etc/php/php.ini in pod 
+## if not set default php config is used
+##
+# phpConfig: |-
+#   [PHP]
+#   ; Lifetime in seconds of cookie or, if 0, until browser is restarted.
+#   ; https://php.net/session.cookie-lifetime
+#   session.cookie_lifetime = 0
+#
+#   ; After this number of seconds, stored data will be seen as 'garbage' and
+#   ; cleaned up by the garbage collection process.
+#   ; https://php.net/session.gc-maxlifetime
+#   session.gc_maxlifetime = 1440
+

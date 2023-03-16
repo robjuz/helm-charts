@@ -82,7 +82,12 @@ spec:
             - name: config
               mountPath: /opt/kimai/config/packages/local.yaml
               subPath: local.yaml
-      {{- end }}
+            {{- end }}
+            {{- if .Values.phpConfig }}
+            - name: phpConfig
+              mountPath: /usr/local/etc/php/php.ini
+              subPath: php.ini
+            {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -103,8 +108,9 @@ spec:
           {{- else }}
           emptyDir: {}
           {{- end }}
-        {{- if .Values.configuration }}
+        {{- if or .Values.configuration .Values.phpConfig }}
         - name: config
           configMap:
             name: {{ include "kimai2.name" . }}-config
         {{- end }}
+
