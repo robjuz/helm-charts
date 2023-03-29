@@ -25,12 +25,14 @@ spec:
               name: data
           command:
             - curl
+            - -A {{ include "chart.userAgent" . }}
             - {{ .Values.nominatimInitialize.customStyleUrl }}
             - -L
+            - -f
             - -o
             - custom.style
 {{- end }}
-
+            - -A {{ include "chart.userAgent" . }}
 {{- if .Values.nominatimInitialize.importWikipedia }}
         - name: download-wikipedia
           image: curlimages/curl
@@ -40,8 +42,10 @@ spec:
               name: data
           command:
             - curl
+            - -A {{ include "chart.userAgent" . }}
             - {{ .Values.nominatimInitialize.wikipediaUrl }}
             - -L
+            - -f
             - -o
             - wikimedia-importance.sql.gz
 {{- end }}
@@ -55,8 +59,10 @@ spec:
               name: data
           command:
             - curl
+            - -A {{ include "chart.userAgent" . }}
             - https://www.nominatim.org/data/gb_postcodes.csv.gz
             - -L
+            - -f
             - -o
             - gb_postcodes.csv.gz
 {{- end }}
@@ -70,8 +76,10 @@ spec:
               name: data
           command:
             - curl
+            - -A {{ include "chart.userAgent" . }}
             - https://www.nominatim.org/data/us_postcodes.csv.gz
             - -L
+            - -f
             - -o
             - us_postcodes.csv.gz
 {{- end }}
@@ -84,9 +92,11 @@ spec:
               name: data
           command:
             - curl
-            - -L
+            - -A {{ include "chart.userAgent" . }}
             - {{ .Values.nominatimInitialize.pbfUrl }}
             - --create-dirs
+            - -L
+            - -f
             - -o
             - data.osm.pbf
 
