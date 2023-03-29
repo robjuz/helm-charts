@@ -32,7 +32,7 @@ spec:
             - -o
             - custom.style
 {{- end }}
-            - -A {{ include "chart.userAgent" . }}
+
 {{- if .Values.nominatimInitialize.importWikipedia }}
         - name: download-wikipedia
           image: curlimages/curl
