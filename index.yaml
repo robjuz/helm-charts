@@ -653,6 +653,26 @@ entries:
     - https://github.com/robjuz/helm-charts/releases/download/kirby3-1.0.0/kirby3-1.0.0.tgz
     version: 1.0.0
   nominatim:
+  - annotations:
+      repository: robjuz/helm-charts
+    apiVersion: v2
+    appVersion: "4.1"
+    created: "2023-03-30T04:37:37.485884355Z"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      version: 1.x.x
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 11.6.20
+    description: A Helm chart for Kubernetes
+    digest: 35bc0ea81bba27dd63dc7c87f2730896b5c47e5947d88d6e265cb9a1e5270adc
+    name: nominatim
+    type: application
+    urls:
+    - https://github.com/robjuz/helm-charts/releases/download/nominatim-3.6.0/nominatim-3.6.0.tgz
+    version: 3.6.0
   - apiVersion: v2
     appVersion: "4.1"
     created: "2023-03-14T14:31:20.352078708Z"
@@ -1593,4 +1613,4 @@ entries:
     urls:
     - https://github.com/robjuz/helm-charts/releases/download/unpubd-1.0.0/unpubd-1.0.0.tgz
     version: 1.0.0
-generated: "2023-03-23T12:37:45.552597031Z"
+generated: "2023-03-30T04:37:37.486232958Z"
