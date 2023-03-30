@@ -31,3 +31,6 @@ dependencies:
     version: 11.6.20
     repository: https://charts.bitnami.com/bitnami
     condition: postgresql.enabled
+
+annotations:
+  repository: robjuz/helm-charts

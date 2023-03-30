@@ -128,3 +128,10 @@ pgsql:host={{ include "nominatim.databaseHost" . }};port={{ include "nominatim.d
 {{- define "nominatim.uiUrl" -}}
 {{- printf "https://github.com/osm-search/nominatim-ui/releases/download/v%s/nominatim-ui-%s.tar.gz" .Values.nominatimUi.version .Values.nominatimUi.version }}
 {{- end }}
+
+{{/*
+Create user agent string for curl
+*/}}
+{{- define "chart.userAgent" -}}
+{{- printf "%s/%s:%s" .Chart.Annotations.Repository .Chart.Name .Chart.Version }}
+{{- end }}
