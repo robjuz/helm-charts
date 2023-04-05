@@ -116,9 +116,9 @@ spec:
             - name: NOMINATIM_DATABASE_DSN
               {{- if .Values.externalDatabase.existingSecretDsn }}
               valueFrom:
-                - secretRef:
-                    name: {{ .Values.externalDatabase.existingSecretDsn }}
-                    key: {{ .Values.externalDatabase.existingSecretDsn }}
+                secretKeyRef:
+                  name: {{ .Values.externalDatabase.existingSecretDsn }}
+                  key: {{ .Values.externalDatabase.existingSecretDsn }}
               {{- end }}
               {{- if not .Values.externalDatabase.existingSecretDsn }}
               value: {{ include "nominatim.databaseUrl" . }}
