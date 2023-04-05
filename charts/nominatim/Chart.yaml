@@ -33,4 +33,4 @@ dependencies:
     condition: postgresql.enabled
 
 annotations:
-  repository: robjuz/helm-charts
+  repository: Doorbit/helm-charts
