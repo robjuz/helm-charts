@@ -254,6 +254,8 @@ postgresql:
 
 
 externalDatabase:
+  existingSecretDsn:
+  existingSecretDsnKey: POSTGRESQL_DSN
   ## @param externalDatabase.host External Database server host
   ##
   host: localhost
