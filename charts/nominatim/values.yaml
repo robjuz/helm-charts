@@ -42,7 +42,7 @@ commonAnnotations: {}
 commonLabels: {}
 
 nominatimInitialize:
-  enabled: true
+  enabled: false
   pbfUrl: https://download.geofabrik.de/europe/germany/sachsen-latest.osm.pbf
   importWikipedia: false
   importGB_Postcode: false
