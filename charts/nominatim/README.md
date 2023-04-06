@@ -187,20 +187,23 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ### Database Parameters
 
-| Name                                          | Description                                                                  | Value                         |
-|-----------------------------------------------|------------------------------------------------------------------------------|-------------------------------|
-| `postgresql.enabled`                          | Deploy a PostgreSQL server to satisfy the applications database requirements | `true`                        |
-| `postgresql.image.repository`                 | PostgreSQL image repository                                                  | `robjuz/postgresql-nominatim` |
-| `postgresql.image.tag`                        | PostgreSQL image tag                                                         | `14.4.0-4.0.1`                |
-| `postgresql.auth.postgresPassword`            | PostgreSQL root password                                                     | `nominatim`                   |
-| `postgresql.primary.persistence.enabled`      | Enable persistence on PostgreSQL using PVC(s)                                | `true`                        |
-| `postgresql.primary.persistence.storageClass` | Persistent Volume storage class                                              | `nil`                         |
-| `postgresql.primary.persistence.accessModes`  | Persistent Volume access modes                                               | `[ReadWriteOnce]`             |
-| `postgresql.primary.persistence.size`         | Persistent Volume size                                                       | `500Gi`                       |
-| `externalDatabase.host`                       | External PostgreSQL host (ignored if `postgresql.enabled = true`)            | localhost                     |
-| `externalDatabase.port`                       | External PostgreSQL post (ignored if `postgresql.enabled = true`)            | 5432                          |
-| `externalDatabase.user`                       | External PostgreSQL user (ignored if `postgresql.enabled = true`)            | nominatim                     |
-| `externalDatabase.password`                   | External PostgreSQL password (ignored if `postgresql.enabled = true`)        | ""                            |
+| Name                                          | Description                                                                                                                              | Value                         |
+|-----------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------|
+| `postgresql.enabled`                          | Deploy a PostgreSQL server to satisfy the applications database requirements                                                             | `true`                        |
+| `postgresql.image.repository`                 | PostgreSQL image repository                                                                                                              | `robjuz/postgresql-nominatim` |
+| `postgresql.image.tag`                        | PostgreSQL image tag                                                                                                                     | `14.4.0-4.0.1`                |
+| `postgresql.auth.postgresPassword`            | PostgreSQL root password                                                                                                                 | `nominatim`                   |
+| `postgresql.primary.persistence.enabled`      | Enable persistence on PostgreSQL using PVC(s)                                                                                            | `true`                        |
+| `postgresql.primary.persistence.storageClass` | Persistent Volume storage class                                                                                                          | `nil`                         |
+| `postgresql.primary.persistence.accessModes`  | Persistent Volume access modes                                                                                                           | `[ReadWriteOnce]`             |
+| `postgresql.primary.persistence.size`         | Persistent Volume size                                                                                                                   | `500Gi`                       |
+| `externalDatabase.host`                       | External PostgreSQL host (ignored if `postgresql.enabled = true`)                                                                        | localhost                     |
+| `externalDatabase.port`                       | External PostgreSQL post (ignored if `postgresql.enabled = true`)                                                                        | 5432                          |
+| `externalDatabase.user`                       | External PostgreSQL user (ignored if `postgresql.enabled = true`)                                                                        | nominatim                     |
+| `externalDatabase.password`                   | External PostgreSQL password (ignored if `postgresql.enabled = true`)                                                                    | ""                            |
+| `externalDatabase.existingSecretDsn`          | Name of existing secret to use to set full PostgreSQL DataSourceName (overrides `externalDatabase.*`)                                    | nil                           |
+| `externalDatabase.existingSecretDsnKey`       | Name of key in existing secret to use to set full PostgreSQL DataSourceName. Only used when `externalDatabase.existingSecretDsn` is set. | POSTGRESQL_DSN                |
+
 ## Configuration and installation details
 
 ### Flatnode support
@@ -212,7 +215,6 @@ This also applies when scaling the nominatim deployment.
 ### PVC For data
 
 When importing large extracts (Europe/Planet) there data needed to be downloaded are quite big. If you server has not enought disk space to store the data, you can use a dedicated PV for this.
-
 
 ### External database support
 
@@ -230,6 +232,26 @@ externalDatabase.port=3306
 
 * Make sure the database does not exist when running the init job. The nominatim tool will create a `nominatim` database for you
 * Make sure the DB user has superuser rights. The nominatim tool will try to enable the postgis extension and will fail otherwise
+
+#### Using an existing secret to connect to the database
+
+You may want to use an existing secret to configure the connection to the database for your needs. To do so, you can use the `externalDatabase.existingSecretDsn` and `externalDatabase.existingSecretDsnKey` parameters. The secret must contain a key with the name specified in `externalDatabase.existingSecretDsnKey` and the value must be a valid PostgreSQL DataSourceName. Here is an example:
+
+```console
+externalDatabase.existingSecretDsn=my-secret
+externalDatabase.existingSecretDsnKey=POSTGRESQL_DSN
+```
+
+With a secret like this:
+
+```console
+apiVersion: v1
+kind: Secret
+metadata:
+  name: my-secret
+data:
+  POSTGRESQL_DSN: pgsql:host=release-name-postgresql;port=5432;user=postgres;password=nominatim;dbname=nominatim
+```
 
 ### Ingress
 
