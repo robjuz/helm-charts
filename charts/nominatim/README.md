@@ -204,6 +204,22 @@ The command removes all the Kubernetes components associated with the chart and 
 | `externalDatabase.existingSecretDsn`          | Name of existing secret to use to set full PostgreSQL DataSourceName (overrides `externalDatabase.*`)                                    | nil                           |
 | `externalDatabase.existingSecretDsnKey`       | Name of key in existing secret to use to set full PostgreSQL DataSourceName. Only used when `externalDatabase.existingSecretDsn` is set. | POSTGRESQL_DSN                |
 
+### Nominatim Appserver Parameters
+
+| Name                            | Description                              | Value                              |
+|---------------------------------|------------------------------------------|------------------------------------|
+| `nominatim.extraEnv`            | Additional environment variables to set. | `[]`                               |
+
+### Nominatim UI Parameters
+
+| Name                              | Description                                                                                                                                     | Value           |
+|-----------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|-----------------|
+| `nominatimUi.enabled`             | Installs and serves an instance of the Nominatim Demo UI. (Same as the one [hosted by OSM](https://nominatim.openstreetmap.org/ui/search.html)) | `true`          |
+| `nominatimUi.version`             | Version of Nominatim UI to install. (See their [GitHub project](https://github.com/osm-search/nominatim-ui/) for reference)                     | `3.2.1`         |
+| `nominatimUi.apacheConfiguration` | Apache Webserver configuration.                                                                                                                 | see values.yaml |
+| `nominatimUi.configuration`       | Additional Nominatim configuration.                                                                                                             | see values.yaml |
+
+
 ## Configuration and installation details
 
 ### Flatnode support

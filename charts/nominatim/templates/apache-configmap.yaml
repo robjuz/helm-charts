@@ -11,4 +11,5 @@ metadata:
   annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
   {{- end }}
 data:
-{{ (.Files.Glob "files/000-default.conf").AsConfig | indent 2 }}
+  000-default.conf: |-
+    {{- include "common.tplvalues.render" ( dict "value" .Values.nominatimUi.apacheConfiguration "context" $ ) | nindent 4 }}
