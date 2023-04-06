@@ -201,7 +201,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | `externalDatabase.port`                       | External PostgreSQL post (ignored if `postgresql.enabled = true`)                                                                        | 5432                          |
 | `externalDatabase.user`                       | External PostgreSQL user (ignored if `postgresql.enabled = true`)                                                                        | nominatim                     |
 | `externalDatabase.password`                   | External PostgreSQL password (ignored if `postgresql.enabled = true`)                                                                    | ""                            |
-| `externalDatabase.existingSecretDsn`          | Name of existing secret to use to set full PostgreSQL DataSourceName (overrides `externalDatabase.*`)                                    | nil                           |
+| `externalDatabase.existingSecretDsn`          | Name of existing secret to use to set full PostgreSQL DataSourceName (overrides `externalDatabase.*`)                                    | `nil`                           |
 | `externalDatabase.existingSecretDsnKey`       | Name of key in existing secret to use to set full PostgreSQL DataSourceName. Only used when `externalDatabase.existingSecretDsn` is set. | POSTGRESQL_DSN                |
 
 ### Nominatim Appserver Parameters
