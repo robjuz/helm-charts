@@ -119,17 +119,18 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ### Nominatim Initialisation Configuration parameters
 
-| Name                                       | Description                                                   | Value                |
-| ------------------------------------------ | ------------------------------------------------------------- | -------------------- |
-| `nominatimInitialize.enabled`              | enable/disable init job                                       | `false `             |
-| `nominatimInitialize.pbfUrl`               | URL of the pbf file to import                                 | `https://download.geofabrik.de/europe/germany/sachsen-latest.osm.pbf` |
-| `nominatimInitialize.importWikipedia`      | If additional Wikipedia/Wikidata rankings should be imported  | `false`               |
-| `nominatimInitialize.wikipediaUrl`         | Wikipedia/Wikidata rankings file URL                          | `https://nominatim.org/data/wikimedia-importance.sql.gz`              |
-| `nominatimInitialize.importGB_Postcode`    | If external GB postcodes should be imported                   | `false`               |
-| `nominatimInitialize.importUS_Postcode`    | If external US postcodes should be imported                   | `false`               |
-| `nominatimInitialize.importStyle`          | Nominatim import style                                        | `full`                |
-| `nominatimInitialize.customStyleUrl`       | Custom import style file URL                                  | `nil`                 |
-| `nominatimInitialize.threads`              | The number of thread used by the import                       | `16`                  |
+| Name                                    | Description                                                  | Value                                                                 |
+|-----------------------------------------|--------------------------------------------------------------|-----------------------------------------------------------------------|
+| `nominatimInitialize.enabled`           | enable/disable init job                                      | `false `                                                              |
+| `nominatimInitialize.pbfUrl`            | URL of the pbf file to import                                | `https://download.geofabrik.de/europe/germany/sachsen-latest.osm.pbf` |
+| `nominatimInitialize.importWikipedia`   | If additional Wikipedia/Wikidata rankings should be imported | `false`                                                               |
+| `nominatimInitialize.wikipediaUrl`      | Wikipedia/Wikidata rankings file URL                         | `https://nominatim.org/data/wikimedia-importance.sql.gz`              |
+| `nominatimInitialize.importGB_Postcode` | If external GB postcodes should be imported                  | `false`                                                               |
+| `nominatimInitialize.importUS_Postcode` | If external US postcodes should be imported                  | `false`                                                               |
+| `nominatimInitialize.importStyle`       | Nominatim import style                                       | `full`                                                                |
+| `nominatimInitialize.customStyleUrl`    | Custom import style file URL                                 | `nil`                                                                 |
+| `nominatimInitialize.threads`           | The number of thread used by the import                      | `16`                                                                  |
+| `nominatimInitialize.resources`         | Define resources requests and limits for the init container  | `{}`                                                                  |
 
 ### Nominatim Replication Configuration parameters
 

@@ -170,6 +170,10 @@ spec:
               name: flatnode
               subPath: flatnode
             {{- end }}
+          {{- if .Values.nominatimInitialize.resources }}
+          resources:
+            {{- toYaml .Values.nominatimInitialize.resources | nindent 12 }}
+          {{- end }}
       restartPolicy: OnFailure
       volumes:
         {{- if  .Values.flatnode.enabled }}
