@@ -216,7 +216,7 @@ The command removes all the Kubernetes components associated with the chart and 
 |-----------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|-----------------|
 | `nominatimUi.enabled`             | Installs and serves an instance of the Nominatim Demo UI. (Same as the one [hosted by OSM](https://nominatim.openstreetmap.org/ui/search.html)) | `true`          |
 | `nominatimUi.version`             | Version of Nominatim UI to install. (See their [GitHub project](https://github.com/osm-search/nominatim-ui/) for reference)                     | `3.2.1`         |
-| `nominatimUi.apacheConfiguration` | Apache Webserver configuration.                                                                                                                 | see values.yaml |
+| `nominatimUi.apacheConfiguration` | Apache Webserver configuration. You have to restart the appserver when you make changes while nominatim is running.                             | see values.yaml |
 | `nominatimUi.configuration`       | Additional Nominatim configuration.                                                                                                             | see values.yaml |
 
 
