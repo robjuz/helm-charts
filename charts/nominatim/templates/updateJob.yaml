@@ -21,7 +21,15 @@ spec:
           workingDir: /nominatim
           env:
             - name: NOMINATIM_DATABASE_DSN
+              {{- if .Values.externalDatabase.existingSecretDsn }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.externalDatabase.existingSecretDsn }}
+                  key: {{ .Values.externalDatabase.existingSecretDsnKey }}
+              {{- end }}
+              {{- if not .Values.externalDatabase.existingSecretDsn }}
               value: {{ include "nominatim.databaseUrl" . }}
+              {{- end }}
             - name: NOMINATIM_REPLICATION_URL
               value: {{ .Values.nominatimReplications.replicationUrl }}
             - name: NOMINATIM_IMPORT_STYLE
