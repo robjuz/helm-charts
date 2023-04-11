@@ -59,6 +59,17 @@ nominatimInitialize:
   threads: 16
   freeze: false
   wikipediaUrl: https://nominatim.org/data/wikimedia-importance.sql.gz
+  resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+#    requests:
+#      cpu: 4000m
+#      memory: 4Gi
+#    limits:
+#      cpu: 4000m
+#      memory: 4Gi
 
 nominatimReplications:
   enabled: false
@@ -70,6 +81,57 @@ nominatim:
 nominatimUi:
   enabled: true
   version: 3.2.1
+  # apacheConfiguration configures the apache webserver that serves the UI.
+  apacheConfiguration: |-
+    <VirtualHost *:80>
+      DocumentRoot /nominatim/website
+      CustomLog "|$/usr/bin/rotatelogs -n 7 /var/log/apache2/access.log 86400" combined
+      ErrorLog  "|$/usr/bin/rotatelogs -n 7 /var/log/apache2/error.log 86400"
+      LogLevel info
+
+      <Directory "/nominatim/nominatim-ui/dist">
+        DirectoryIndex search.html
+        Require all granted
+      </Directory>
+
+      Alias /ui /nominatim/nominatim-ui/dist
+
+      <Directory /nominatim/website>
+        Options FollowSymLinks MultiViews
+        DirectoryIndex search.php
+        Require all granted
+
+        RewriteEngine On
+
+          # This must correspond to the URL where nominatim can be found.
+          RewriteBase "/"
+
+          # If no endpoint is given, then use search.
+          RewriteRule ^(/|$)   "search.php"
+
+          # If format-html is explicity requested, forward to the UI.
+          RewriteCond %{QUERY_STRING} "format=html"
+          RewriteRule ^([^/]+).php ui/$1.html [R,END]
+          # Same but .php suffix is missing.
+          RewriteCond %{QUERY_STRING} "format=html"
+          RewriteRule ^([^/]+) ui/$1.html [R,END]
+
+          # If no format parameter is there then forward anything
+          # but /reverse and /lookup to the UI.
+          RewriteCond %{QUERY_STRING} "!format="
+          RewriteCond %{REQUEST_URI}  "!/lookup"
+          RewriteCond %{REQUEST_URI}  "!/reverse"
+          RewriteRule ^([^/]+).php ui/$1.html [R,END]
+          # Same but .php suffix is missing.
+          RewriteCond %{QUERY_STRING} "!format="
+          RewriteCond %{REQUEST_URI}  "!/lookup"
+          RewriteCond %{REQUEST_URI}  "!/reverse"
+          RewriteRule ^([^/]+) ui/$1.html [R,END]
+      </Directory>
+
+      AddType text/html .php
+    </VirtualHost>
+
   configuration: |-
     Nominatim_Config.Nominatim_API_Endpoint = '/';
 
@@ -261,6 +323,12 @@ postgresql:
 
 
 externalDatabase:
+  ## @param externalDatabase.existingSecretDsn Use an existing secret for the DSN (Data Source Name) to connect to the external PostgreSQL database
+  ###
+  existingSecretDsn:
+  ## @param externalDatabase.existingSecretDsnKey Key in the existing secret to use for the DSN
+  ##
+  existingSecretDsnKey: POSTGRESQL_DSN
   ## @param externalDatabase.host External Database server host
   ##
   host: localhost

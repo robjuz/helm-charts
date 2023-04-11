@@ -114,7 +114,15 @@ spec:
               value: {{ .Values.nominatimInitialize.importStyle }}
             {{- end }}
             - name: NOMINATIM_DATABASE_DSN
+              {{- if .Values.externalDatabase.existingSecretDsn }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.externalDatabase.existingSecretDsn }}
+                  key: {{ .Values.externalDatabase.existingSecretDsnKey }}
+              {{- end }}
+              {{- if not .Values.externalDatabase.existingSecretDsn }}
               value: {{ include "nominatim.databaseUrl" . }}
+              {{- end }}
             {{- if .Values.flatnode.enabled }}
             - name: NOMINATIM_FLATNODE_FILE
               value: /nominatim/flatnode/flatnode.file
@@ -170,6 +178,10 @@ spec:
               name: flatnode
               subPath: flatnode
             {{- end }}
+          {{- if .Values.nominatimInitialize.resources }}
+          resources:
+            {{- toYaml .Values.nominatimInitialize.resources | nindent 12 }}
+          {{- end }}
       restartPolicy: OnFailure
       volumes:
         {{- if  .Values.flatnode.enabled }}
