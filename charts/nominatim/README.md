@@ -122,7 +122,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | Name                                    | Description                                                  | Value                                                                 |
 |-----------------------------------------|--------------------------------------------------------------|-----------------------------------------------------------------------|
 | `nominatimInitialize.enabled`           | enable/disable init job                                      | `false`                                                               |
-| `nominatimInitialize.continue`          | Select init step to continue from                            | `nil` `[ load-data &#124; indexing &#124; db-postprocess ]`           |
+| `nominatimInitialize.continue`          | Select init step to continue from                            | `nil` `[ load-data \| indexing \| db-postprocess ]`                   |
 | `nominatimInitialize.pbfUrl`            | URL of the pbf file to import                                | `https://download.geofabrik.de/europe/germany/sachsen-latest.osm.pbf` |
 | `nominatimInitialize.importWikipedia`   | If additional Wikipedia/Wikidata rankings should be imported | `false`                                                               |
 | `nominatimInitialize.wikipediaUrl`      | Wikipedia/Wikidata rankings file URL                         | `https://nominatim.org/data/wikimedia-importance.sql.gz`              |
