@@ -91,14 +91,18 @@ spec:
             - mountPath: /nominatim
               name: data
           command:
-            - curl
-            - -A {{ include "chart.userAgent" . }}
-            - {{ .Values.nominatimInitialize.pbfUrl }}
-            - --create-dirs
-            - -L
-            - -f
-            - -o
-            - data.osm.pbf
+            - /bin/sh
+            - -c
+            - |
+              if [ -f "data.osm.pbf" ]; then
+                echo "data.osm.pbf exists."
+              else
+                echo "Downloading pbf file"
+                curl -A {{ include "chart.userAgent" . }} \
+                {{ .Values.nominatimInitialize.pbfUrl }} \
+                --create-dirs -L -f -o data.osm.pbf
+              fi
+
 
       containers:
         - name: {{ .Chart.Name }}
@@ -175,6 +179,10 @@ spec:
             {{- toYaml .Values.nominatimInitialize.resources | nindent 12 }}
           {{- end }}
       restartPolicy: OnFailure
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       volumes:
         {{- if  .Values.flatnode.enabled }}
         - name: flatnode

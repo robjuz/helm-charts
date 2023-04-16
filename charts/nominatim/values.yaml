@@ -313,8 +313,6 @@ postgresql:
         max_wal_size = 1GB
         checkpoint_timeout = 10min
         checkpoint_completion_target = 0.9
-
-
 externalDatabase:
   ## @param externalDatabase.existingSecretDsn Use an existing secret for the DSN (Data Source Name) to connect to the external PostgreSQL database
   ###
