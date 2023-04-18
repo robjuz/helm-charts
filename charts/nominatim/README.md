@@ -68,7 +68,7 @@ helm upgrade --install nominatim robjuz/nominatim -f values.yaml
 
 You need to set ```nominatimInitialize.enabled: false```
 
-You also should remove the ```postgresqlExtendedConf```
+You also should remove the ```postgresql.primary.extendedConfiguration```
 
 ```yaml
   nominatimInitialize:
