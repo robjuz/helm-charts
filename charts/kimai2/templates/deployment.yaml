@@ -78,6 +78,9 @@ spec:
           volumeMounts:
             - mountPath: /opt/kimai/var
               name: kimai-data
+            {{- if .Values.extraVolumeMounts }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumeMounts "context" $) | nindent 12 }}
+            {{- end }}
             {{- if .Values.configuration }}
             - name: config
               mountPath: /opt/kimai/config/packages/local.yaml
@@ -107,4 +110,7 @@ spec:
         - name: config
           configMap:
             name: {{ include "kimai2.name" . }}-config
+        {{- end }}
+        {{- if .Values.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumes "context" $) | nindent 8 }}
         {{- end }}

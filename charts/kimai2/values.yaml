@@ -35,7 +35,12 @@ commonLabels: {}
 ## @param commonAnnotations Annotations to add to all deployed objects
 ##
 commonAnnotations: {}
-
+## @param extraVolumes Optionally specify extra list of additional volumes for Kimai pods
+##
+extraVolumes: []
+## @param extraVolumeMounts Optionally specify extra list of additional volumeMounts for Kimai container(s)
+##
+extraVolumeMounts: []
 ## @param existingSecret Use existing secret for password details
 ## You can use an existingSecret for the kimaiAppSecret, kimaiAdminPassword and kimaiMailerUrl,
 ## these will be ignored and picked up from the secret.
