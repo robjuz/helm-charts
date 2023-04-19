@@ -87,7 +87,8 @@ serviceAccount:
   # Annotations to add to the service account
   annotations: {}
   # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
+  # When defined and serviceAccount.create is true, name of the SA to create
+  # otherwise when serviceAccount.create is false, name of the existing SA to use
   name: ""
 
 ## Configure extra options for Kimai containers' liveness, readiness and startup probes
