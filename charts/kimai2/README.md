@@ -114,6 +114,15 @@ The command removes all the Kubernetes components associated with the chart and 
 | `customLivenessProbe`                | Custom livenessProbe that overrides the default one      | `{}`            |
 | `customReadinessProbe`               | Custom readinessProbe that overrides the default one     | `{}`            |
 
+### Service account parameters
+
+| Name                         | Description                                                                   | Value         |
+|------------------------------|-------------------------------------------------------------------------------|---------------|
+| `serviceAccount.create`      | Whether to create a service account                                           | `false`       |
+| `serviceAccount.annotations  | Annotations to set when creating a service account                            | `{}`          |
+| `serviceAccount.name`        | When defined and serviceAccount.create is true, name of the SA to create      | `nil`         |
+|                              | otherwise when serviceAccount.create is true, name of the existing SA to use  |               |
+
 ### Traffic Exposure Parameters
 
 | Name                  | Description                                                                   | Value         |
