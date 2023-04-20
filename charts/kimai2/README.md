@@ -113,6 +113,8 @@ The command removes all the Kubernetes components associated with the chart and 
 | `startupProbe.successThreshold`      | Success threshold for startupProbe                       | `1`             |
 | `customLivenessProbe`                | Custom livenessProbe that overrides the default one      | `{}`            |
 | `customReadinessProbe`               | Custom readinessProbe that overrides the default one     | `{}`            |
+| `extraVolumes`                       | Optionally specify additional volumes                    | `[]`            |
+| `extraVolumeMounts`                  | Optionally specify additional volumeMounts               | `[]`            |
 
 ### Service account parameters
 
