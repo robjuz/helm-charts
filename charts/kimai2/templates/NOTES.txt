@@ -18,9 +18,6 @@ Access the pod you want to debug by executing
 
   kubectl exec --namespace {{ .Release.Namespace }} -ti <NAME OF THE POD> -- bash
 
-In order to replicate the container startup scripts execute this command:
-
-    /opt/bitnami/scripts/wordpress/entrypoint.sh /opt/bitnami/scripts/apache/run.sh
 
 {{- else }}
 
