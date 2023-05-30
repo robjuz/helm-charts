@@ -73,15 +73,15 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ### Kimai Image parameters
 
-| Name                | Description                                                                                           | Value                 |
-|---------------------|-------------------------------------------------------------------------------------------------------|-----------------------|
-| `image.registry`    | Kimai image registry                                                                                  | `docker.io`           |
-| `image.repository`  | Kimai image repository                                                                                | `bitnami/wordpress`   |
-| `image.tag`         | Kimai image tag (immutable tags are recommended)                                                      | `6.2.0-debian-11-r18` |
-| `image.digest`      | Kimai image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag | `""`                  |
-| `image.pullPolicy`  | Kimai image pull policy                                                                               | `IfNotPresent`        |
-| `image.pullSecrets` | Kimai image pull secrets                                                                              | `[]`                  |
-| `image.debug`       | Specify if debug values should be set                                                                 |                       |
+| Name                | Description                                                                                           | Value                |
+|---------------------|-------------------------------------------------------------------------------------------------------|----------------------|
+| `image.registry`    | Kimai image registry                                                                                  | `docker.io`          |
+| `image.repository`  | Kimai image repository                                                                                | `kimai/kimai2`       |
+| `image.tag`         | Kimai image tag (immutable tags are recommended)                                                      | `apache-2.0.23-prod` |
+| `image.digest`      | Kimai image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag | `""`                 |
+| `image.pullPolicy`  | Kimai image pull policy                                                                               | `IfNotPresent`       |
+| `image.pullSecrets` | Kimai image pull secrets                                                                              | `[]`                 |
+| `image.debug`       | Specify if debug values should be set                                                                 |                      |
 
 ### Kimai Configuration parameters
 
@@ -325,6 +325,8 @@ The chart also facilitates the creation of TLS secrets for use with the Ingress 
 ### To 3.0.0
 
 This major release renames several values in this chart and adds missing features. It's based on the [bitnami wordpress chart](https://github.com/bitnami/charts/tree/main/bitnami/wordpress)
+
+It also bumps the app version to 2.x
 
 ### To 2.0.0
 

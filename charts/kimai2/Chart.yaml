@@ -3,7 +3,7 @@ name: kimai2
 description: A Helm chart for Kubernetes
 type: application
 version: 3.0.0
-appVersion: "apache-1.30.11-prod"
+appVersion: "apache-2.0.23-prod"
 
 dependencies:
   - condition: mariadb.enabled
