@@ -102,10 +102,10 @@ kimaiEnvironment: prod
 kimaiAppSecret: change_this_to_something_unique
 ## @param kimaiAdminEmail Email for the superadmin account
 ##
-kimaiAdminEmail: admin@kimai.local
+kimaiAdminEmail:
 ## @param kimaiAdminPassword Password for the superadmin account
 ##
-kimaiAdminPassword: changemeplease
+kimaiAdminPassword:
 ## @param kimaiMailerFrom Application specific “from” address for all emails
 ##
 kimaiMailerFrom: kimai@example.com
@@ -126,10 +126,6 @@ kimaiTrustedProxies: ""
 ## NOTE: Must contain key `database-url`
 ##
 existingSecret: ""
-php:
-  ## @param php.memory_limit Set the max. amount of memory a script may consume in MB
-  ##
-  memory_limit: 128
 
 ## @param command Override default container command (useful when using custom images)
 ##
@@ -140,8 +136,8 @@ args: []
 ## @param extraEnvVars Array with extra environment variables to add to the Kimai container
 ## e.g:
 ## extraEnvVars:
-##   - name: FOO
-##     value: "bar"
+##   - name: memory_limit
+##     value: "500"
 ##
 extraEnvVars: []
 ## @param extraEnvVarsCM Name of existing ConfigMap containing extra env vars
@@ -842,7 +838,7 @@ mariadb:
   ##      https://github.com/bitnami/bitnami-docker-mariadb/blob/master/README.md#creating-a-database-on-first-run
   ##      https://github.com/bitnami/bitnami-docker-mariadb/blob/master/README.md#creating-a-database-user-on-first-run
   auth:
-    rootPassword: changeme
+    rootPassword: kimaiR00tPassw0rd
     database: kimai
     username: kimai
     password: kimai

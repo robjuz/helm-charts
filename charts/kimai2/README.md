@@ -51,7 +51,7 @@ The command removes all the Kubernetes components associated with the chart and 
 ### Global parameters
 
 | Name                      | Description                                     | Value |
-| ------------------------- | ----------------------------------------------- | ----- |
+|---------------------------|-------------------------------------------------|-------|
 | `global.imageRegistry`    | Global Docker image registry                    | `""`  |
 | `global.imagePullSecrets` | Global Docker registry secret names as an array | `[]`  |
 | `global.storageClass`     | Global StorageClass for Persistent Volume(s)    | `""`  |
@@ -59,7 +59,7 @@ The command removes all the Kubernetes components associated with the chart and 
 ### Common parameters
 
 | Name                     | Description                                                                                  | Value           |
-| ------------------------ | -------------------------------------------------------------------------------------------- | --------------- |
+|--------------------------|----------------------------------------------------------------------------------------------|-----------------|
 | `kubeVersion`            | Override Kubernetes version                                                                  | `""`            |
 | `nameOverride`           | String to partially override common.names.fullname template (will maintain the release name) | `""`            |
 | `fullnameOverride`       | String to fully override common.names.fullname template                                      | `""`            |
@@ -69,19 +69,19 @@ The command removes all the Kubernetes components associated with the chart and 
 | `extraDeploy`            | Array of extra objects to deploy with the release                                            | `[]`            |
 | `diagnosticMode.enabled` | Enable diagnostic mode (all probes will be disabled and the command will be overridden)      | `false`         |
 | `diagnosticMode.command` | Command to override all containers in the deployment                                         | `["sleep"]`     |
-| `diagnosticMode.args`    | Args to override all containers in the deployment        
+| `diagnosticMode.args`    | Args to override all containers in the deployment                                            |                 |
 
 ### Kimai Image parameters
 
-| Name                | Description                                                                                               | Value                 |
-| ------------------- | --------------------------------------------------------------------------------------------------------- | --------------------- |
+| Name                | Description                                                                                           | Value                 |
+|---------------------|-------------------------------------------------------------------------------------------------------|-----------------------|
 | `image.registry`    | Kimai image registry                                                                                  | `docker.io`           |
 | `image.repository`  | Kimai image repository                                                                                | `bitnami/wordpress`   |
 | `image.tag`         | Kimai image tag (immutable tags are recommended)                                                      | `6.2.0-debian-11-r18` |
 | `image.digest`      | Kimai image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag | `""`                  |
 | `image.pullPolicy`  | Kimai image pull policy                                                                               | `IfNotPresent`        |
 | `image.pullSecrets` | Kimai image pull secrets                                                                              | `[]`                  |
-| `image.debug`       | Specify if debug values should be set             
+| `image.debug`       | Specify if debug values should be set                                                                 |                       |
 
 ### Kimai Configuration parameters
 
@@ -89,18 +89,12 @@ The command removes all the Kubernetes components associated with the chart and 
 |-----------------------|------------------------------------------------------|-----------------------------------|
 | `kimaiEnvironment`    | Kimai environment name                               | `prod`                            |
 | `kimaiAppSecret`      | Secret used to encrypt session cookies               | `change_this_to_something_unique` |
-| `kimaiAdminEmail`     | Email for the superadmin account                     | `admin@kimai.local`               |
-| `kimaiAdminPassword`  | Password for the superadmin account                  | `changemeplease`                  |
+| `kimaiAdminEmail`     | Email for the superadmin account                     | ``                                |
+| `kimaiAdminPassword`  | Password for the superadmin account                  | ``                                |
 | `kimaiMailerFrom`     | Application specific “from” address for all emails   | `kimai@example.com`               |
 | `kimaiMailerUrl`      | SMTP connection for emails                           | `null://localhost`                |
 | `kimaiTrustedProxies` |                                                      | `""`                              |
 | `existingSecret`      | Name of existing secret containing Kimai credentials | `""`                              |
-
-### PHP Configuration parameters
-
-| Name               | Description                                          | Value |
-|--------------------|------------------------------------------------------|-------|
-| `php.memory_limit` | The max. amount of memory a script may consume in MB | `128` |
 
 ### Kimai deployment parameters
 
@@ -167,19 +161,19 @@ The command removes all the Kubernetes components associated with the chart and 
 
 | Name                               | Description                                                                                                                                              | Value                    |
 |------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------|
-| `service.type`                     | WordPress service type                                                                                                                                   | `LoadBalancer`           |
-| `service.ports.http`               | WordPress service HTTP port                                                                                                                              | `80`                     |
+| `service.type`                     | Kimai service type                                                                                                                                       | `LoadBalancer`           |
+| `service.ports.http`               | Kimai service HTTP port                                                                                                                                  | `80`                     |
 | `service.httpsTargetPort`          | Target port for HTTPS                                                                                                                                    | `https`                  |
 | `service.nodePorts.http`           | Node port for HTTP                                                                                                                                       | `""`                     |
 | `service.sessionAffinity`          | Control where client requests go, to the same pod or round-robin                                                                                         | `None`                   |
 | `service.sessionAffinityConfig`    | Additional settings for the sessionAffinity                                                                                                              | `{}`                     |
-| `service.clusterIP`                | WordPress service Cluster IP                                                                                                                             | `""`                     |
-| `service.loadBalancerIP`           | WordPress service Load Balancer IP                                                                                                                       | `""`                     |
-| `service.loadBalancerSourceRanges` | WordPress service Load Balancer sources                                                                                                                  | `[]`                     |
-| `service.externalTrafficPolicy`    | WordPress service external traffic policy                                                                                                                | `Cluster`                |
-| `service.annotations`              | Additional custom annotations for WordPress service                                                                                                      | `{}`                     |
-| `service.extraPorts`               | Extra port to expose on WordPress service                                                                                                                | `[]`                     |
-| `ingress.enabled`                  | Enable ingress record generation for WordPress                                                                                                           | `false`                  |
+| `service.clusterIP`                | Kimai service Cluster IP                                                                                                                                 | `""`                     |
+| `service.loadBalancerIP`           | Kimai service Load Balancer IP                                                                                                                           | `""`                     |
+| `service.loadBalancerSourceRanges` | Kimai service Load Balancer sources                                                                                                                      | `[]`                     |
+| `service.externalTrafficPolicy`    | Kimai service external traffic policy                                                                                                                    | `Cluster`                |
+| `service.annotations`              | Additional custom annotations for Kimai service                                                                                                          | `{}`                     |
+| `service.extraPorts`               | Extra port to expose on Kimai service                                                                                                                    | `[]`                     |
+| `ingress.enabled`                  | Enable ingress record generation for Kimai                                                                                                               | `false`                  |
 | `ingress.pathType`                 | Ingress path type                                                                                                                                        | `ImplementationSpecific` |
 | `ingress.apiVersion`               | Force Ingress API version (automatically detected if not set)                                                                                            | `""`                     |
 | `ingress.ingressClassName`         | IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)                                                                            | `""`                     |
@@ -198,7 +192,7 @@ The command removes all the Kubernetes components associated with the chart and 
 ### Persistence Parameters
 
 | Name                                                   | Description                                                                                                   | Value                   |
-| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- | ----------------------- |
+|--------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|-------------------------|
 | `persistence.enabled`                                  | Enable persistence using Persistent Volume Claims                                                             | `true`                  |
 | `persistence.storageClass`                             | Persistent Volume storage class                                                                               | `""`                    |
 | `persistence.accessModes`                              | Persistent Volume access modes                                                                                | `[]`                    |
@@ -206,7 +200,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | `persistence.size`                                     | Persistent Volume size                                                                                        | `10Gi`                  |
 | `persistence.dataSource`                               | Custom PVC data source                                                                                        | `{}`                    |
 | `persistence.existingClaim`                            | The name of an existing PVC to use for persistence                                                            | `""`                    |
-| `persistence.selector`                                 | Selector to match an existing Persistent Volume for WordPress data PVC                                        | `{}`                    |
+| `persistence.selector`                                 | Selector to match an existing Persistent Volume for Kimai data PVC                                            | `{}`                    |
 | `persistence.annotations`                              | Persistent Volume Claim annotations                                                                           | `{}`                    |
 | `volumePermissions.enabled`                            | Enable init container that changes the owner/group of the PV mount point to `runAsUser:fsGroup`               | `false`                 |
 | `volumePermissions.image.registry`                     | Bitnami Shell image registry                                                                                  | `docker.io`             |
@@ -223,24 +217,24 @@ The command removes all the Kubernetes components associated with the chart and 
 ### Other Parameters
 
 | Name                                          | Description                                                            | Value   |
-| --------------------------------------------- | ---------------------------------------------------------------------- | ------- |
-| `serviceAccount.create`                       | Enable creation of ServiceAccount for WordPress pod                    | `false` |
+|-----------------------------------------------|------------------------------------------------------------------------|---------|
+| `serviceAccount.create`                       | Enable creation of ServiceAccount for Kimai pod                        | `false` |
 | `serviceAccount.name`                         | The name of the ServiceAccount to use.                                 | `""`    |
 | `serviceAccount.automountServiceAccountToken` | Allows auto mount of ServiceAccountToken on the serviceAccount created | `true`  |
 | `serviceAccount.annotations`                  | Additional custom annotations for the ServiceAccount                   | `{}`    |
 | `pdb.create`                                  | Enable a Pod Disruption Budget creation                                | `false` |
 | `pdb.minAvailable`                            | Minimum number/percentage of pods that should remain scheduled         | `1`     |
 | `pdb.maxUnavailable`                          | Maximum number/percentage of pods that may be made unavailable         | `""`    |
-| `autoscaling.enabled`                         | Enable Horizontal POD autoscaling for WordPress                        | `false` |
-| `autoscaling.minReplicas`                     | Minimum number of WordPress replicas                                   | `1`     |
-| `autoscaling.maxReplicas`                     | Maximum number of WordPress replicas                                   | `11`    |
+| `autoscaling.enabled`                         | Enable Horizontal POD autoscaling for Kimai                            | `false` |
+| `autoscaling.minReplicas`                     | Minimum number of Kimai replicas                                       | `1`     |
+| `autoscaling.maxReplicas`                     | Maximum number of Kimai replicas                                       | `11`    |
 | `autoscaling.targetCPU`                       | Target CPU utilization percentage                                      | `50`    |
 | `autoscaling.targetMemory`                    | Target Memory utilization percentage                                   | `50`    |
 
 ### NetworkPolicy parameters
 
 | Name                                                          | Description                                                                                                                  | Value   |
-| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------- |
+|---------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------|---------|
 | `networkPolicy.enabled`                                       | Enable network policies                                                                                                      | `false` |
 | `networkPolicy.metrics.enabled`                               | Enable network policy for metrics (prometheus)                                                                               | `false` |
 | `networkPolicy.metrics.namespaceSelector`                     | Monitoring namespace selector labels. These labels will be used to identify the prometheus' namespace.                       | `{}`    |
@@ -260,24 +254,24 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ### Database Parameters
 
-| Name                                       | Description                                                                       | Value               |
-| ------------------------------------------ | --------------------------------------------------------------------------------- | ------------------- |
-| `mariadb.enabled`                          | Deploy a MariaDB server to satisfy the applications database requirements         | `true`              |
-| `mariadb.architecture`                     | MariaDB architecture. Allowed values: `standalone` or `replication`               | `standalone`        |
-| `mariadb.auth.rootPassword`                | MariaDB root password                                                             | `""`                |
-| `mariadb.auth.database`                    | MariaDB custom database                                                           | `bitnami_wordpress` |
-| `mariadb.auth.username`                    | MariaDB custom user name                                                          | `bn_wordpress`      |
-| `mariadb.auth.password`                    | MariaDB custom user password                                                      | `""`                |
-| `mariadb.primary.persistence.enabled`      | Enable persistence on MariaDB using PVC(s)                                        | `true`              |
-| `mariadb.primary.persistence.storageClass` | Persistent Volume storage class                                                   | `""`                |
-| `mariadb.primary.persistence.accessModes`  | Persistent Volume access modes                                                    | `[]`                |
-| `mariadb.primary.persistence.size`         | Persistent Volume size                                                            | `8Gi`               |
-| `externalDatabase.host`                    | External Database server host                                                     | `localhost`         |
-| `externalDatabase.port`                    | External Database server port                                                     | `3306`              |
-| `externalDatabase.user`                    | External Database username                                                        | `bn_wordpress`      |
-| `externalDatabase.password`                | External Database user password                                                   | `""`                |
-| `externalDatabase.database`                | External Database database name                                                   | `bitnami_wordpress` |
-| `externalDatabase.existingSecret`          | The name of an existing secret with database credentials. Evaluated as a template | `""`                |
+| Name                                       | Description                                                                       | Value                 |
+|--------------------------------------------|-----------------------------------------------------------------------------------|-----------------------|
+| `mariadb.enabled`                          | Deploy a MariaDB server to satisfy the applications database requirements         | `true`                |
+| `mariadb.architecture`                     | MariaDB architecture. Allowed values: `standalone` or `replication`               | `standalone`          |
+| `mariadb.auth.rootPassword`                | MariaDB root password                                                             | `"kimaiR00tPassw0rd"` |
+| `mariadb.auth.database`                    | MariaDB custom database                                                           | `kimai`               |
+| `mariadb.auth.username`                    | MariaDB custom user name                                                          | `kimai`               |
+| `mariadb.auth.password`                    | MariaDB custom user password                                                      | `"kimai"`             |
+| `mariadb.primary.persistence.enabled`      | Enable persistence on MariaDB using PVC(s)                                        | `true`                |
+| `mariadb.primary.persistence.storageClass` | Persistent Volume storage class                                                   | `""`                  |
+| `mariadb.primary.persistence.accessModes`  | Persistent Volume access modes                                                    | `[]`                  |
+| `mariadb.primary.persistence.size`         | Persistent Volume size                                                            | `8Gi`                 |
+| `externalDatabase.host`                    | External Database server host                                                     | `localhost`           |
+| `externalDatabase.port`                    | External Database server port                                                     | `3306`                |
+| `externalDatabase.user`                    | External Database username                                                        | `kimai`               |
+| `externalDatabase.password`                | External Database user password                                                   | `"kimai"`             |
+| `externalDatabase.database`                | External Database database name                                                   | `kimai`               |
+| `externalDatabase.existingSecret`          | The name of an existing secret with database credentials. Evaluated as a template | `""`                  |
 
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example,
