@@ -332,8 +332,6 @@ The chart also facilitates the creation of TLS secrets for use with the Ingress 
 
 This major release renames several values in this chart and adds missing features. It's based on the [bitnami wordpress chart](https://github.com/bitnami/charts/tree/main/bitnami/wordpress)
 
-Additionally the default MariaDB version was updated to 10.11.
-
 ### To 2.0.0
 
 This major release bumps default MariaDB version to 10.6. Follow the [official instructions](https://mariadb.com/kb/en/upgrading-from-mariadb-105-to-mariadb-106/) from upgrading between 10.5 and 10.6.
