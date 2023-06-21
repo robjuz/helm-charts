@@ -387,7 +387,7 @@ startupProbe:
   enabled: false
   httpGet:
     path: /en/login
-    port: http>e
+    port: http
     ## If using an HTTPS-terminating load-balancer, the probes may need to behave
     ## like the balancer to prevent HTTP 302 responses. According to the Kubernetes
     ## docs, 302 should be considered "successful", but this issue on GitHub
