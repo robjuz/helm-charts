@@ -85,16 +85,17 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ### Kimai Configuration parameters
 
-| Name                  | Description                                          | Value                             |
-|-----------------------|------------------------------------------------------|-----------------------------------|
-| `kimaiEnvironment`    | Kimai environment name                               | `prod`                            |
-| `kimaiAppSecret`      | Secret used to encrypt session cookies               | `change_this_to_something_unique` |
-| `kimaiAdminEmail`     | Email for the superadmin account                     | ``                                |
-| `kimaiAdminPassword`  | Password for the superadmin account                  | ``                                |
-| `kimaiMailerFrom`     | Application specific “from” address for all emails   | `kimai@example.com`               |
-| `kimaiMailerUrl`      | SMTP connection for emails                           | `null://localhost`                |
-| `kimaiTrustedProxies` |                                                      | `""`                              |
-| `existingSecret`      | Name of existing secret containing Kimai credentials | `""`                              |
+| Name                      | Description                                                                                                       | Value                             |
+|---------------------------|-------------------------------------------------------------------------------------------------------------------|-----------------------------------|
+| `kimaiEnvironment`        | Kimai environment name                                                                                            | `prod`                            |
+| `kimaiAppSecret`          | Secret used to encrypt session cookies                                                                            | `change_this_to_something_unique` |
+| `kimaiAdminEmail`         | Email for the superadmin account                                                                                  | ``                                |
+| `kimaiAdminPassword`      | Password for the superadmin account                                                                               | ``                                |
+| `kimaiMailerFrom`         | Application specific “from” address for all emails                                                                | `kimai@example.com`               |
+| `kimaiMailerUrl`          | SMTP connection for emails                                                                                        | `null://localhost`                |
+| `kimaiTrustedProxies`     |                                                                                                                   | `""`                              |
+| `existingSecret`          | Name of existing secret containing Kimai credentials                                                              | `""`                              |
+| `configurationFromSecret` | Use an existing secret match the common.names.fullname template containing “local.yaml“ key as configuration file | `false`                           |
 
 ### Kimai deployment parameters
 
