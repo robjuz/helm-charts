@@ -137,7 +137,7 @@ args: []
 ## e.g:
 ## extraEnvVars:
 ##   - name: memory_limit
-##     value: "500"
+##     value: "256M"
 ##
 extraEnvVars: []
 ## @param extraEnvVarsCM Name of existing ConfigMap containing extra env vars
@@ -294,7 +294,7 @@ extraContainerPorts: []
 ## @param podSecurityContext.seccompProfile.type Set Kimai container's Security Context seccomp profile
 ##
 podSecurityContext:
-  enabled: true
+  enabled: false
   fsGroup: 1001
   seccompProfile:
     type: "RuntimeDefault"
@@ -307,7 +307,7 @@ podSecurityContext:
 ## @param containerSecurityContext.capabilities.drop Set Kimai container's Security Context runAsNonRoot
 ##
 containerSecurityContext:
-  enabled: true
+  enabled: false
   runAsUser: 1001
   runAsNonRoot: true
   allowPrivilegeEscalation: false

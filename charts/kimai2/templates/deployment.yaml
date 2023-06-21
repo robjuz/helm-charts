@@ -149,6 +149,9 @@ spec:
             - name: TRUSTED_PROXIES
               value: {{ .Values.kimaiTrustedProxies }}
             {{- end }}
+            {{- if .Values.extraEnvVars }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.extraEnvVars "context" $) | nindent 12 }}
+            {{- end }}
           envFrom:
             {{- if .Values.extraEnvVarsCM }}
             - configMapRef:

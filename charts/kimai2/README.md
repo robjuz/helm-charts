@@ -126,10 +126,10 @@ The command removes all the Kubernetes components associated with the chart and 
 | `resources.requests.cpu`                            | The requested cpu for the Kimai containers                                                                               | `100m`           |
 | `containerPorts.http`                               | Kimai HTTP container port                                                                                                | `80`             |
 | `extraContainerPorts`                               | Optionally specify extra list of additional ports for Kimai container(s)                                                 | `[]`             |
-| `podSecurityContext.enabled`                        | Enabled Kimai pods' Security Context                                                                                     | `true`           |
+| `podSecurityContext.enabled`                        | Enabled Kimai pods' Security Context                                                                                     | `false`          |
 | `podSecurityContext.fsGroup`                        | Set Kimai pod's Security Context fsGroup                                                                                 | `1001`           |
 | `podSecurityContext.seccompProfile.type`            | Set Kimai container's Security Context seccomp profile                                                                   | `RuntimeDefault` |
-| `containerSecurityContext.enabled`                  | Enabled Kimai containers' Security Context                                                                               | `true`           |
+| `containerSecurityContext.enabled`                  | Enabled Kimai containers' Security Context                                                                               | `false`          |
 | `containerSecurityContext.runAsUser`                | Set Kimai container's Security Context runAsUser                                                                         | `1001`           |
 | `containerSecurityContext.runAsNonRoot`             | Set Kimai container's Security Context runAsNonRoot                                                                      | `true`           |
 | `containerSecurityContext.allowPrivilegeEscalation` | Set Kimai container's privilege escalation                                                                               | `false`          |
