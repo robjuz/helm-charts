@@ -120,7 +120,7 @@ spec:
             - name: APP_ENV
               value: {{ .Values.kimaiEnvironment }}
             - name: APP_SECRET
-              value:
+              valueFrom:
                 secretKeyRef:
                   name: {{ include "kimai.secretName" . }}
                   key: app-secret
@@ -139,7 +139,7 @@ spec:
                   name: {{ include "kimai.secretName" . }}
                   key: mailer-url
             - name: DATABASE_URL
-              value:
+              valueFrom:
                 secretKeyRef:
                   name: {{ include "kimai.secretName" . }}
                   key: database-url

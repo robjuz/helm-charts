@@ -1,0 +1,9 @@
+ingress:
+  enabled: true
+  hostname: shopware.k8s.hw.ag
+  ingressClassName: nginx
+service:
+  type: ClusterIP
+
+shopwareAppUrl: http://shopware.k8s.hw.ag
+shopwarePassword: shopware
