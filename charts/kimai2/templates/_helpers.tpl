@@ -1,74 +1,66 @@
-{{/*
-Expand the name of the chart.
-*/}}
-{{- define "kimai2.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
-{{- end }}
-
-{{/*
-Create a default fully qualified app name.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
-If release name contains chart name it will be used as a full name.
-*/}}
-{{- define "kimai2.fullname" -}}
-{{- if .Values.fullnameOverride }}
-{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
-{{- else }}
-{{- $name := default .Chart.Name .Values.nameOverride }}
-{{- if contains $name .Release.Name }}
-{{- .Release.Name | trunc 63 | trimSuffix "-" }}
-{{- else }}
-{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
-{{- end }}
-{{- end }}
-{{- end }}
+{{/* vim: set filetype=mustache: */}}
 
 {{/*
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
-{{- define "kimai2.mariadb.fullname" -}}
-{{- printf "%s-mariadb" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- define "kimai.mariadb.fullname" -}}
+{{- include "common.names.dependency.fullname" (dict "chartName" "mariadb" "chartValues" .Values.mariadb "context" $) -}}
 {{- end -}}
 
 {{/*
-Create chart name and version as used by the chart label.
+Return the proper WordPress image name
 */}}
-{{- define "kimai2.chart" -}}
-{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
-{{- end }}
+{{- define "kimai.image" -}}
+{{- include "common.images.image" (dict "imageRoot" .Values.image "global" .Values.global) -}}
+{{- end -}}
 
 {{/*
-Common labels
+Return the proper image name (for the init container volume-permissions image)
 */}}
-{{- define "kimai2.labels" -}}
-helm.sh/chart: {{ include "kimai2.chart" . }}
-{{ include "kimai2.selectorLabels" . }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-{{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- end }}
+{{- define "kimai.volumePermissions.image" -}}
+{{- include "common.images.image" ( dict "imageRoot" .Values.volumePermissions.image "global" .Values.global ) -}}
+{{- end -}}
 
 {{/*
-Selector labels
+Return the proper Docker Image Registry Secret Names
 */}}
-{{- define "kimai2.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "kimai2.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end }}
+{{- define "kimai.imagePullSecrets" -}}
+{{- include "common.images.pullSecrets" (dict "images" (list .Values.image .Values.volumePermissions.image) "global" .Values.global) -}}
+{{- end -}}
+
+{{/*
+ Create the name of the service account to use
+ */}}
+{{- define "kimai.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create -}}
+    {{ default (include "common.names.fullname" .) .Values.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
 
 
+{{/*
+Return the kimai Secret Name
+*/}}
+{{- define "kimai.secretName" -}}
+{{- if .Values.existingSecret }}
+    {{- printf "%s" .Values.existingSecret -}}
+{{- else -}}
+    {{- printf "%s" (include "common.names.fullname" .) -}}
+{{- end -}}
+{{- end -}}
 
 {{/*
 Return the MariaDB Hostname
 */}}
-{{- define "kimai2.databaseHost" -}}
+{{- define "kimai.databaseHost" -}}
 {{- if .Values.mariadb.enabled }}
     {{- if eq .Values.mariadb.architecture "replication" }}
-        {{- printf "%s-primary" (include "kimai2.mariadb.fullname" .) | trunc 63 | trimSuffix "-" -}}
+        {{- printf "%s-primary" (include "kimai.mariadb.fullname" .) | trunc 63 | trimSuffix "-" -}}
     {{- else -}}
-        {{- printf "%s" (include "kimai2.mariadb.fullname" .) -}}
+        {{- printf "%s" (include "kimai.mariadb.fullname" .) -}}
     {{- end -}}
 {{- else -}}
     {{- printf "%s" .Values.externalDatabase.host -}}
@@ -78,7 +70,7 @@ Return the MariaDB Hostname
 {{/*
 Return the MariaDB Port
 */}}
-{{- define "kimai2.databasePort" -}}
+{{- define "kimai.databasePort" -}}
 {{- if .Values.mariadb.enabled }}
     {{- printf "3306" -}}
 {{- else -}}
@@ -89,7 +81,7 @@ Return the MariaDB Port
 {{/*
 Return the MariaDB Database Name
 */}}
-{{- define "kimai2.databaseName" -}}
+{{- define "kimai.databaseName" -}}
 {{- if .Values.mariadb.enabled }}
     {{- printf "%s" .Values.mariadb.auth.database -}}
 {{- else -}}
@@ -100,7 +92,7 @@ Return the MariaDB Database Name
 {{/*
 Return the MariaDB User
 */}}
-{{- define "kimai2.databaseUser" -}}
+{{- define "kimai.databaseUser" -}}
 {{- if .Values.mariadb.enabled }}
     {{- printf "%s" .Values.mariadb.auth.username -}}
 {{- else -}}
@@ -111,7 +103,7 @@ Return the MariaDB User
 {{/*
 Return the MariaDB Password
 */}}
-{{- define "kimai2.databasePassword" -}}
+{{- define "kimai.databasePassword" -}}
 {{- if .Values.mariadb.enabled }}
     {{- printf "%s" .Values.mariadb.auth.password -}}
 {{- else -}}
@@ -122,6 +114,6 @@ Return the MariaDB Password
 {{/*
 Create the database URL. For the time being, this supports only an integrated MySQL
 */}}
-{{- define "kimai2.databaseUrl" -}}
-mysql://{{ include "kimai2.databaseUser" . }}:{{ include "kimai2.databasePassword" . }}@{{ include "kimai2.databaseHost" . }}/{{ include "kimai2.databaseName" . }}
+{{- define "kimai.databaseUrl" -}}
+mysql://{{ include "kimai.databaseUser" . }}:{{ include "kimai.databasePassword" . }}@{{ include "kimai.databaseHost" . }}/{{ include "kimai.databaseName" . }}
 {{- end }}
