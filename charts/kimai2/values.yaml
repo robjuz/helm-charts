@@ -279,7 +279,7 @@ resources:
 ## @param containerPorts.http Kimai HTTP container port
 ##
 containerPorts:
-  http: 80
+  http: 8001
 ## @param extraContainerPorts Optionally specify extra list of additional ports for Kimai container(s)
 ## e.g:
 ## extraContainerPorts:
