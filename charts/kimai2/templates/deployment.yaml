@@ -25,12 +25,12 @@ spec:
         {{- if .Values.podLabels }}
         {{- include "common.tplvalues.render" (dict "value" .Values.podLabels "context" $) | nindent 8 }}
         {{- end }}
-      {{- if .Values.podAnnotations }}
       annotations:
+      {{- if .Values.podAnnotations }}
         {{- include "common.tplvalues.render" (dict "value" .Values.podAnnotations "context" $) | nindent 8 }}
+      {{- end }}
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml" ) . | sha256sum }}
         checksum/secret: {{ include (print $.Template.BasePath "/secrets.yaml" ) . | sha256sum }}
-      {{- end }}
     spec:
       {{- include "kimai.imagePullSecrets" . | nindent 6 }}
       {{- if .Values.hostAliases }}
