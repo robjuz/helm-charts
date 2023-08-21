@@ -202,11 +202,16 @@ spec:
         {{- include "common.tplvalues.render" (dict "value" .Values.sidecars "context" $) | nindent 8 }}
         {{- end }}
       volumes:
-        {{- if .Values.configuration }}
+        {{- if and .Values.configuration (not .Values.configurationFromSecret.enabled) }}
         - name: config
           configMap:
             name: {{ printf "%s-config" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
             defaultMode: 0555
+        {{- end }}
+        {{- if .Values.configurationFromSecret.enabled}}
+        - name: config
+          secret:
+            secretName: {{ printf "%s-config" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
         {{- end }}
         - name: kimai-data
           {{- if .Values.persistence.enabled }}

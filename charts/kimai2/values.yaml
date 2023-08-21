@@ -127,6 +127,11 @@ kimaiTrustedProxies: ""
 ##
 existingSecret: ""
 
+configurationFromSecret:
+  ## @param configurationFromSecret.enabled Enables Kimai configuration retrieval from secret
+  ## When the value is set to 'true', the secret name must match the common.names.fullname template and include a 'local.yaml' key.
+  enabled: false
+
 ## @param command Override default container command (useful when using custom images)
 ##
 command: []
