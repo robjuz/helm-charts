@@ -43,6 +43,13 @@ commonLabels: {}
 
 nominatimInitialize:
   enabled: false
+  ## @param nominatimInitialize.continue Nominatim import CLI continue arg
+  ## If undefined (default) `--continue` flag is not set on nominatim import
+  ## If defined, `nominatim import --continue <step>` is set
+  ## Supported steps: `[ load-data | indexing | db-postprocess ]`
+  ## More info on: https://nominatim.org/release-docs/latest/admin/Faq/#can-a-stoppedkilled-import-process-be-resumed
+  ##
+  continue:
   pbfUrl: https://download.geofabrik.de/europe/germany/sachsen-latest.osm.pbf
   importWikipedia: false
   importGB_Postcode: false

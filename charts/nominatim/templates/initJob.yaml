@@ -5,6 +5,9 @@ metadata:
   name: {{ include "nominatim.fullname" . }}-init
   namespace: {{ include "common.names.namespace" . | quote }}
   labels: {{- include "common.labels.standard" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "10"
 spec:
   template:
     spec:
@@ -137,11 +140,19 @@ spec:
               value: {{ .Values.nominatimInitialize.threads | quote }}
             - name: NOMINATIM_DATABASE_WEBUSER
               value: {{ include "nominatim.databaseUser" . }}
+            - name: CONTINUE
+              value: {{ .Values.nominatimInitialize.continue | quote }}
           command:
             - /bin/bash
             - -ec
             - |
-              nominatim import --osm-file data.osm.pbf --threads $THREADS
+              if [ -z "$CONTINUE" ]; then
+                echo "Starting data import."
+                nominatim import --osm-file data.osm.pbf --threads $THREADS
+              else
+                echo "Continuing initialization from step: '$CONTINUE'."
+                nominatim import --continue $CONTINUE --threads $THREADS
+              fi
               nominatim index --threads $THREADS
               nominatim admin --check-database
 
@@ -178,7 +189,7 @@ spec:
           resources:
             {{- toYaml .Values.nominatimInitialize.resources | nindent 12 }}
           {{- end }}
-      restartPolicy: OnFailure
+      restartPolicy: Never
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

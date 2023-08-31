@@ -33,7 +33,7 @@ The installation consist of 2 steps
 2. App deployment
 
 ### Initialisation
-Set```nominatimInitialize.enabled: true```
+Set ```nominatimInitialize.enabled: true```
 
 During the initialization, all required data are downloaded and the database is build.
 To improve the import speed you can set additional PostgreSQL params
@@ -121,7 +121,8 @@ The command removes all the Kubernetes components associated with the chart and 
 
 | Name                                    | Description                                                  | Value                                                                 |
 |-----------------------------------------|--------------------------------------------------------------|-----------------------------------------------------------------------|
-| `nominatimInitialize.enabled`           | enable/disable init job                                      | `false `                                                              |
+| `nominatimInitialize.enabled`           | enable/disable init job                                      | `false`                                                               |
+| `nominatimInitialize.continue`          | Select init step to continue from                            | `nil` `[ load-data \| indexing \| db-postprocess ]`                   |
 | `nominatimInitialize.pbfUrl`            | URL of the pbf file to import                                | `https://download.geofabrik.de/europe/germany/sachsen-latest.osm.pbf` |
 | `nominatimInitialize.importWikipedia`   | If additional Wikipedia/Wikidata rankings should be imported | `false`                                                               |
 | `nominatimInitialize.wikipediaUrl`      | Wikipedia/Wikidata rankings file URL                         | `https://nominatim.org/data/wikimedia-importance.sql.gz`              |
@@ -136,7 +137,7 @@ The command removes all the Kubernetes components associated with the chart and 
 
 | Name                                       | Description                     | Value                |
 | ------------------------------------------ | ------------------------------- | -------------------- |
-| `nominatimReplications.enabled`            | enable/disable replication      | `false `             |
+| `nominatimReplications.enabled`            | enable/disable replication      | `false`             |
 | `nominatimReplications.replicationUrl`     | URL with update information     | `https://download.geofabrik.de/europe/germany/sachsen-updates/` |
 
 ### Nominatim deployment parameters
