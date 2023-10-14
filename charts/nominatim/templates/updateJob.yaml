@@ -42,8 +42,11 @@ spec:
             {{- include "common.tplvalues.render" (dict "value" .Values.nominatim.extraEnv "context" $) | nindent 12 }}
           {{- end }}
           command:
-            - nominatim
-            - replication
+            - /bin/bash
+            - -ec
+            - |
+                nominatim replication --check-for-updates
+                nominatim replication --threads {{ .Values.nominatimReplications.threads }}
           volumeMounts:
             - mountPath: /dev/shm
               name: dshm
