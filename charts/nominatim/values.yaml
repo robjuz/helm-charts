@@ -65,7 +65,7 @@ nominatimInitialize:
 #      memory: 4Gi
 
 nominatimReplications:
-  enabled: true
+  enabled: false
   replicationUrl: https://download.geofabrik.de/europe/germany/sachsen-updates/
   threads: 1
 
