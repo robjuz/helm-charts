@@ -54,6 +54,10 @@ spec:
             - mountPath: /nominatim/flatnode
               name: nominatim
               subPath: flatnode
+            {{- end }}
+          {{- if .Values.nominatimReplications.resources }}
+          resources:
+            {{- toYaml .Values.nominatimReplications.resources | nindent 12 }}
           {{- end }}
       restartPolicy: Always
       {{- with .Values.nodeSelector }}

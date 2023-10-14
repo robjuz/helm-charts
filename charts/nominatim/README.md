@@ -134,11 +134,12 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ### Nominatim Replication Configuration parameters
 
-| Name                                   | Description                 | Value                                                           |
-|----------------------------------------|-----------------------------|-----------------------------------------------------------------|
-| `nominatimReplications.enabled`        | enable/disable replication  | `false `                                                        |
-| `nominatimReplications.replicationUrl` | URL with update information | `https://download.geofabrik.de/europe/germany/sachsen-updates/` |
-| `nominatimReplications.threads`        | Amount of threads to use    | `1`                                                             |
+| Name                                   | Description                                             | Value                                                           |
+|----------------------------------------|---------------------------------------------------------|-----------------------------------------------------------------|
+| `nominatimReplications.enabled`        | enable/disable replication                              | `false `                                                        |
+| `nominatimReplications.replicationUrl` | URL with update information                             | `https://download.geofabrik.de/europe/germany/sachsen-updates/` |
+| `nominatimReplications.resources`      | Define resources requests and limits for the update job | `{}`                                                            |
+| `nominatimReplications.threads`        | Amount of threads to use                                | `1`                                                             |
 
 ### Nominatim deployment parameters
 
