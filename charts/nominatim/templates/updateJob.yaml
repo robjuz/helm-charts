@@ -45,7 +45,6 @@ spec:
             - /bin/bash
             - -ec
             - |
-                nominatim replication --check-for-updates
                 nominatim replication --threads {{ .Values.nominatimReplications.threads }}
           volumeMounts:
             - mountPath: /dev/shm
