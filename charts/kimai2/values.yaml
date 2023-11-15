@@ -873,6 +873,9 @@ externalDatabase:
   ## @param externalDatabase.port External Database server port
   ##
   port: 3306
+  ## @param externalDatabase.serverVersion External Database server version
+  ##
+  serverVersion: '5.7'
   ## @param externalDatabase.user External Database username
   ##
   user: kimai

@@ -53,7 +53,7 @@ Return the kimai Secret Name
 {{- end -}}
 
 {{/*
-Return the MariaDB Hostname
+Return the Database Hostname
 */}}
 {{- define "kimai.databaseHost" -}}
 {{- if .Values.mariadb.enabled }}
@@ -66,9 +66,10 @@ Return the MariaDB Hostname
     {{- printf "%s" .Values.externalDatabase.host -}}
 {{- end -}}
 {{- end -}}
+{{/*
 
 {{/*
-Return the MariaDB Port
+Return the Database Port
 */}}
 {{- define "kimai.databasePort" -}}
 {{- if .Values.mariadb.enabled }}
@@ -79,7 +80,18 @@ Return the MariaDB Port
 {{- end -}}
 
 {{/*
-Return the MariaDB Database Name
+Return the Database ServerVersion
+*/}}
+{{- define "kimai.databaseServerVersion" -}}
+{{- if .Values.mariadb.enabled }}
+    {{- printf "%s" (regexReplaceAll "-.*$" .Values.mariadb.image.tag "") -}}
+{{- else -}}
+    {{- printf "%d" (.Values.externalDatabase.port | int ) -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return the Database Name
 */}}
 {{- define "kimai.databaseName" -}}
 {{- if .Values.mariadb.enabled }}
@@ -90,7 +102,7 @@ Return the MariaDB Database Name
 {{- end -}}
 
 {{/*
-Return the MariaDB User
+Return the Database User
 */}}
 {{- define "kimai.databaseUser" -}}
 {{- if .Values.mariadb.enabled }}
@@ -101,7 +113,7 @@ Return the MariaDB User
 {{- end -}}
 
 {{/*
-Return the MariaDB Password
+Return the Database Password
 */}}
 {{- define "kimai.databasePassword" -}}
 {{- if .Values.mariadb.enabled }}
@@ -112,8 +124,8 @@ Return the MariaDB Password
 {{- end -}}
 
 {{/*
-Create the database URL. For the time being, this supports only an integrated MySQL
+Create the Database URL. For the time being, this supports only an integrated MySQL
 */}}
 {{- define "kimai.databaseUrl" -}}
-mysql://{{ include "kimai.databaseUser" . }}:{{ include "kimai.databasePassword" . }}@{{ include "kimai.databaseHost" . }}/{{ include "kimai.databaseName" . }}
+mysql://{{ include "kimai.databaseUser" . }}:{{ include "kimai.databasePassword" . }}@{{ include "kimai.databaseHost" . }}/{{ include "kimai.databaseName" . }}?charset=utf8&serverVersion={{ include "kimai.databaseServerVersion" . }}
 {{- end }}
