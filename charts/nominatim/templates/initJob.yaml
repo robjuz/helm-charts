@@ -12,9 +12,15 @@ spec:
         fsGroup: 2000
       initContainers:
         - name: wait-for-db
-          image: willwill/wait-for-it
+          image: postgres
           args:
-            - {{ include "nominatim.databaseHost" . }}:{{ include "nominatim.databasePort" . }}
+            - /bin/bash
+            - -c
+            - |
+              until pg_isready -h {{ include "nominatim.databaseHost" . }} -p {{ include "nominatim.databasePort" . }} -U {{ include "nominatim.databaseUser" . }}; do
+                echo "Waiting for database..."
+                sleep 2
+              done
 
 {{- if .Values.nominatimInitialize.customStyleUrl }}
         - name: download-custom-style
