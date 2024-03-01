@@ -89,7 +89,34 @@ To uninstall/delete the `nominatim` deployment:
 helm delete nominatim
 ```
 
-The command removes all the Kubernetes components associated with the chart and deletes the release.
+The command removes all the Kubernetes components associated with the chart and deletes the release, but the imported data still remains.
+
+## Removing persisted data
+For a total uninstallation of nomination, a data removal is necessary. To do so, first of all, you need to search for the right persistence volume. To indetify it, you need to type de command below, and search for a volume containing the helm release name.
+
+```console
+kubectl get pvc
+```
+
+You'll receive an output similar to:
+
+| NAME                        | STATUS | VOLUME                                   | CAPACITY | ACCESS MODES | STORAGECLASS | AGE  |
+| --------------------------- | ------ | ---------------------------------------- | -------- | ------------ | ------------ | ---- |
+| data-nominatim-postgresql-0 | Bound  | pvc-b450c62d-d888-4869-9568-298e6d10b597 | 500Gi    | RWO          | standard     | 3d1h |
+
+Once you found the correct PVC, you just need to type de command to delete it:
+
+```console
+kubectl delete pvc data-nominatim-postgresql-0
+```
+
+Or, you may use a single command for both operation, like following:
+
+```console
+kubectl delete pvc -l app.kubernetes.io/instance=nominatim
+```
+
+Note: The command above may differ a little depending the k8s cluster version you're using.
 
 ## Parameters
 
