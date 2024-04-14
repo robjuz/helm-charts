@@ -102,7 +102,7 @@ kimaiEnvironment: prod
 kimaiAppSecret: change_this_to_something_unique
 ## @param kimaiAdminEmail Email for the superadmin account
 ##
-kimaiAdminEmail:
+kimaiAdminEmail: admin@example.com
 ## @param kimaiAdminPassword Password for the superadmin account
 ##
 kimaiAdminPassword:

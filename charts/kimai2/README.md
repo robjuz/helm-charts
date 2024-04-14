@@ -89,7 +89,7 @@ The command removes all the Kubernetes components associated with the chart and 
 |---------------------------|-------------------------------------------------------------------------------------------------------------------|-----------------------------------|
 | `kimaiEnvironment`        | Kimai environment name                                                                                            | `prod`                            |
 | `kimaiAppSecret`          | Secret used to encrypt session cookies                                                                            | `change_this_to_something_unique` |
-| `kimaiAdminEmail`         | Email for the superadmin account                                                                                  | ``                                |
+| `kimaiAdminEmail`         | Email for the superadmin account                                                                                  | `admin@example.com`               |
 | `kimaiAdminPassword`      | Password for the superadmin account                                                                               | ``                                |
 | `kimaiMailerFrom`         | Application specific “from” address for all emails                                                                | `kimai@example.com`               |
 | `kimaiMailerUrl`          | SMTP connection for emails                                                                                        | `null://localhost`                |
@@ -279,8 +279,8 @@ Specify each parameter using the `--set key=value[,key=value]` argument to `helm
 
 ```console
 helm install my-release \
-  --set kimaiUsername=admin \
-  --set kimaiPassword=password \
+  --set kimaiAdminEmail=admin@example.com \
+  --set kimaiAdminPassword=password \
   --set mariadb.auth.rootPassword=secretpassword \
     robjuz/kimai2
 ```
@@ -320,8 +320,31 @@ To enable Ingress integration, set `ingress.enabled` to `true`. The `ingress.hos
 
 The chart also facilitates the creation of TLS secrets for use with the Ingress controller, with different options for certificate management.
 
+### Persistence
+The [Kimai2](https://github.com/tobybatch/kimai2) image stores the Kimai data at the /opt/kimai/var/data path of the container. Persistent Volume Claims are used to keep the data across deployments.
+
+### Plugins
+You have 2 options to add plugins to your Kimai installation
+
+1. Create a custom docker image and add the plugins under `/opt/kimai/var/plugins`
+
+2. Add a volume map and upload the plugin.
+
+   Here an example using the default volume 
+```yaml
+persistence:
+   enabled: true
+extraVolumeMounts:
+    - mountPath: /opt/kimai/var/plugins
+      name: kimai-data
+      subPath: plugins
+```
 
 ## Upgrading
+
+### To 4.0.0
+
+Per default only `/opt/kimai/var/data` are present in the persistence volume. You can use `extraVolumeMounts` to add additional directories to the volume
 
 ### To 3.0.0
 

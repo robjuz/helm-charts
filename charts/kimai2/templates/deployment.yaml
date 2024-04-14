@@ -188,8 +188,9 @@ spec:
           resources: {{- toYaml .Values.resources | nindent 12 }}
           {{- end }}
           volumeMounts:
-            - mountPath: /opt/kimai/var
+            - mountPath: /opt/kimai/var/data
               name: kimai-data
+              subPath: data
             {{- if .Values.extraVolumeMounts }}
             {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumeMounts "context" $) | nindent 12 }}
             {{- end }}
