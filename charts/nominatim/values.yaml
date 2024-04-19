@@ -222,6 +222,8 @@ ingress:
   ## @param ingress.enabled Enable ingress record generation for nominatim
   ##
   enabled: false
+  ## @param ingress.ingressClassName Configure Ingress class
+  ingressClassName:
   ## @param ingress.certManager Add the corresponding annotations for cert-manager integration
   ##
   certManager: false
