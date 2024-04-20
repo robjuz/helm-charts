@@ -95,27 +95,27 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ### Common parameters
 
-| Name                | Description                                        | Value           |
-| ------------------- | -------------------------------------------------- | --------------- |
-| `nameOverride`      | String to partially override common.names.fullname | `nil`           |
-| `fullnameOverride`  | String to fully override common.names.fullname     | `nil`           |
+| Name               | Description                                        | Value |
+|--------------------|----------------------------------------------------|-------|
+| `nameOverride`     | String to partially override common.names.fullname | `nil` |
+| `fullnameOverride` | String to fully override common.names.fullname     | `nil` |
 
 ### Nominatim Image parameters
 
-| Name                | Description                                          | Value                 |
-| ------------------- | ---------------------------------------------------- | --------------------- |
-| `image.repository`  | Nominatim image repository                               | `mediagis/nominatim`        |
-| `image.tag`         | Nominatim image tag (immutable tags are recommended)     | `3.7` |
-| `image.pullPolicy`  | Nominatim image pull policy                              | `IfNotPresent`        |
-| `imagePullSecrets`  | Nominatim image pull secrets                             | `[]`                  |
+| Name               | Description                                          | Value                |
+|--------------------|------------------------------------------------------|----------------------|
+| `image.repository` | Nominatim image repository                           | `mediagis/nominatim` |
+| `image.tag`        | Nominatim image tag (immutable tags are recommended) | `3.7`                |
+| `image.pullPolicy` | Nominatim image pull policy                          | `IfNotPresent`       |
+| `imagePullSecrets` | Nominatim image pull secrets                         | `[]`                 |
 
 ### Nominatim Configuration parameters
 
-| Name                                   | Description                           | Value                |
-| -------------------------------------- | ------------------------------------- | -------------------- |
-| `NominatimAdminEmail`                      | Email for the superadmin account      | `admin@Nominatim.local`  |
-| `NominatimAdminPassword`                   | Password for the superadmin account   | `changemeplease`     |
-| `NominatimEnvironment`                     | Nominatim environment name                | `prod`               |
+| Name                     | Description                         | Value                   |
+|--------------------------|-------------------------------------|-------------------------|
+| `NominatimAdminEmail`    | Email for the superadmin account    | `admin@Nominatim.local` |
+| `NominatimAdminPassword` | Password for the superadmin account | `changemeplease`        |
+| `NominatimEnvironment`   | Nominatim environment name          | `prod`                  |
 
 ### Nominatim Initialisation Configuration parameters
 
@@ -143,49 +143,50 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ### Nominatim deployment parameters
 
-| Name                                    | Description                                                | Value           |
-| --------------------------------------- | -----------------------------------------------------------| --------------- |
-| `replicaCount`                          | Number of Nominatim replicas to deploy                         | `1`             |
-| `updateStrategy.type`                   | Nominatim deployment strategy type                             | `RollingUpdate` |
-| `updateStrategy.rollingUpdate`          | Nominatim deployment rolling update configuration parameters   | `{}`            |
-| `schedulerName`                         | Alternate scheduler                                        | `nil`           |
-| `serviceAccountName`                    | ServiceAccount name                                        | `default`       |
-| `podAnnotations`                        | Annotations for Nominatim pods                                 | `{}`            |
+| Name                           | Description                                                  | Value           |
+|--------------------------------|--------------------------------------------------------------|-----------------|
+| `replicaCount`                 | Number of Nominatim replicas to deploy                       | `1`             |
+| `updateStrategy.type`          | Nominatim deployment strategy type                           | `RollingUpdate` |
+| `updateStrategy.rollingUpdate` | Nominatim deployment rolling update configuration parameters | `{}`            |
+| `schedulerName`                | Alternate scheduler                                          | `nil`           |
+| `serviceAccountName`           | ServiceAccount name                                          | `default`       |
+| `podAnnotations`               | Annotations for Nominatim pods                               | `{}`            |
 
 ### Traffic Exposure Parameters
 
-| Name                               | Description                                                                      | Value          |
-| ---------------------------------- | ---------------------------------------------------------------------------------| -------------- |
-| `service.type`                     | Nominatim service type                                                               | `ClusterIP`    |
-| `service.port`                     | Nominatim service HTTP port                                                          | `80`           |
-| `ingress.enabled`                  | Enable ingress record generation for Nominatim                                       | `false`        |
-| `ingress.certManager`              | Add the corresponding annotations for cert-manager integration                   | `false`        |
-| `ingress.hostname`                 | Default host for the ingress record                                              | `Nominatim.local`  |
-| `ingress.annotations`              | Additional custom annotations for the ingress record                             | `{}`           |
-| `ingress.tls`                      | Enable TLS configuration for the host defined at `ingress.hostname` parameter    | `false`        |
-| `ingress.secrets`                  | Custom TLS certificates as secrets                                               | `[]`           |
+| Name                       | Description                                                                   | Value             |
+|----------------------------|-------------------------------------------------------------------------------|-------------------|
+| `service.type`             | Nominatim service type                                                        | `ClusterIP`       |
+| `service.port`             | Nominatim service HTTP port                                                   | `80`              |
+| `ingress.enabled`          | Enable ingress record generation for Nominatim                                | `false`           |
+| `ingress.certManager`      | Add the corresponding annotations for cert-manager integration                | `false`           |
+| `ingress.ingressClassName` | IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+) |                   |
+| `ingress.hostname`         | Default host for the ingress record                                           | `Nominatim.local` |
+| `ingress.annotations`      | Additional custom annotations for the ingress record                          | `{}`              |
+| `ingress.tls`              | Enable TLS configuration for the host defined at `ingress.hostname` parameter | `false`           |
+| `ingress.secrets`          | Custom TLS certificates as secrets                                            | `[]`              |
 
 ### Flatnode Parameters
 
-| Name                                          | Description                                                | Value             |
-| --------------------------------------------- | -----------------------------------------------------------| ----------------- |
-| `flatnode.enabled`                         | Enable flatnode using Persistent Volume Claims             | `false`            |
-| `flatnode.storageClass`                    | Persistent Volume storage class                            | `nil`             |
-| `flatnode.accessModes`                     | Persistent Volume access modes                             | `[ReadWriteMany]` |
-| `flatnode.size`                            | Persistent Volume size                                     | `100Gi`             |
-| `flatnode.existingClaim`                   | The name of an existing PVC to use for flatnode            | `nil`             |
+| Name                     | Description                                     | Value             |
+|--------------------------|-------------------------------------------------|-------------------|
+| `flatnode.enabled`       | Enable flatnode using Persistent Volume Claims  | `false`           |
+| `flatnode.storageClass`  | Persistent Volume storage class                 | `nil`             |
+| `flatnode.accessModes`   | Persistent Volume access modes                  | `[ReadWriteMany]` |
+| `flatnode.size`          | Persistent Volume size                          | `100Gi`           |
+| `flatnode.existingClaim` | The name of an existing PVC to use for flatnode | `nil`             |
 
 
 ### Data PVC Parameters
 
 
-| Name                                          | Description                                                | Value             |
-| --------------------------------------------- | -----------------------------------------------------------| ----------------- |
-| `datapvc.enabled`                         | Enable Data persistence using Persistent Volume Claims             | `false`            |
-| `datapvc.storageClass`                    | Persistent Volume storage class                            | `nil`             |
-| `datapvc.accessModes`                     | Persistent Volume access modes                             | `[ReadWriteMany]` |
-| `datapvc.size`                            | Persistent Volume size                                     | `100Gi`             |
-| `datapvc.existingClaim`                   | The name of an existing PVC            | `nil`             |
+| Name                    | Description                                            | Value             |
+|-------------------------|--------------------------------------------------------|-------------------|
+| `datapvc.enabled`       | Enable Data persistence using Persistent Volume Claims | `false`           |
+| `datapvc.storageClass`  | Persistent Volume storage class                        | `nil`             |
+| `datapvc.accessModes`   | Persistent Volume access modes                         | `[ReadWriteMany]` |
+| `datapvc.size`          | Persistent Volume size                                 | `100Gi`           |
+| `datapvc.existingClaim` | The name of an existing PVC                            | `nil`             |
 
 
 ### Database Parameters
@@ -204,7 +205,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | `externalDatabase.port`                       | External PostgreSQL post (ignored if `postgresql.enabled = true`)                                                                        | 5432                          |
 | `externalDatabase.user`                       | External PostgreSQL user (ignored if `postgresql.enabled = true`)                                                                        | nominatim                     |
 | `externalDatabase.password`                   | External PostgreSQL password (ignored if `postgresql.enabled = true`)                                                                    | ""                            |
-| `externalDatabase.existingSecretDsn`          | Name of existing secret to use to set full PostgreSQL DataSourceName (overrides `externalDatabase.*`)                                    | `nil`                           |
+| `externalDatabase.existingSecretDsn`          | Name of existing secret to use to set full PostgreSQL DataSourceName (overrides `externalDatabase.*`)                                    | `nil`                         |
 | `externalDatabase.existingSecretDsnKey`       | Name of key in existing secret to use to set full PostgreSQL DataSourceName. Only used when `externalDatabase.existingSecretDsn` is set. | POSTGRESQL_DSN                |
 
 ### Nominatim Appserver Parameters
