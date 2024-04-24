@@ -1,12 +1,29 @@
-{{- if .Values.nominatimInitialize.enabled }}
+{{- if .Values.initJob.enabled }}
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "nominatim.fullname" . }}-init
+  name: {{ include "common.names.fullname" . }}-init
   namespace: {{ include "common.names.namespace" . | quote }}
-  labels: {{- include "common.labels.standard" . | nindent 4 }}
+  {{- $versionLabel := dict "app.kubernetes.io/version" ( include "common.images.version" ( dict "imageRoot" .Values.initJob.image "chart" .Chart ) ) }}
+  {{- $labels := include "common.tplvalues.merge" ( dict "values" ( list .Values.commonLabels $versionLabel ) "context" . ) }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" $labels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/part-of: nominatim
+    app.kubernetes.io/component: nominatim
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.initJob.annotations "context" $ ) | nindent 4 }}
+    {{- if .Values.commonAnnotations }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- end }}
 spec:
+  backoffLimit: {{ .Values.initJob.backoffLimit }}
   template:
+    metadata:
+      {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.initJob.podLabels .Values.commonLabels $versionLabel ) "context" . ) }}
+      labels: {{- include "common.labels.standard" ( dict "customLabels" $podLabels "context" $ ) | nindent 8 }}
+        app.kubernetes.io/part-of: nominatim
+        app.kubernetes.io/component: nominatim
+      {{- if .Values.initJob.podAnnotations }}
+      annotations: {{- include "common.tplvalues.render" (dict "value" .Values.initJob.podAnnotations "context" $) | nindent 8 }}
+      {{- end }}
     spec:
       securityContext:
         fsGroup: 2000
@@ -16,7 +33,7 @@ spec:
           args:
             - {{ include "nominatim.databaseHost" . }}:{{ include "nominatim.databasePort" . }}
 
-{{- if .Values.nominatimInitialize.customStyleUrl }}
+{{- if .Values.initJob.customStyleUrl }}
         - name: download-custom-style
           image: curlimages/curl
           workingDir: /nominatim
@@ -26,14 +43,14 @@ spec:
           command:
             - curl
             - -A {{ include "chart.userAgent" . }}
-            - {{ .Values.nominatimInitialize.customStyleUrl }}
+            - {{ .Values.initJob.customStyleUrl }}
             - -L
             - -f
             - -o
             - custom.style
 {{- end }}
 
-{{- if .Values.nominatimInitialize.importWikipedia }}
+{{- if .Values.initJob.importWikipedia }}
         - name: download-wikipedia
           image: curlimages/curl
           workingDir: /nominatim
@@ -43,14 +60,14 @@ spec:
           command:
             - curl
             - -A {{ include "chart.userAgent" . }}
-            - {{ .Values.nominatimInitialize.wikipediaUrl }}
+            - {{ .Values.initJob.wikipediaUrl }}
             - -L
             - -f
             - -o
             - wikimedia-importance.sql.gz
 {{- end }}
 
-{{- if .Values.nominatimInitialize.importGB_Postcode }}
+{{- if .Values.initJob.importGB_Postcode }}
         - name: download-gb-postcode
           image: curlimages/curl
           workingDir: /nominatim
@@ -67,7 +84,7 @@ spec:
             - gb_postcodes.csv.gz
 {{- end }}
 
-{{- if .Values.nominatimInitialize.importUS_Postcode }}
+{{- if .Values.initJob.importUS_Postcode }}
         - name: download-us-postcode
           image: curlimages/curl
           workingDir: /nominatim
@@ -99,7 +116,7 @@ spec:
               else
                 echo "Downloading pbf file"
                 curl -A {{ include "chart.userAgent" . }} \
-                {{ .Values.nominatimInitialize.pbfUrl }} \
+                {{ .Values.initJob.pbfUrl }} \
                 --create-dirs -L -f -o data.osm.pbf
               fi
 
@@ -110,12 +127,12 @@ spec:
           workingDir: /nominatim
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            {{- if .Values.nominatimInitialize.customStyleUrl }}
+            {{- if .Values.initJob.customStyleUrl }}
             - name: NOMINATIM_IMPORT_STYLE
               value: /nominatim/custom.style
             {{- else }}
             - name: NOMINATIM_IMPORT_STYLE
-              value: {{ .Values.nominatimInitialize.importStyle }}
+              value: {{ .Values.initJob.importStyle }}
             {{- end }}
             - name: NOMINATIM_DATABASE_DSN
               {{- if .Values.externalDatabase.existingSecretDsn }}
@@ -132,9 +149,9 @@ spec:
               value: /nominatim/flatnode/flatnode.file
             {{- end }}
             - name: REPLICATION_ENABLED
-              value: {{ .Values.nominatimReplications.enabled | quote }}
+              value: {{ .Values.updates.enabled | quote }}
             - name: THREADS
-              value: {{ .Values.nominatimInitialize.threads | quote }}
+              value: {{ .Values.initJob.threads | quote }}
             - name: NOMINATIM_DATABASE_WEBUSER
               value: {{ include "nominatim.databaseUser" . }}
           command:
@@ -174,9 +191,9 @@ spec:
               name: flatnode
               subPath: flatnode
             {{- end }}
-          {{- if .Values.nominatimInitialize.resources }}
+          {{- if .Values.initJob.resources }}
           resources:
-            {{- toYaml .Values.nominatimInitialize.resources | nindent 12 }}
+            {{- toYaml .Values.initJob.resources | nindent 12 }}
           {{- end }}
       restartPolicy: OnFailure
       {{- with .Values.nodeSelector }}
@@ -191,15 +208,15 @@ spec:
         {{- if  .Values.flatnode.enabled }}
         - name: flatnode
           persistentVolumeClaim:
-            claimName: {{ .Values.flatnode.existingClaim | default (include "nominatim.fullname" .) }}
+            claimName: {{ include "common.names.fullname" . }}
         {{- end }}
         - name: dshm
           emptyDir:
             medium: Memory
         - name: data
-          {{- if .Values.datapvc.enabled }}
+          {{- if .Values.initJob.persistence.enabled }}
           persistentVolumeClaim:
-            claimName: {{ .Values.datapvc.existingClaim | default (printf "%s-data" (include "nominatim.fullname" .)) }}
+            claimName: {{ .Values.initJob.persistence.existingClaim | default (printf "%s-data" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-") }}
           {{- else }}
           emptyDir: {}
           {{- end }}

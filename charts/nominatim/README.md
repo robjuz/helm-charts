@@ -154,17 +154,35 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ### Traffic Exposure Parameters
 
-| Name                       | Description                                                                   | Value             |
-|----------------------------|-------------------------------------------------------------------------------|-------------------|
-| `service.type`             | Nominatim service type                                                        | `ClusterIP`       |
-| `service.port`             | Nominatim service HTTP port                                                   | `80`              |
-| `ingress.enabled`          | Enable ingress record generation for Nominatim                                | `false`           |
-| `ingress.certManager`      | Add the corresponding annotations for cert-manager integration                | `false`           |
-| `ingress.ingressClassName` | IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+) |                   |
-| `ingress.hostname`         | Default host for the ingress record                                           | `Nominatim.local` |
-| `ingress.annotations`      | Additional custom annotations for the ingress record                          | `{}`              |
-| `ingress.tls`              | Enable TLS configuration for the host defined at `ingress.hostname` parameter | `false`           |
-| `ingress.secrets`          | Custom TLS certificates as secrets                                            | `[]`              |
+| Name                               | Description                                                                                                                                              | Value                    |
+|------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------|
+| `service.type`                     | Nominatim service type                                                                                                                                   | `LoadBalancer`           |
+| `service.ports.http`               | Nominatim service HTTP port                                                                                                                              | `80`                     |
+| `service.httpsTargetPort`          | Target port for HTTPS                                                                                                                                    | `https`                  |
+| `service.nodePorts.http`           | Node port for HTTP                                                                                                                                       | `""`                     |
+| `service.sessionAffinity`          | Control where client requests go, to the same pod or round-robin                                                                                         | `None`                   |
+| `service.sessionAffinityConfig`    | Additional settings for the sessionAffinity                                                                                                              | `{}`                     |
+| `service.clusterIP`                | Nominatim service Cluster IP                                                                                                                             | `""`                     |
+| `service.loadBalancerIP`           | Nominatim service Load Balancer IP                                                                                                                       | `""`                     |
+| `service.loadBalancerSourceRanges` | Nominatim service Load Balancer sources                                                                                                                  | `[]`                     |
+| `service.externalTrafficPolicy`    | Nominatim service external traffic policy                                                                                                                | `Cluster`                |
+| `service.annotations`              | Additional custom annotations for Nominatim service                                                                                                      | `{}`                     |
+| `service.extraPorts`               | Extra port to expose on Nominatim service                                                                                                                | `[]`                     |
+| `ingress.enabled`                  | Enable ingress record generation for Nominatim                                                                                                           | `false`                  |
+| `ingress.pathType`                 | Ingress path type                                                                                                                                        | `ImplementationSpecific` |
+| `ingress.apiVersion`               | Force Ingress API version (automatically detected if not set)                                                                                            | `""`                     |
+| `ingress.ingressClassName`         | IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)                                                                            | `""`                     |
+| `ingress.hostname`                 | Default host for the ingress record. The hostname is templated and thus can contain other variable references.                                           | `kimai.local`            |
+| `ingress.path`                     | Default path for the ingress record                                                                                                                      | `/`                      |
+| `ingress.annotations`              | Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.                         | `{}`                     |
+| `ingress.tls`                      | Enable TLS configuration for the host defined at `ingress.hostname` parameter                                                                            | `false`                  |
+| `ingress.selfSigned`               | Create a TLS secret for this ingress record using self-signed certificates generated by Helm                                                             | `false`                  |
+| `ingress.extraHosts`               | An array with additional hostname(s) to be covered with the ingress record. The host names are templated and thus can contain other variable references. | `[]`                     |
+| `ingress.extraPaths`               | An array with additional arbitrary paths that may need to be added to the ingress under the main host                                                    | `[]`                     |
+| `ingress.extraTls`                 | TLS configuration for additional hostname(s) to be covered with this ingress record                                                                      | `[]`                     |
+| `ingress.secrets`                  | Custom TLS certificates as secrets                                                                                                                       | `[]`                     |
+| `ingress.extraRules`               | Additional rules to be covered with this ingress record                                                                                                  | `[]`                     |
+
 
 ### Flatnode Parameters
 
@@ -187,6 +205,26 @@ The command removes all the Kubernetes components associated with the chart and 
 | `datapvc.accessModes`   | Persistent Volume access modes                         | `[ReadWriteMany]` |
 | `datapvc.size`          | Persistent Volume size                                 | `100Gi`           |
 | `datapvc.existingClaim` | The name of an existing PVC                            | `nil`             |
+
+### NetworkPolicy parameters
+
+| Name                                                          | Description                                                                                                                  | Value   |
+|---------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------|---------|
+| `networkPolicy.enabled`                                       | Enable network policies                                                                                                      | `false` |
+| `networkPolicy.metrics.enabled`                               | Enable network policy for metrics (prometheus)                                                                               | `false` |
+| `networkPolicy.metrics.namespaceSelector`                     | Monitoring namespace selector labels. These labels will be used to identify the prometheus' namespace.                       | `{}`    |
+| `networkPolicy.metrics.podSelector`                           | Monitoring pod selector labels. These labels will be used to identify the Prometheus pods.                                   | `{}`    |
+| `networkPolicy.ingress.enabled`                               | Enable network policy for Ingress Proxies                                                                                    | `false` |
+| `networkPolicy.ingress.namespaceSelector`                     | Ingress Proxy namespace selector labels. These labels will be used to identify the Ingress Proxy's namespace.                | `{}`    |
+| `networkPolicy.ingress.podSelector`                           | Ingress Proxy pods selector labels. These labels will be used to identify the Ingress Proxy pods.                            | `{}`    |
+| `networkPolicy.ingressRules.backendOnlyAccessibleByFrontend`  | Enable ingress rule that makes the backend (mariadb) only accessible by testlink's pods.                                     | `false` |
+| `networkPolicy.ingressRules.customBackendSelector`            | Backend selector labels. These labels will be used to identify the backend pods.                                             | `{}`    |
+| `networkPolicy.ingressRules.accessOnlyFrom.enabled`           | Enable ingress rule that makes testlink only accessible from a particular origin                                             | `false` |
+| `networkPolicy.ingressRules.accessOnlyFrom.namespaceSelector` | Namespace selector label that is allowed to access testlink. This label will be used to identified the allowed namespace(s). | `{}`    |
+| `networkPolicy.ingressRules.accessOnlyFrom.podSelector`       | Pods selector label that is allowed to access testlink. This label will be used to identified the allowed pod(s).            | `{}`    |
+| `networkPolicy.ingressRules.customRules`                      | Custom network policy ingress rule                                                                                           | `{}`    |
+| `networkPolicy.egressRules.denyConnectionsToExternal`         | Enable egress rule that denies outgoing traffic outside the cluster, except for DNS (port 53).                               | `false` |
+| `networkPolicy.egressRules.customRules`                       | Custom network policy rule                                                                                                   | `{}`    |
 
 
 ### Database Parameters

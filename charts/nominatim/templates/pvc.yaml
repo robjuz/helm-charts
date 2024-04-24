@@ -1,10 +1,22 @@
 {{- if and .Values.flatnode.enabled (not .Values.flatnode.existingClaim) }}
-apiVersion: v1
 kind: PersistentVolumeClaim
+apiVersion: v1
 metadata:
-  name: {{ include "nominatim.fullname" . }}
-  namespace: {{ include "common.names.namespace" . | quote }}
+  name: {{ include "common.names.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
   labels: {{- include "common.labels.standard" . | nindent 4 }}
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- if or .Values.flatnode.annotations .Values.commonAnnotations }}
+  annotations:
+    {{- if .Values.flatnode.annotations }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.flatnode.annotations "context" $ ) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.commonAnnotations }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- end }}
 spec:
   accessModes:
     {{- range .Values.flatnode.accessModes }}
@@ -14,4 +26,10 @@ spec:
     requests:
       storage: {{ .Values.flatnode.size | quote }}
   {{- include "common.storage.class" (dict "persistence" .Values.flatnode "global" .Values.global) | nindent 2 }}
-{{- end}}
+  {{- if .Values.flatnode.dataSource }}
+  dataSource: {{- include "common.tplvalues.render" (dict "value" .Values.flatnode.dataSource "context" $) | nindent 4 }}
+  {{- end }}
+  {{- if .Values.flatnode.selector }}
+  selector: {{- include "common.tplvalues.render" (dict "value" .Values.flatnode.selector "context" $) | nindent 4 }}
+  {{- end -}}
+{{- end }}
