@@ -12,9 +12,12 @@ spec:
         fsGroup: 2000
       initContainers:
         - name: wait-for-db
-          image: willwill/wait-for-it
+          image: chainguard/wait-for-it:latest
           args:
-            - {{ include "nominatim.databaseHost" . }}:{{ include "nominatim.databasePort" . }}
+            - -h
+            - {{ include "nominatim.databaseHost" . | quote}}
+            - -p
+            - {{ include "nominatim.databasePort" . | quote }}
 
 {{- if .Values.nominatimInitialize.customStyleUrl }}
         - name: download-custom-style
