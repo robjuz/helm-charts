@@ -624,7 +624,7 @@ initJob:
   ## @param initJob.podSecurityContext.seccompProfile.type Set Nominatim Replications container's Security Context seccomp profile
   ##
   podSecurityContext:
-    enabled: false
+    enabled: true
     fsGroup: 101
     seccompProfile:
       type: "RuntimeDefault"
