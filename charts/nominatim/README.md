@@ -42,23 +42,23 @@ During the initialization, all required data are downloaded and the database is 
 To improve the import speed you can set additional PostgreSQL params
 
 ```yaml
-  initJob:
-    enabled: true
+initJob:
+  enabled: true
 
-  postgresql:
-    primary:
-        extendedConfiguration: |
-          shared_buffers = 2GB
-          maintenance_work_mem = 10GB
-          autovacuum_work_mem = 2GB
-          work_mem = 50MB
-          effective_cache_size = 24GB
-          synchronous_commit = off
-          max_wal_size = 1GB
-          checkpoint_timeout = 10min
-          checkpoint_completion_target = 0.9
-          fsync = off
-          full_page_writes = off
+postgresql:
+  primary:
+      extendedConfiguration: |
+        shared_buffers = 2GB
+        maintenance_work_mem = 10GB
+        autovacuum_work_mem = 2GB
+        work_mem = 50MB
+        effective_cache_size = 24GB
+        synchronous_commit = off
+        max_wal_size = 1GB
+        checkpoint_timeout = 10min
+        checkpoint_completion_target = 0.9
+        fsync = off
+        full_page_writes = off
 ```
 
 To install the chart with the release name `nominatim`:
@@ -74,8 +74,8 @@ You need to set ```initJob.enabled: false```
 You also should remove the ```postgresql.primary.extendedConfiguration```
 
 ```yaml
-  initJob:
-    enabled: false
+initJob:
+  enabled: false
 ```
 
 To install the chart with the release name `nominatim`:
@@ -148,19 +148,27 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ### Nominatim Initialisation Deployment parameters
 
-| Name                                | Description                                                                                                                                                                                                       | Value                                                                 |
-|-------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------|
-| `initJob.resources`                 | Define resources requests and limits for the init container                                                                                                                                                       | `{}`                                                                  |
-| `initJob.persistence.enabled`       | Enable persistence using Persistent Volume Claims                                                                                                                                                                 | `false`                                                               |
-| `initJob.persistence.storageClass`  | Persistent Volume storage class                                                                                                                                                                                   | `nil`                                                                 |
-| `initJob.persistence.accessModes`   | Persistent Volume access modes                                                                                                                                                                                    | `[ReadWriteOnce]`                                                     |
-| `initJob.persistence.size`          | Persistent Volume size                                                                                                                                                                                            | `100Gi`                                                               |
-| `initJob.persistence.dataSource`    | Custom PVC data source                                                                                                                                                                                            | `{}`                                                                  |
-| `initJob.persistence.existingClaim` | The name of an existing PVC to use for flatnode                                                                                                                                                                   | `nil`                                                                 |
-| `initJob.persistence.selector`      | Selector to match an existing Persistent Volume for Nominatim data PVC                                                                                                                                            | `{}`                                                                  |
-| `initJob.persistence.annotations`   | Persistent Volume Claim annotations                                                                                                                                                                               | `{}`                                                                  |
-| `initJob.resourcesPreset`           | Set container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge). This is ignored if resources is set (resources is recommended for production). | `micro`                                                               |
-| `initJob.resources`                 | Set container requests and limits for different resources like CPU or memory (essential for production workloads)                                                                                                 | `{}`                                                                  |
+| Name                                                        | Description                                                                                                                                                                                                       | Value             |
+|-------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
+| `initJob.resources`                                         | Define resources requests and limits for the init container                                                                                                                                                       | `{}`              |
+| `initJob.persistence.enabled`                               | Enable persistence using Persistent Volume Claims                                                                                                                                                                 | `false`           |
+| `initJob.persistence.storageClass`                          | Persistent Volume storage class                                                                                                                                                                                   | `nil`             |
+| `initJob.persistence.accessModes`                           | Persistent Volume access modes                                                                                                                                                                                    | `[ReadWriteOnce]` |
+| `initJob.persistence.size`                                  | Persistent Volume size                                                                                                                                                                                            | `100Gi`           |
+| `initJob.persistence.dataSource`                            | Custom PVC data source                                                                                                                                                                                            | `{}`              |
+| `initJob.persistence.existingClaim`                         | The name of an existing PVC to use for flatnode                                                                                                                                                                   | `nil`             |
+| `initJob.persistence.selector`                              | Selector to match an existing Persistent Volume for Nominatim data PVC                                                                                                                                            | `{}`              |
+| `initJob.persistence.annotations`                           | Persistent Volume Claim annotations                                                                                                                                                                               | `{}`              |
+| `initJob.resourcesPreset`                                   | Set container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge). This is ignored if resources is set (resources is recommended for production). | `micro`           |
+| `initJob.resources`                                         | Set container requests and limits for different resources like CPU or memory (essential for production workloads)                                                                                                 | `{}`              |
+| `updates.podSecurityContext.enabled`                        | Enabled Nominatim pods' Security Context                                                                                                                                                                          | `false`           |
+| `updates.podSecurityContext.fsGroup`                        | Set Nominatim pod's Security Context fsGroup                                                                                                                                                                      | `1001`            |
+| `updates.podSecurityContext.seccompProfile.type`            | Set Nominatim container's Security Context seccomp profile                                                                                                                                                        | `RuntimeDefault`  |
+| `updates.containerSecurityContext.enabled`                  | Enabled Nominatim containers' Security Context                                                                                                                                                                    | `false`           |
+| `updates.containerSecurityContext.runAsUser`                | Set Nominatim container's Security Context runAsUser                                                                                                                                                              | `1001`            |
+| `updates.containerSecurityContext.runAsNonRoot`             | Set Nominatim container's Security Context runAsNonRoot                                                                                                                                                           | `true`            |
+| `updates.containerSecurityContext.allowPrivilegeEscalation` | Set Nominatim container's privilege escalation                                                                                                                                                                    | `false`           |
+| `updates.containerSecurityContext.capabilities.drop`        | Set Nominatim container's Security Context runAsNonRoot                                                                                                                                                           | `["ALL"]`         |
 
 ### Nominatim Updates Configuration parameters
 | Name                         | Description                                                              | Value                                                           |
@@ -479,3 +487,5 @@ certificate management.
 ### To 4.0.0
 
 This major release renames several values in this chart and adds missing features.
+
+It also bumps default PostgreSQL to 16.2.0

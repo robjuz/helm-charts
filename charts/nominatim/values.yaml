@@ -617,6 +617,32 @@ initJob:
     ## @param initJob.persistence.annotations Persistent Volume Claim annotations
     ##
     annotations: { }
+  ## Configure Pods Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ## @param initJob.podSecurityContext.enabled Enabled Nominatim Replications pods' Security Context
+  ## @param initJob.podSecurityContext.fsGroup Set Nominatim Replications pod's Security Context fsGroup
+  ## @param initJob.podSecurityContext.seccompProfile.type Set Nominatim Replications container's Security Context seccomp profile
+  ##
+  podSecurityContext:
+    enabled: false
+    fsGroup: 101
+    seccompProfile:
+      type: "RuntimeDefault"
+  ## Configure Container Security Context (only main container)
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+  ## @param initJob.containerSecurityContext.enabled Enabled Nominatim Replications containers' Security Context
+  ## @param initJob.containerSecurityContext.runAsUser Set Nominatim Replications container's Security Context runAsUser
+  ## @param initJob.containerSecurityContext.runAsNonRoot Set Nominatim Replications container's Security Context runAsNonRoot
+  ## @param initJob.containerSecurityContext.allowPrivilegeEscalation Set Nominatim Replications container's privilege escalation
+  ## @param initJob.containerSecurityContext.capabilities.drop Set Nominatim Replications container's Security Context runAsNonRoot
+  ##
+  containerSecurityContext:
+    enabled: false
+    runAsUser: 1001
+    runAsNonRoot: true
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: [ "ALL" ]
   ## @param initJob.resourcesPreset Set container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge). This is ignored if resources is set (resources is recommended for production).
   ## More information: https://github.com/bitnami/charts/blob/main/bitnami/common/templates/_resources.tpl#L15
   ##
@@ -711,9 +737,9 @@ updates:
   priorityClassName: ""
   ## Configure Pods Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
-  ## @param initJob.podSecurityContext.enabled Enabled Nominatim Replications pods' Security Context
-  ## @param initJob.podSecurityContext.fsGroup Set Nominatim Replications pod's Security Context fsGroup
-  ## @param initJob.podSecurityContext.seccompProfile.type Set Nominatim Replications container's Security Context seccomp profile
+  ## @param updates.podSecurityContext.enabled Enabled Nominatim Replications pods' Security Context
+  ## @param updates.podSecurityContext.fsGroup Set Nominatim Replications pod's Security Context fsGroup
+  ## @param updates.podSecurityContext.seccompProfile.type Set Nominatim Replications container's Security Context seccomp profile
   ##
   podSecurityContext:
     enabled: false
@@ -722,11 +748,11 @@ updates:
       type: "RuntimeDefault"
   ## Configure Container Security Context (only main container)
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
-  ## @param initJob.containerSecurityContext.enabled Enabled Nominatim Replications containers' Security Context
-  ## @param initJob.containerSecurityContext.runAsUser Set Nominatim Replications container's Security Context runAsUser
-  ## @param initJob.containerSecurityContext.runAsNonRoot Set Nominatim Replications container's Security Context runAsNonRoot
-  ## @param initJob.containerSecurityContext.allowPrivilegeEscalation Set Nominatim Replications container's privilege escalation
-  ## @param initJob.containerSecurityContext.capabilities.drop Set Nominatim Replications container's Security Context runAsNonRoot
+  ## @param updates.containerSecurityContext.enabled Enabled Nominatim Replications containers' Security Context
+  ## @param updates.containerSecurityContext.runAsUser Set Nominatim Replications container's Security Context runAsUser
+  ## @param updates.containerSecurityContext.runAsNonRoot Set Nominatim Replications container's Security Context runAsNonRoot
+  ## @param updates.containerSecurityContext.allowPrivilegeEscalation Set Nominatim Replications container's privilege escalation
+  ## @param updates.containerSecurityContext.capabilities.drop Set Nominatim Replications container's Security Context runAsNonRoot
   ##
   containerSecurityContext:
     enabled: false
