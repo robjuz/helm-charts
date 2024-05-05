@@ -568,34 +568,6 @@ initJob:
   freeze: false
   wikipediaUrl: https://nominatim.org/data/wikimedia-importance.sql.gz
 
-
-  ## Nominatim image
-  ## ref: https://hub.docker.com/r/mediagis/nominatim/tags
-  ## @param initJob.image.registry Nominatim image registry
-  ## @param initJob.image.repository Nominatim image repository
-  ## @skip initJob.image.tag Nominatim image tag (immutable tags are recommended)
-  ## @param initJob.image.digest Nominatim image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)
-  ## @param initJob.image.pullPolicy Nominatim image pull policy
-  ## @param initJob.image.pullSecrets Nominatim image pull secrets
-  ##
-  image:
-    registry: docker.io
-    repository: mediagis/nominatim
-    tag: 4.3
-    digest: ""
-    ## Specify a imagePullPolicy
-    ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
-    ## ref: http://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
-    ##
-    pullPolicy: IfNotPresent
-    ## Optionally specify an array of imagePullSecrets.
-    ## Secrets must be manually created in the namespace.
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-    ## e.g:
-    ## pullSecrets:
-    ##   - myRegistryKeySecretName
-    ##
-    pullSecrets: [ ]
   ## @param initJob.backoffLimit set backoff limit of the job
   ##
   backoffLimit: 10
@@ -645,6 +617,10 @@ initJob:
     ## @param initJob.persistence.annotations Persistent Volume Claim annotations
     ##
     annotations: { }
+  ## @param initJob.resourcesPreset Set container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge). This is ignored if resources is set (resources is recommended for production).
+  ## More information: https://github.com/bitnami/charts/blob/main/bitnami/common/templates/_resources.tpl#L15
+  ##
+  resourcesPreset: "micro"
   resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
