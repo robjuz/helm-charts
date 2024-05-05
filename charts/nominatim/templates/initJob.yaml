@@ -33,75 +33,7 @@ spec:
           args:
             - {{ include "nominatim.databaseHost" . }}:{{ include "nominatim.databasePort" . }}
 
-{{- if .Values.initJob.customStyleUrl }}
-        - name: download-custom-style
-          image: curlimages/curl
-          workingDir: /nominatim
-          volumeMounts:
-            - mountPath: /nominatim
-              name: data
-          command:
-            - curl
-            - -A {{ include "chart.userAgent" . }}
-            - {{ .Values.initJob.customStyleUrl }}
-            - -L
-            - -f
-            - -o
-            - custom.style
-{{- end }}
-
-{{- if .Values.initJob.importWikipedia }}
-        - name: download-wikipedia
-          image: curlimages/curl
-          workingDir: /nominatim
-          volumeMounts:
-            - mountPath: /nominatim
-              name: data
-          command:
-            - curl
-            - -A {{ include "chart.userAgent" . }}
-            - {{ .Values.initJob.wikipediaUrl }}
-            - -L
-            - -f
-            - -o
-            - wikimedia-importance.sql.gz
-{{- end }}
-
-{{- if .Values.initJob.importGB_Postcode }}
-        - name: download-gb-postcode
-          image: curlimages/curl
-          workingDir: /nominatim
-          volumeMounts:
-            - mountPath: /nominatim
-              name: data
-          command:
-            - curl
-            - -A {{ include "chart.userAgent" . }}
-            - https://www.nominatim.org/data/gb_postcodes.csv.gz
-            - -L
-            - -f
-            - -o
-            - gb_postcodes.csv.gz
-{{- end }}
-
-{{- if .Values.initJob.importUS_Postcode }}
-        - name: download-us-postcode
-          image: curlimages/curl
-          workingDir: /nominatim
-          volumeMounts:
-            - mountPath: /nominatim
-              name: data
-          command:
-            - curl
-            - -A {{ include "chart.userAgent" . }}
-            - https://www.nominatim.org/data/us_postcodes.csv.gz
-            - -L
-            - -f
-            - -o
-            - us_postcodes.csv.gz
-{{- end }}
-
-        - name: download-pbf
+        - name: download
           image: curlimages/curl
           workingDir: /nominatim
           volumeMounts:
@@ -111,13 +43,46 @@ spec:
             - /bin/sh
             - -c
             - |
+{{- if .Values.initJob.customStyleUrl }}
+              if [ -f custom.style" ]; then
+                echo "custom.style exists."
+              else
+                echo "Downloading US postcode"
+                curl -A {{ include "chart.userAgent" . }} {{ .Values.initJob.customStyleUrl }} --create-dirs -L -f -o custom.style
+              fi
+ {{- end }}
+
+{{- if .Values.initJob.importGB_Postcode }}
+              if [ -f "wikimedia-importance.sql.gz" ]; then
+                echo "wikimedia-importance.sql.gz exists."
+              else
+                echo "Downloading US postcode"
+                curl -A {{ include "chart.userAgent" . }} {{ .Values.initJob.wikipediaUrl }} --create-dirs -L -f -o wikimedia-importance.sql.gz
+              fi
+ {{- end }}
+
+{{- if .Values.initJob.importGB_Postcode }}
+              if [ -f "gb_postcodes.csv.gz" ]; then
+                echo "gb_postcodes.csv.gz exists."
+              else
+                echo "Downloading US postcode"
+                curl -A {{ include "chart.userAgent" . }} https://www.nominatim.org/data/gb_postcodes.csv.gz --create-dirs -L -f -o gb_postcodes.csv.gz
+              fi
+ {{- end }}
+
+{{- if .Values.initJob.importUS_Postcode }}
+              if [ -f "us_postcodes.csv.gz" ]; then
+                echo "us_postcodes.csv.gz exists."
+              else
+                echo "Downloading US postcode"
+                curl -A {{ include "chart.userAgent" . }} https://www.nominatim.org/data/us_postcodes.csv.gz --create-dirs -L -f -o us_postcodes.csv.gz
+              fi
+ {{- end }}
               if [ -f "data.osm.pbf" ]; then
                 echo "data.osm.pbf exists."
               else
                 echo "Downloading pbf file"
-                curl -A {{ include "chart.userAgent" . }} \
-                {{ .Values.initJob.pbfUrl }} \
-                --create-dirs -L -f -o data.osm.pbf
+                curl -A {{ include "chart.userAgent" . }} {{ .Values.initJob.pbfUrl }} --create-dirs -L -f -o data.osm.pbf
               fi
 
 

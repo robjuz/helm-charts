@@ -387,8 +387,8 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ### Nominatim UI Parameters
 
-| Name                                          | Description                                                                                                                              | Value                         |
-|-----------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------|
+| Name                              | Description                                                                                                                                     | Value           |
+|-----------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|-----------------|
 | `nominatimUi.enabled`             | Installs and serves an instance of the Nominatim Demo UI. (Same as the one [hosted by OSM](https://nominatim.openstreetmap.org/ui/search.html)) | `true`          |
 | `nominatimUi.version`             | Version of Nominatim UI to install. (See their [GitHub project](https://github.com/osm-search/nominatim-ui/) for referenc                       | `3.2.1`         |
 | `nominatimUi.apacheConfiguration` | Apache Webserver configuration. You have to restart the appserver when you make changes while nominatim is running.                             | see values.yaml |
@@ -403,10 +403,12 @@ Using flatnode with replication enabled requires the usage of a ReadWriteMany vo
 be shared within the pods.
 This also applies when scaling the nominatim deployment.
 
+
+
 ### PVC For data
 
-When importing large extracts (Europe/Planet) there data needed to be downloaded are quite big. If you server has not
-enought disk space to store the data, you can use a dedicated PV for this.
+When importing large extracts (Europe/Planet) the data needed to be downloaded are quite big. If your server has not
+enough disk space to store the data, you can use a dedicated PV for this.
 
 ### External database support
 
@@ -456,8 +458,7 @@ data:
 
 ### Ingress
 
-This chart provides support for Ingress resources. If an Ingress controller, such
-as [nginx-ingress](https://kubeapps.com/charts/stable/nginx-ingress)
+This chart provides support for Ingress resources. If an Ingress controller, such as [nginx-ingress](https://kubeapps.com/charts/stable/nginx-ingress)
 or [traefik](https://kubeapps.com/charts/stable/traefik), that Ingress controller can be used to serve Nominatim.
 
 To enable Ingress integration, set `ingress.enabled` to `true`. The `ingress.hostname` property can be used to set the
@@ -466,14 +467,17 @@ host name. The `ingress.tls` parameter can be used to add the TLS configuration 
 ### Custom Import Style
 
 If none of the [default styles](https://nominatim.org/release-docs/latest/admin/Import/#filtering-imported-data)
-satisfies your needs, you can provide
-your [customized style file](https://nominatim.org/release-docs/latest/customize/Import-Styles/) by setting
-the `nominatimInitialize.customStyleUrl` value.
+satisfies your needs, you can provide your [customized style file](https://nominatim.org/release-docs/latest/customize/Import-Styles/) by setting the `initJob.customStyleUrl` value.
 
-Make sure the file is publicly available for init job to download
-it. [Example](https://raw.githubusercontent.com/osm-search/Nominatim/master/settings/import-street.style)
+Make sure the file is publicly available for init job to download it. [Example](https://raw.githubusercontent.com/osm-search/Nominatim/master/settings/import-street.style)
 
 ### TLS secrets
 
 The chart also facilitates the creation of TLS secrets for use with the Ingress controller, with different options for
 certificate management.
+
+## Upgrading
+
+### To 4.0.0
+
+This major release renames several values in this chart and adds missing features.
