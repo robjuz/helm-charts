@@ -570,7 +570,7 @@ initJob:
 
   ## @param initJob.backoffLimit set backoff limit of the job
   ##
-  backoffLimit: 10
+  backoffLimit: 1
   ## @param initJob.annotations [object] Add annotations to the job
   ##
   annotations: {}
