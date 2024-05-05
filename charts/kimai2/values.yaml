@@ -275,6 +275,7 @@ tolerations: []
 ## @param resources.limits.memory The memory limit for the Kimai containers
 ## @param resources.requests.cpu The requested cpu for the Kimai containers
 ##
+
 resources:
   limits:
     memory: 256Mi
@@ -627,6 +628,7 @@ persistence:
   ## @param persistence.annotations Persistent Volume Claim annotations
   ##
   annotations: {}
+
 ## Init containers parameters:
 ## volumePermissions: Change the owner and group of the persistent volume(s) mountpoint(s) to 'runAsUser:fsGroup' on each node
 ##
