@@ -53,6 +53,17 @@ Return the kimai Secret Name
 {{- end -}}
 
 {{/*
+Return the Kimai configuration secret
+*/}}
+{{- define "kimai.configSecretName" -}}
+{{- if .Values.configurationFromSecret.secretName -}}
+    {{- printf "%s" (tpl .Values.configurationFromSecret.secretName $) -}}
+{{- else -}}
+    {{- printf "%s-config" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Return the Database Hostname
 */}}
 {{- define "kimai.databaseHost" -}}
