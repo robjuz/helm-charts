@@ -15,10 +15,8 @@ helm install nominatim robjuz/nominatim
 This chart bootstraps a [Nominatim](https://nominatim.org/) deployment on a [Kubernetes](http://kubernetes.io) cluster
 using the [Helm](https://helm.sh) package manager.
 
-It also packages a
-customized [Bitnami PostgreSQL chart](https://github.com/bitnami/charts/tree/master/bitnami/postgresql) with build
-nominatim module which is required for bootstrapping a PostgreSQL deployment for the database requirements of the
-Nominatim application.
+It also packages a [Bitnami PostgreSQL chart](https://github.com/bitnami/charts/tree/master/bitnami/postgresql) 
+which is required for bootstrapping a PostgreSQL deployment for the database requirements of the Nominatim application.
 
 This chart has been tested to work with NGINX Ingress and cert-manager on top of the [MicroK8s](https://microk8s.io/).
 
@@ -38,13 +36,13 @@ The installation consist of 2 steps
 
 ### Initialisation
 
-Set```nominatimInitialize.enabled: true```
+Set```initJob.enabled: true```
 
 During the initialization, all required data are downloaded and the database is build.
 To improve the import speed you can set additional PostgreSQL params
 
 ```yaml
-  nominatimInitialize:
+  initJob:
     enabled: true
 
   postgresql:
@@ -71,12 +69,12 @@ helm upgrade --install nominatim robjuz/nominatim -f values.yaml
 
 ### App deployment
 
-You need to set ```nominatimInitialize.enabled: false```
+You need to set ```initJob.enabled: false```
 
 You also should remove the ```postgresql.primary.extendedConfiguration```
 
 ```yaml
-  nominatimInitialize:
+  initJob:
     enabled: false
 ```
 

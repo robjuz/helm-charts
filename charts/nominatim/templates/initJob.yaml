@@ -52,7 +52,7 @@ spec:
               fi
  {{- end }}
 
-{{- if .Values.initJob.importGB_Postcode }}
+{{- if .Values.initJob.importWikipedia }}
               if [ -f "wikimedia-importance.sql.gz" ]; then
                 echo "wikimedia-importance.sql.gz exists."
               else
