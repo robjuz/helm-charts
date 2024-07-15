@@ -322,6 +322,13 @@ helm install kimai -f values.yaml robjuz/kimai2
 
 ## Configuration and installation details
 
+### A note about database credentials
+https://symfony.com/doc/6.4/doctrine.html#configuring-the-database
+
+> If the username, password, host or database name contain any character considered special in a URI (such as : / ? # [ ] @ ! $ & ' ( ) * + , ; =), you must encode them. See RFC 3986 for the full list of reserved characters or use the urlencode function to encode them. In this case you need to remove the resolve: prefix in config/packages/doctrine.yaml to avoid errors: url: '%env(DATABASE_URL)%'
+
+The underlying `dbtest.php` script does not support this, so **don't use special characters**
+
 ### External database support
 
 You may want to have Kimai connect to an external database rather than installing one inside your cluster. Typical reasons for this are to use a managed database service, or to share a common database server for all your applications. To achieve this, the chart allows you to specify credentials for an external database with the [`externalDatabase` parameter](#database-parameters). You should also disable the MariaDB installation with the `mariadb.enabled` option. Here is an example:
