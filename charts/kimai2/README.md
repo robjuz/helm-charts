@@ -94,6 +94,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | `kimaiMailerFrom`         | Application specific “from” address for all emails                                                                | `kimai@example.com`               |
 | `kimaiMailerUrl`          | SMTP connection for emails                                                                                        | `null://localhost`                |
 | `kimaiTrustedProxies`     |                                                                                                                   | `""`                              |
+| `kimaiRedisCache`         | Configure Kimai to use Redis as caching  instance. (See redis settings below)                                     | `false`                           |
 | `existingSecret`          | Name of existing secret containing Kimai credentials                                                              | `""`                              |
 | `configurationFromSecret` | Use an existing secret match the common.names.fullname template containing “local.yaml“ key as configuration file | `false`                           |
 
@@ -274,6 +275,30 @@ The command removes all the Kubernetes components associated with the chart and 
 | `externalDatabase.database`                | External Database database name                                                   | `kimai`               |
 | `externalDatabase.existingSecret`          | The name of an existing secret with database credentials. Evaluated as a template | `""`                  |
 
+### Redis&reg; parameters
+
+| Name                                      | Description                                                                                                                                                                                                              | Value        |
+|-------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
+| `redis.enabled`                           | Switch to enable or disable the Redis&reg; helm                                                                                                                                                                          | `false`      |
+| `redis.auth.enabled`                      | Enable password authentication                                                                                                                                                                                           | `false`      |
+| `redis.auth.password`                     | Redis&reg; password                                                                                                                                                                                                      | `""`         |
+| `redis.auth.existingSecret`               | The name of an existing secret with Redis&reg; credentials                                                                                                                                                               | `""`         |
+| `redis.architecture`                      | Redis&reg; architecture. Allowed values: `standalone` or `replication`                                                                                                                                                   | `standalone` |
+| `redis.sentinel.enabled`                  | Use Redis&reg; Sentinel on Redis&reg; pods.                                                                                                                                                                              | `false`      |
+| `redis.sentinel.masterSet`                | Master set name                                                                                                                                                                                                          | `mymaster`   |
+| `redis.sentinel.service.ports.sentinel`   | Redis&reg; service port for Redis&reg; Sentinel                                                                                                                                                                          | `26379`      |
+| `redis.master.resourcesPreset`            | Set container resources according to one common preset (allowed values: none, nano, small, medium, large, xlarge, 2xlarge). This is ignored if master.resources is set (master.resources is recommended for production). | `nano`       |
+| `redis.master.resources`                  | Set container requests and limits for different resources like CPU or memory (essential for production workloads)                                                                                                        | `{}`         |
+| `externalRedis.host`                      | Redis&reg; host                                                                                                                                                                                                          | `localhost`  |
+| `externalRedis.port`                      | Redis&reg; port number                                                                                                                                                                                                   | `6379`       |
+| `externalRedis.password`                  | Redis&reg; password                                                                                                                                                                                                      | `""`         |
+| `externalRedis.coreDatabaseIndex`         | Index for core database                                                                                                                                                                                                  | `0`          |
+| `externalRedis.jobserviceDatabaseIndex`   | Index for jobservice database                                                                                                                                                                                            | `1`          |
+| `externalRedis.registryDatabaseIndex`     | Index for registry database                                                                                                                                                                                              | `2`          |
+| `externalRedis.trivyAdapterDatabaseIndex` | Index for trivy adapter database                                                                                                                                                                                         | `5`          |
+| `externalRedis.sentinel.enabled`          | If external redis with sentinal is used, set it to `true`                                                                                                                                                                | `false`      |
+| `externalRedis.sentinel.masterSet`        | Name of sentinel masterSet if sentinel is used                                                                                                                                                                           | `mymaster`   |
+| `externalRedis.sentinel.hosts`            | Sentinel hosts and ports in the format                                                                                                                                                                                   | `""`         |
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example,
 
@@ -339,6 +364,9 @@ extraVolumeMounts:
       name: kimai-data
       subPath: plugins
 ```
+
+### Using redis for cache
+Set `kimaiRedisCache` to `true` and provide your redis connection default. You can also use the redis provided with this chart by setting `redis.enabled` to `true`
 
 ## Upgrading
 

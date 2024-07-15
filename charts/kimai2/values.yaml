@@ -99,7 +99,7 @@ image:
 kimaiEnvironment: prod
 ## @param kimaiAppSecret Secret used to encrypt session cookies (users will be logged out if you change it)
 ##
-kimaiAppSecret: change_this_to_something_unique
+kimaiAppSecret:
 ## @param kimaiAdminEmail Email for the superadmin account
 ##
 kimaiAdminEmail: admin@example.com
@@ -115,6 +115,10 @@ kimaiMailerUrl: null://localhost
 ## @param kimaiTrustedProxies
 ##
 kimaiTrustedProxies: ""
+## @param kimaiRedisCache Configure Kimai to use Redis as caching  instance.
+## ref: https://www.kimai.org/documentation/redis.html
+##
+kimaiRedisCache: false
 
 ## @param existingSecret Name of existing secret containing Kimai credentials
 ## NOTE: Must contain key `app-secret`
@@ -890,3 +894,78 @@ externalDatabase:
   ## NOTE: When it's set, the `externalDatabase.password` parameter is ignored
   ##
   existingSecret: ""
+
+## Redis&reg; chart configuration
+## ref: https://github.com/bitnami/charts/blob/main/bitnami/redis/values.yaml
+## @param redis.enabled Switch to enable or disable the Redis&reg; helm
+## @param redis.auth.enabled Enable password authentication
+## @param redis.auth.password Redis&reg; password
+## @param redis.auth.existingSecret The name of an existing secret with Redis&reg; credentials
+## @param redis.architecture Redis&reg; architecture. Allowed values: `standalone` or `replication`
+## @param redis.sentinel.enabled Use Redis&reg; Sentinel on Redis&reg; pods.
+## @param redis.sentinel.masterSet Master set name
+## @param redis.sentinel.service.ports.sentinel Redis&reg; service port for Redis&reg; Sentinel
+##
+redis:
+  enabled: false
+  auth:
+    enabled: false
+    ## Redis&reg; password (both master and slave). Defaults to a random 10-character alphanumeric string if not set and auth.enabled is true.
+    ## It should always be set using the password value or in the existingSecret to avoid issues
+    ## with Harbor.
+    ## The password value is ignored if existingSecret is set
+    ##
+    password: ""
+    existingSecret: ""
+  architecture: standalone
+  sentinel:
+    enabled: false
+    masterSet: mymaster
+    service:
+      ports:
+        sentinel: 26379
+  master:
+    ## Redis&reg; master resource requests and limits
+    ## ref: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
+    ## @param redis.master.resourcesPreset Set container resources according to one common preset (allowed values: none, nano, small, medium, large, xlarge, 2xlarge). This is ignored if master.resources is set (master.resources is recommended for production).
+    ## More information: https://github.com/bitnami/charts/blob/main/bitnami/common/templates/_resources.tpl#L15
+    ##
+    resourcesPreset: "nano"
+    ## @param redis.master.resources Set container requests and limits for different resources like CPU or memory (essential for production workloads)
+    ## Example:
+    ## resources:
+    ##   requests:
+    ##     cpu: 2
+    ##     memory: 512Mi
+    ##   limits:
+    ##     cpu: 3
+    ##     memory: 1024Mi
+    ##
+    resources: {}
+## External Redis&reg; configuration
+## All of these values are only used when redis.enabled is set to false
+## @param externalRedis.host Redis&reg; host
+## @param externalRedis.port Redis&reg; port number
+## @param externalRedis.password Redis&reg; password
+## @param externalRedis.coreDatabaseIndex Index for core database
+## @param externalRedis.jobserviceDatabaseIndex Index for jobservice database
+## @param externalRedis.registryDatabaseIndex Index for registry database
+## @param externalRedis.trivyAdapterDatabaseIndex Index for trivy adapter database
+##
+externalRedis:
+  host: localhost
+  port: 6379
+  password: ""
+  coreDatabaseIndex: "0"
+  jobserviceDatabaseIndex: "1"
+  registryDatabaseIndex: "2"
+  trivyAdapterDatabaseIndex: "5"
+  ## Redis&reg; sentinel configuration
+  ## @param externalRedis.sentinel.enabled If external redis with sentinal is used, set it to `true`
+  ## @param externalRedis.sentinel.masterSet Name of sentinel masterSet if sentinel is used
+  ## @param externalRedis.sentinel.hosts Sentinel hosts and ports in the format
+  ##
+  sentinel:
+    enabled: false
+    masterSet: "mymaster"
+    hosts: ""

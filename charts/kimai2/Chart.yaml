@@ -2,7 +2,7 @@ apiVersion: v2
 name: kimai2
 description: A Helm chart for Kubernetes
 type: application
-version: 4.1.3
+version: 4.2.0
 appVersion: "apache-2.18.0-prod"
 
 dependencies:
@@ -10,6 +10,10 @@ dependencies:
     name: mariadb
     repository: oci://registry-1.docker.io/bitnamicharts
     version: 11.5.7
+  - condition: redis.enabled
+    name: redis
+    repository: oci://registry-1.docker.io/bitnamicharts
+    version: 19.5.0
   - name: common
     repository: oci://registry-1.docker.io/bitnamicharts
     tags:
