@@ -11,7 +11,7 @@ helm install kimai robjuz/kimai2
 
 ## Introduction
 
-This chart bootstraps a [Kimai2](https://github.com/tobybatch/kimai2) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
+This chart bootstraps a [Kimai](https://github.com/kimai/kimai) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
 
 It also packages the [Bitnami MariaDB chart](https://github.com/bitnami/charts/tree/master/bitnami/mariadb) which is required for bootstrapping a MariaDB deployment for the database requirements of the Kimai application.
 
@@ -325,9 +325,7 @@ helm install kimai -f values.yaml robjuz/kimai2
 ### A note about database credentials
 https://symfony.com/doc/6.4/doctrine.html#configuring-the-database
 
-> If the username, password, host or database name contain any character considered special in a URI (such as : / ? # [ ] @ ! $ & ' ( ) * + , ; =), you must encode them. See RFC 3986 for the full list of reserved characters or use the urlencode function to encode them. In this case you need to remove the resolve: prefix in config/packages/doctrine.yaml to avoid errors: url: '%env(DATABASE_URL)%'
-
-The underlying `dbtest.php` script does not support this, so **don't use special characters**
+> If the username, password, host or database name contain any character considered special in a URI (such as : / ? # [ ] @ ! $ & ' ( ) * + , ; =), you must encode them. See RFC 3986 for the full list of reserved characters or use the urlencode function to encode them. 
 
 ### External database support
 
@@ -353,7 +351,7 @@ To enable Ingress integration, set `ingress.enabled` to `true`. The `ingress.hos
 The chart also facilitates the creation of TLS secrets for use with the Ingress controller, with different options for certificate management.
 
 ### Persistence
-The [Kimai2](https://github.com/tobybatch/kimai2) image stores the Kimai data at the /opt/kimai/var/data path of the container. Persistent Volume Claims are used to keep the data across deployments.
+The [Kimai](https://github.com/tobybatch/kimai2) image stores the Kimai data at the /opt/kimai/var/data path of the container. Persistent Volume Claims are used to keep the data across deployments.
 
 ### Plugins
 You have 2 options to add plugins to your Kimai installation
