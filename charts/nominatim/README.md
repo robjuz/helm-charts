@@ -542,4 +542,4 @@ certificate management.
 
 This major release renames several values in this chart and adds missing features.
 
-It also bumps default PostgreSQL to 16.2.0
+It also bumps default PostgreSQL to 16.3.0
