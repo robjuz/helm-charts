@@ -179,7 +179,7 @@ Note: The command above may differ a little depending the k8s cluster version yo
 |---------------------|-----------------------------------------------------------------------------------------------------------|----------------------|
 | `image.registry`    | Nominatim image registry                                                                                  | `docker.io`          |
 | `image.repository`  | Nominatim image repository                                                                                | `mediagis/nominatim` |
-| `image.tag`         | Nominatim image tag (immutable tags are recommended)                                                      | `4.3`                |
+| `image.tag`         | Nominatim image tag (immutable tags are recommended)                                                      | `4.4`                |
 | `image.digest`      | Nominatim image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag | `""`                 |
 | `image.pullPolicy`  | Nominatim image pull policy                                                                               | `IfNotPresent`       |
 | `image.pullSecrets` | Nominatim image pull secrets                                                                              | `[]`                 |
@@ -542,4 +542,4 @@ certificate management.
 
 This major release renames several values in this chart and adds missing features.
 
-It also bumps default PostgreSQL to 16.3.0
+It also bumps the version of Nominatim to 4.4 and default PostgreSQL to 16.3.0
