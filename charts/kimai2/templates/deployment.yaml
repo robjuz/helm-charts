@@ -59,7 +59,7 @@ spec:
       schedulerName: {{ .Values.schedulerName | quote }}
       {{- end }}
       {{- if .Values.podSecurityContext.enabled }}
-      securityContext: {{- omit .Values.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.podSecurityContext "context" $) | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "kimai.serviceAccountName" .}}
       {{- if .Values.terminationGracePeriodSeconds }}
@@ -69,37 +69,37 @@ spec:
       topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.topologySpreadConstraints "context" .) | nindent 8 }}
       {{- end }}
       {{- if or (and .Values.podSecurityContext.enabled .Values.volumePermissions.enabled .Values.persistence.enabled) (.Values.initContainers) }}
-        initContainers:
-        {{- if and .Values.podSecurityContext.enabled .Values.volumePermissions.enabled .Values.persistence.enabled }}
-          - name: volume-permissions
-            image: "{{ include "kimai.volumePermissions.image" . }}"
-            imagePullPolicy: {{ .Values.volumePermissions.image.pullPolicy | quote }}
-            command:
-              - /bin/bash
-            args:
-              - -ec
-              - |
-                mkdir -p /opt/kimai/var
-              {{- if eq ( toString ( .Values.volumePermissions.containerSecurityContext.runAsUser )) "auto" }}
-                find /opt/kimai/var -mindepth 0 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | xargs -r chown -R $(id -u):$(id -G | cut -d " " -f2)
-              {{- else }}
-                find /opt/kimai/var -mindepth 0 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | xargs -r chown -R {{ .Values.containerSecurityContext.runAsUser }}:{{ .Values.podSecurityContext.fsGroup }}
-              {{- end }}
-          {{- if eq ( toString ( .Values.volumePermissions.containerSecurityContext.runAsUser )) "auto " }}
-            securityContext: {{- omit .Values.volumePermissions.containerSecurityContext "runAsUser" | toYaml | nindent 12 }}
-          {{- else }}
-            securityContext: {{- .Values.volumePermissions.containerSecurityContext | toYaml | nindent 12 }}
-          {{- end }}
-          {{- if .Values.volumePermissions.resources }}
-            resources: {{- toYaml .Values.volumePermissions.resources | nindent 12 }}
-          {{- end }}
-            volumeMounts:
-              - mountPath: /opt/kimai/var
-                name: kimai-data
+      initContainers:
+      {{- if and .Values.podSecurityContext.enabled .Values.volumePermissions.enabled .Values.persistence.enabled }}
+        - name: volume-permissions
+          image: "{{ include "kimai.volumePermissions.image" . }}"
+          imagePullPolicy: {{ .Values.volumePermissions.image.pullPolicy | quote }}
+          command:
+            - /bin/bash
+          args:
+            - -ec
+            - |
+              mkdir -p /opt/kimai/var
+            {{- if eq ( toString ( .Values.volumePermissions.containerSecurityContext.runAsUser )) "auto" }}
+              find /opt/kimai/var -mindepth 0 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | xargs -r chown -R $(id -u):$(id -G | cut -d " " -f2)
+            {{- else }}
+              find /opt/kimai/var -mindepth 0 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | xargs -r chown -R {{ .Values.containerSecurityContext.runAsUser }}:{{ .Values.podSecurityContext.fsGroup }}
+            {{- end }}
+        {{- if eq ( toString ( .Values.volumePermissions.containerSecurityContext.runAsUser )) "auto " }}
+          securityContext: {{- omit .Values.volumePermissions.containerSecurityContext "runAsUser" | toYaml | nindent 12 }}
+        {{- else }}
+          securityContext: {{- .Values.volumePermissions.containerSecurityContext | toYaml | nindent 12 }}
         {{- end }}
-        {{- if .Values.initContainers }}
-          {{- include "common.tplvalues.render" (dict "value" .Values.initContainers "context" $) | nindent 8 }}
+        {{- if .Values.volumePermissions.resources }}
+          resources: {{- toYaml .Values.volumePermissions.resources | nindent 12 }}
         {{- end }}
+          volumeMounts:
+            - mountPath: /opt/kimai/var
+              name: kimai-data
+      {{- end }}
+      {{- if .Values.initContainers }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.initContainers "context" $) | nindent 8 }}
+      {{- end }}
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
@@ -212,7 +212,7 @@ spec:
         {{- if .Values.configurationFromSecret.enabled}}
         - name: config
           secret:
-            secretName: {{ printf "%s-config" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
+            secretName: {{ include "kimai.configSecretName" . }}
         {{- end }}
         - name: kimai-data
           {{- if .Values.persistence.enabled }}
