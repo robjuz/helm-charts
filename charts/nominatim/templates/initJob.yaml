@@ -1,15 +1,30 @@
-{{- if .Values.nominatimInitialize.enabled }}
+{{- if .Values.initJob.enabled }}
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "nominatim.fullname" . }}-init
-  namespace: {{ include "common.names.namespace" . | quote }}
-  labels: {{- include "common.labels.standard" . | nindent 4 }}
+  name: {{ include "common.names.fullname" . }}-init
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/part-of: nominatim
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.initJob.annotations "context" $ ) | nindent 4 }}
+    {{- if .Values.commonAnnotations }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- end }}
 spec:
+  backoffLimit: {{ .Values.initJob.backoffLimit }}
   template:
+    metadata:
+          {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.initJob.podLabels .Values.commonLabels ) "context" . ) }}
+      labels: {{- include "common.labels.standard" ( dict "customLabels" $podLabels "context" $ ) | nindent 8 }}
+        app.kubernetes.io/component: init
+          {{- if .Values.initJob.podAnnotations }}
+      annotations: {{- include "common.tplvalues.render" (dict "value" .Values.initJob.podAnnotations "context" $) | nindent 8 }}
+          {{- end }}
     spec:
-      securityContext:
-        fsGroup: 2000
+      restartPolicy: Never
+      {{- if .Values.initJob.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.initJob.podSecurityContext "context" $) | nindent 8 }}
+      {{- end }}
       initContainers:
         - name: wait-for-db
           image: chainguard/wait-for-it:latest
@@ -19,75 +34,7 @@ spec:
             - -p
             - {{ include "nominatim.databasePort" . | quote }}
 
-{{- if .Values.nominatimInitialize.customStyleUrl }}
-        - name: download-custom-style
-          image: curlimages/curl
-          workingDir: /nominatim
-          volumeMounts:
-            - mountPath: /nominatim
-              name: data
-          command:
-            - curl
-            - -A {{ include "chart.userAgent" . }}
-            - {{ .Values.nominatimInitialize.customStyleUrl }}
-            - -L
-            - -f
-            - -o
-            - custom.style
-{{- end }}
-
-{{- if .Values.nominatimInitialize.importWikipedia }}
-        - name: download-wikipedia
-          image: curlimages/curl
-          workingDir: /nominatim
-          volumeMounts:
-            - mountPath: /nominatim
-              name: data
-          command:
-            - curl
-            - -A {{ include "chart.userAgent" . }}
-            - {{ .Values.nominatimInitialize.wikipediaUrl }}
-            - -L
-            - -f
-            - -o
-            - wikimedia-importance.sql.gz
-{{- end }}
-
-{{- if .Values.nominatimInitialize.importGB_Postcode }}
-        - name: download-gb-postcode
-          image: curlimages/curl
-          workingDir: /nominatim
-          volumeMounts:
-            - mountPath: /nominatim
-              name: data
-          command:
-            - curl
-            - -A {{ include "chart.userAgent" . }}
-            - https://www.nominatim.org/data/gb_postcodes.csv.gz
-            - -L
-            - -f
-            - -o
-            - gb_postcodes.csv.gz
-{{- end }}
-
-{{- if .Values.nominatimInitialize.importUS_Postcode }}
-        - name: download-us-postcode
-          image: curlimages/curl
-          workingDir: /nominatim
-          volumeMounts:
-            - mountPath: /nominatim
-              name: data
-          command:
-            - curl
-            - -A {{ include "chart.userAgent" . }}
-            - https://www.nominatim.org/data/us_postcodes.csv.gz
-            - -L
-            - -f
-            - -o
-            - us_postcodes.csv.gz
-{{- end }}
-
-        - name: download-pbf
+        - name: download
           image: curlimages/curl
           workingDir: /nominatim
           volumeMounts:
@@ -97,28 +44,68 @@ spec:
             - /bin/sh
             - -c
             - |
+{{- if .Values.initJob.customStyleUrl }}
+              if [ -f custom.style" ]; then
+                echo "custom.style exists."
+              else
+                echo "Downloading US postcode"
+                curl -A {{ include "chart.userAgent" . }} {{ .Values.initJob.customStyleUrl }} --create-dirs -L -f -o custom.style
+              fi
+ {{- end }}
+
+{{- if .Values.initJob.importWikipedia }}
+              if [ -f "wikimedia-importance.sql.gz" ]; then
+                echo "wikimedia-importance.sql.gz exists."
+              else
+                echo "Downloading US postcode"
+                curl -A {{ include "chart.userAgent" . }} {{ .Values.initJob.wikipediaUrl }} --create-dirs -L -f -o wikimedia-importance.sql.gz
+              fi
+ {{- end }}
+
+{{- if .Values.initJob.importGB_Postcode }}
+              if [ -f "gb_postcodes.csv.gz" ]; then
+                echo "gb_postcodes.csv.gz exists."
+              else
+                echo "Downloading US postcode"
+                curl -A {{ include "chart.userAgent" . }} https://www.nominatim.org/data/gb_postcodes.csv.gz --create-dirs -L -f -o gb_postcodes.csv.gz
+              fi
+ {{- end }}
+
+{{- if .Values.initJob.importUS_Postcode }}
+              if [ -f "us_postcodes.csv.gz" ]; then
+                echo "us_postcodes.csv.gz exists."
+              else
+                echo "Downloading US postcode"
+                curl -A {{ include "chart.userAgent" . }} https://www.nominatim.org/data/us_postcodes.csv.gz --create-dirs -L -f -o us_postcodes.csv.gz
+              fi
+ {{- end }}
               if [ -f "data.osm.pbf" ]; then
                 echo "data.osm.pbf exists."
               else
                 echo "Downloading pbf file"
-                curl -A {{ include "chart.userAgent" . }} \
-                {{ .Values.nominatimInitialize.pbfUrl }} \
-                --create-dirs -L -f -o data.osm.pbf
+                curl -A {{ include "chart.userAgent" . }} {{ .Values.initJob.pbfUrl }} --create-dirs -L -f -o data.osm.pbf
               fi
 
-
+          {{- if .Values.initJob.containerSecurityContext.enabled }}
+          securityContext: {{- omit .Values.initJob.containerSecurityContext "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.initJob.resources }}
+          resources: {{- toYaml .Values.initJob.resources | nindent 12 }}
+          {{- else if ne .Values.initJob.resourcesPreset "none" }}
+          resources: {{- include "common.resources.preset" (dict "type" .Values.initJob.resourcesPreset) | nindent 12 }}
+          {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           workingDir: /nominatim
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            {{- if .Values.nominatimInitialize.customStyleUrl }}
+            {{- if .Values.initJob.customStyleUrl }}
             - name: NOMINATIM_IMPORT_STYLE
               value: /nominatim/custom.style
             {{- else }}
             - name: NOMINATIM_IMPORT_STYLE
-              value: {{ .Values.nominatimInitialize.importStyle }}
+              value: {{ .Values.initJob.importStyle }}
             {{- end }}
             - name: NOMINATIM_DATABASE_DSN
               {{- if .Values.externalDatabase.existingSecretDsn }}
@@ -135,9 +122,9 @@ spec:
               value: /nominatim/flatnode/flatnode.file
             {{- end }}
             - name: REPLICATION_ENABLED
-              value: {{ .Values.nominatimReplications.enabled | quote }}
+              value: {{ .Values.updates.enabled | quote }}
             - name: THREADS
-              value: {{ .Values.nominatimInitialize.threads | quote }}
+              value: {{ .Values.initJob.threads | quote }}
             - name: NOMINATIM_DATABASE_WEBUSER
               value: {{ include "nominatim.databaseUser" . }}
           command:
@@ -166,7 +153,10 @@ spec:
 
               echo "Warming finished."
               echo "Initialization finished. Please continue with step 2 now."
-
+            - /scripts/migrate-and-create-admin.sh
+          {{- if .Values.initJob.containerSecurityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.initJob.containerSecurityContext "context" $) | nindent 12 }}
+          {{- end }}
           volumeMounts:
             - mountPath: /nominatim
               name: data
@@ -177,11 +167,10 @@ spec:
               name: flatnode
               subPath: flatnode
             {{- end }}
-          {{- if .Values.nominatimInitialize.resources }}
+          {{- if .Values.initJob.resources }}
           resources:
-            {{- toYaml .Values.nominatimInitialize.resources | nindent 12 }}
+            {{- toYaml .Values.initJob.resources | nindent 12 }}
           {{- end }}
-      restartPolicy: OnFailure
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -194,15 +183,15 @@ spec:
         {{- if  .Values.flatnode.enabled }}
         - name: flatnode
           persistentVolumeClaim:
-            claimName: {{ .Values.flatnode.existingClaim | default (include "nominatim.fullname" .) }}
+            claimName: {{ include "common.names.fullname" . }}
         {{- end }}
         - name: dshm
           emptyDir:
             medium: Memory
         - name: data
-          {{- if .Values.datapvc.enabled }}
+          {{- if .Values.initJob.persistence.enabled }}
           persistentVolumeClaim:
-            claimName: {{ .Values.datapvc.existingClaim | default (printf "%s-data" (include "nominatim.fullname" .)) }}
+            claimName: {{ .Values.initJob.persistence.existingClaim | default (printf "%s-data" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-") }}
           {{- else }}
           emptyDir: {}
           {{- end }}
