@@ -187,7 +187,7 @@ sidecars: []
 ##  - name: your-image-name
 ##    image: your-image
 ##    imagePullPolicy: Always
-##    command: ['sh', '-c', 'copy themes and plugins from git and push to /bitnami/wordpress/wp-content. Should work with extraVolumeMounts and extraVolumes']
+##    command: ['sh', '-c', 'do magic here']
 ##
 initContainers: []
 ## @param podLabels Extra labels for Nominatim pods

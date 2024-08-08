@@ -1,5 +1,5 @@
 {{/*
-Return the proper WordPress image name
+Return the proper Nominatim image name
 */}}
 {{- define "nominatim.image" -}}
 {{- include "common.images.image" (dict "imageRoot" .Values.image "global" .Values.global) -}}

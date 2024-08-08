@@ -229,7 +229,7 @@ Note: The command above may differ a little depending the k8s cluster version yo
 |------------------------------|--------------------------------------------------------------------------|-----------------------------------------------------------------|
 | `updates.enabled`            | enable/disable replication                                               | `false `                                                        |
 | `updates.replicationUrl`     | URL with update information                                              | `https://download.geofabrik.de/europe/germany/sachsen-updates/` |
-| `updates.extraEnvVars`       | Array with extra environment variables to add to the WordPress container | `[]`                                                            |
+| `updates.extraEnvVars`       | Array with extra environment variables to add to the Nominatim container | `[]`                                                            |
 | `updates.extraEnvVarsCM`     | Name of existing ConfigMap containing extra env vars                     | `""`                                                            |
 | `updates.extraEnvVarsSecret` | Name of existing Secret containing extra env vars                        | `""`                                                            |
 
@@ -266,7 +266,7 @@ Note: The command above may differ a little depending the k8s cluster version yo
 |----------------------|--------------------------------------------------------------------------|-------|
 | `command`            | Override default container command (useful when using custom images)     | `[]`  |
 | `args`               | Override default container args (useful when using custom images)        | `[]`  |
-| `extraEnvVars`       | Array with extra environment variables to add to the WordPress container | `[]`  |
+| `extraEnvVars`       | Array with extra environment variables to add to the Nominatim container | `[]`  |
 | `extraEnvVarsCM`     | Name of existing ConfigMap containing extra env vars                     | `""`  |
 | `extraEnvVarsSecret` | Name of existing Secret containing extra env vars                        | `""`  |
 
