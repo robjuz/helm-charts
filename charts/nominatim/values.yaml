@@ -659,15 +659,48 @@ initJob:
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-#    requests:
-#      cpu: 4000m
-#      memory: 4Gi
-#    limits:
-#      cpu: 4000m
-#      memory: 4Gi
+  #    requests:
+  #      cpu: 4000m
+  #      memory: 4Gi
+  #    limits:
+  #      cpu: 4000m
+  #      memory: 4Gi
 
+  ## K8s CronJob configuration
+  ## ref: https://kubernetes.io/docs/tasks/job/automated-tasks-with-cron-jobs/
+  ##
 updates:
+  ## @param updates.enabled How often should the job run (default to every hour)
+  ##
   enabled: false
+  ## @param updates.enabled How often should the job run (default to every hour)
+  ##
+  schedule: "0 * * * *"
+  ## @param updates.timeZone The time zone name for the given schedule, see <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones>
+  ##
+  timeZone: ""
+  ## @param updates.startingDeadlineSeconds Optional deadline in seconds for starting the job if it misses scheduled time for any reason
+  ##
+  startingDeadlineSeconds: ""
+  ## @param updates.concurrencyPolicy Specifies how to treat concurrent executions of a Job
+  ##
+  concurrencyPolicy: Forbid
+  ## @param updates.suspend This flag tells the controller to suspend subsequent executions
+  ##
+  suspend: ""
+  ## @param updates.successfulJobsHistoryLimit The number of successful finished jobs to retain
+  ##
+  successfulJobsHistoryLimit: ""
+  ## @param updates.failedJobsHistoryLimit The number of failed finished jobs to retain
+  ##
+  failedJobsHistoryLimit: ""
+  ## @param updates.backoffLimit The number of retries before marking this job failed
+  ##
+  backoffLimit: ""
+  ## @param updates.ttlSecondsAfterFinished The maximum retention before removing the job
+  ##
+  ttlSecondsAfterFinished: ""
+
   replicationUrl: https://download.geofabrik.de/europe/germany/sachsen-updates/
   ## @param updates.command Override default container command (useful when using custom images)
   ##
@@ -675,10 +708,11 @@ updates:
     - /bin/bash
     - -ec
   ## @param updates.args Override default container args (useful when using custom images)
+  ## ref: https://nominatim.org/release-docs/latest/admin/Update/#catch-up-mode
   ##
   args:
     - |
-      nominatim replication --threads 1
+      NOMINATIM_REPLICATION_MAX_DIFF=5000 nominatim replication --catch-up --threads 1
 
   ## @param initJob.podLabels Additional pod labels
   ## Ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/

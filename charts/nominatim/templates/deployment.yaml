@@ -165,8 +165,6 @@ spec:
               {{- if not .Values.externalDatabase.existingSecretDsn }}
               value: {{ include "nominatim.databaseUrl" . }}
               {{- end }}
-            - name: NOMINATIM_REPLICATION_URL
-              value: {{ .Values.updates.replicationUrl }}
             {{- if .Values.extraEnvVars }}
             {{- include "common.tplvalues.render" (dict "value" .Values.extraEnvVars "context" $) | nindent 12 }}
             {{- end }}

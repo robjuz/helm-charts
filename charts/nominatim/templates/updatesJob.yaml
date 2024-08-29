@@ -1,0 +1,159 @@
+{{- if and .Values.updates.enabled (not .Values.initJob.enabled) }}
+apiVersion: {{ include "common.capabilities.cronjob.apiVersion" . }}
+kind: CronJob
+metadata:
+  name: {{ printf "%s-updates" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/part-of: nominatim
+    app.kubernetes.io/component: updates
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  schedule: "{{ .Values.updates.schedule }}"
+  {{- if .Values.updates.timeZone }}
+  timeZone: {{ .Values.updates.timeZone }}
+  {{- end }}
+  {{- if .Values.updates.startingDeadlineSeconds }}
+  startingDeadlineSeconds: {{ .Values.updates.startingDeadlineSeconds }}
+  {{- end }}
+  {{- if .Values.updates.concurrencyPolicy }}
+  concurrencyPolicy: {{ .Values.updates.concurrencyPolicy }}
+  {{- end }}
+  {{- if .Values.updates.suspend }}
+  suspend: {{ .Values.updates.suspend }}
+  {{- end }}
+  {{- if .Values.updates.successfulJobsHistoryLimit }}
+  successfulJobsHistoryLimit: {{ .Values.updates.successfulJobsHistoryLimit }}
+  {{- end }}
+  {{- if .Values.updates.failedJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.updates.failedJobsHistoryLimit }}
+  {{- end }}
+  jobTemplate:
+    spec:
+      {{- if .Values.updates.backoffLimit }}
+      backoffLimit: {{ .Values.updates.backoffLimit }}
+      {{- end }}
+      {{- if .Values.updates.activeDeadlineSeconds }}
+      activeDeadlineSeconds: {{ .Values.updates.activeDeadlineSeconds }}
+      {{- end }}
+      {{- if .Values.updates.ttlSecondsAfterFinished }}
+      ttlSecondsAfterFinished: {{ .Values.updates.ttlSecondsAfterFinished }}
+      {{- end }}
+      template:
+        metadata:
+          labels: {{- include "common.labels.standard" . | nindent 12 }}
+            {{- if .Values.updates.podLabels }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.updates.podLabels "context" $) | nindent 12 }}
+            {{- end }}
+            app.kubernetes.io/part-of: nominatim
+            app.kubernetes.io/component: updates
+          annotations:
+          {{- if .Values.updates.podAnnotations }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.updates.podAnnotations "context" $) | nindent 12 }}
+          {{- end }}
+        spec:
+          {{- include "nominatim.imagePullSecrets" . | nindent 10 }}
+          {{- if .Values.updates.affinity }}
+          affinity: {{- include "common.tplvalues.render" (dict "value" .Values.updates.affinity "context" $) | nindent 12 }}
+          {{- else }}
+          affinity:
+            podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.updates.podAffinityPreset "context" $) | nindent 14 }}
+            podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.updates.podAntiAffinityPreset "context" $) | nindent 14 }}
+            nodeAffinity: {{- include "common.affinities.nodes" (dict "type" .Values.updates.nodeAffinityPreset.type "key" .Values.updates.nodeAffinityPreset.key "values" .Values.updates.nodeAffinityPreset.values) | nindent 14 }}
+          {{- end }}
+          {{- if .Values.updates.nodeSelector }}
+          nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.updates.nodeSelector "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.updates.tolerations }}
+          tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.updates.tolerations "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.updates.priorityClassName }}
+          priorityClassName: {{ .Values.updates.priorityClassName }}
+          {{- end }}
+          {{- if .Values.updates.schedulerName }}
+          schedulerName: {{ .Values.updates.schedulerName | quote }}
+          {{- end }}
+          {{- if .Values.updates.podSecurityContext.enabled }}
+          securityContext: {{- omit .Values.updates.podSecurityContext "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          serviceAccountName: {{ include "nominatim.serviceAccountName" .}}
+          {{- if .Values.updates.terminationGracePeriodSeconds }}
+          terminationGracePeriodSeconds: {{ .Values.updates.terminationGracePeriodSeconds }}
+          {{- end }}
+          {{- if .Values.updates.topologySpreadConstraints }}
+          topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.updates.topologySpreadConstraints "context" .) | nindent 12 }}
+          {{- end }}
+          restartPolicy: Never
+          containers:
+            - name: nominatim-updates
+              image: {{ include "nominatim.image" . }}
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              workingDir: /nominatim
+              {{- if .Values.diagnosticMode.enabled }}
+              command: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.command "context" $) | nindent 16 }}
+              {{- else if .Values.updates.command }}
+              command: {{- include "common.tplvalues.render" ( dict "value" .Values.updates.command "context" $) | nindent 16 }}
+              {{- end }}
+              {{- if .Values.diagnosticMode.enabled }}
+              args: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.args "context" $) | nindent 16 }}
+              {{- else if .Values.updates.args }}
+              args: {{- include "common.tplvalues.render" ( dict "value" .Values.updates.args "context" $) | nindent 16 }}
+              {{- end }}
+              {{- if .Values.updates.containerSecurityContext.enabled }}
+              securityContext: {{- omit .Values.updates.containerSecurityContext "enabled" | toYaml | nindent 16 }}
+              {{- end }}
+              env:
+                - name: NOMINATIM_DATABASE_DSN
+                  {{- if .Values.externalDatabase.existingSecretDsn }}
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.externalDatabase.existingSecretDsn }}
+                      key: {{ .Values.externalDatabase.existingSecretDsnKey }}
+                  {{- end }}
+                  {{- if not .Values.externalDatabase.existingSecretDsn }}
+                  value: {{ include "nominatim.databaseUrl" . }}
+                  {{- end }}
+                - name: NOMINATIM_REPLICATION_URL
+                  value: {{ .Values.updates.replicationUrl }}
+                - name: NOMINATIM_IMPORT_STYLE
+                  value: {{ .Values.initJob.importStyle }}
+                {{- if .Values.flatnode.enabled }}
+                - name: NOMINATIM_FLATNODE_FILE
+                  value: /nominatim/flatnode/flatnode.file
+                {{- end }}
+                {{- if .Values.updates.extraEnvVars }}
+                {{- include "common.tplvalues.render" (dict "value" .Values.updates.extraEnvVars "context" $) | nindent 16 }}
+                {{- end }}
+              envFrom:
+                {{- if .Values.updates.extraEnvVarsCM }}
+                - configMapRef:
+                    name: {{ include "common.tplvalues.render" (dict "value" .Values.updates.extraEnvVarsCM "context" $) }}
+                {{- end }}
+                {{- if .Values.updates.extraEnvVarsSecret }}
+                - secretRef:
+                    name: {{ include "common.tplvalues.render" (dict "value" .Values.updates.extraEnvVarsSecret "context" $) }}
+                {{- end }}
+              volumeMounts:
+                - mountPath: /dev/shm
+                  name: dshm
+                {{- if .Values.flatnode.enabled }}
+                - mountPath: /nominatim/flatnode
+                  name: nominatim
+                  subPath: flatnode
+                {{- end }}
+              {{- if .Values.updates.resources }}
+              resources:
+                {{- toYaml .Values.updates.resources | nindent 16 }}
+              {{- end }}
+          volumes:
+          {{- if  .Values.flatnode.enabled }}
+          - name: nominatim
+            persistentVolumeClaim:
+              claimName: {{ .Values.flatnode.existingClaim | default (include "common.names.fullname" .) }}
+          {{- end }}
+          - name: dshm
+            emptyDir:
+              medium: Memory
+{{- end }}
