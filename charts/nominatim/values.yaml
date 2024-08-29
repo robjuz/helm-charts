@@ -568,9 +568,16 @@ initJob:
   freeze: false
   wikipediaUrl: https://nominatim.org/data/wikimedia-importance.sql.gz
 
+  ## @param initJob.continue Nominatim import CLI continue arg
+  ## If undefined (default) `--continue` flag is not set on nominatim import
+  ## If defined, `nominatim import --continue <step>` is set
+  ## Supported steps: `[ import-from-file load-data | indexing | db-postprocess ]`
+  ## More info on: https://nominatim.org/release-docs/latest/admin/Faq/#can-a-stoppedkilled-import-process-be-resumed
+  ##
+  continue:
   ## @param initJob.backoffLimit set backoff limit of the job
   ##
-  backoffLimit: 1
+  backoffLimit: 0
   ## @param initJob.annotations [object] Add annotations to the job
   ##
   annotations: {}
@@ -1094,6 +1101,24 @@ postgresql:
   primary:
     persistence:
       size: 500Gi
+
+    ## PostgreSQL Primary resource requests and limits
+    ## ref: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
+    ## @param postgresql.primary.resourcesPreset Set container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge). This is ignored if primary.resources is set (primary.resources is recommended for production).
+    ## More information: https://github.com/bitnami/charts/blob/main/bitnami/common/templates/_resources.tpl#L15
+    ##
+    resourcesPreset: "none"
+    ## @param postgresql.primary.resources Set container requests and limits for different resources like CPU or memory (essential for production workloads)
+    ## Example:
+    ## resources:
+    ##   requests:
+    ##     cpu: 2
+    ##     memory: 512Mi
+    ##   limits:
+    ##     cpu: 3
+    ##     memory: 1024Mi
+    ##
+    resources: { }
 
     extendedConfiguration: |
         shared_buffers = 2GB

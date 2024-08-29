@@ -47,18 +47,18 @@ initJob:
 
 postgresql:
   primary:
-      extendedConfiguration: |
-        shared_buffers = 2GB
-        maintenance_work_mem = 10GB
-        autovacuum_work_mem = 2GB
-        work_mem = 50MB
-        effective_cache_size = 24GB
-        synchronous_commit = off
-        max_wal_size = 1GB
-        checkpoint_timeout = 10min
-        checkpoint_completion_target = 0.9
-        fsync = off
-        full_page_writes = off
+    extendedConfiguration: |
+      shared_buffers = 2GB
+      maintenance_work_mem = 10GB
+      autovacuum_work_mem = 2GB
+      work_mem = 50MB
+      effective_cache_size = 24GB
+      synchronous_commit = off
+      max_wal_size = 1GB
+      checkpoint_timeout = 10min
+      checkpoint_completion_target = 0.9
+      fsync = off
+      full_page_writes = off
 ```
 
 To install the chart with the release name `nominatim`:
@@ -422,22 +422,24 @@ Note: The command above may differ a little depending the k8s cluster version yo
 
 ### Database Parameters
 
-| Name                                          | Description                                                                                                                              | Value                         |
-|-----------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------|
-| `postgresql.enabled`                          | Deploy a PostgreSQL server to satisfy the applications database requirements                                                             | `true`                        |
-| `postgresql.image.repository`                 | PostgreSQL image repository                                                                                                              | `robjuz/postgresql-nominatim` |
-| `postgresql.image.tag`                        | PostgreSQL image tag                                                                                                                     | `14.4.0-4.0.1`                |
-| `postgresql.auth.postgresPassword`            | PostgreSQL root password                                                                                                                 | `nominatim`                   |
-| `postgresql.primary.persistence.enabled`      | Enable persistence on PostgreSQL using PVC(s)                                                                                            | `true`                        |
-| `postgresql.primary.persistence.storageClass` | Persistent Volume storage class                                                                                                          | `nil`                         |
-| `postgresql.primary.persistence.accessModes`  | Persistent Volume access modes                                                                                                           | `[ReadWriteOnce]`             |
-| `postgresql.primary.persistence.size`         | Persistent Volume size                                                                                                                   | `500Gi`                       |
-| `externalDatabase.host`                       | External PostgreSQL host (ignored if `postgresql.enabled = true`)                                                                        | localhost                     |
-| `externalDatabase.port`                       | External PostgreSQL post (ignored if `postgresql.enabled = true`)                                                                        | 5432                          |
-| `externalDatabase.user`                       | External PostgreSQL user (ignored if `postgresql.enabled = true`)                                                                        | nominatim                     |
-| `externalDatabase.password`                   | External PostgreSQL password (ignored if `postgresql.enabled = true`)                                                                    | ""                            |
-| `externalDatabase.existingSecretDsn`          | Name of existing secret to use to set full PostgreSQL DataSourceName (overrides `externalDatabase.*`)                                    | `nil`                         |
-| `externalDatabase.existingSecretDsnKey`       | Name of key in existing secret to use to set full PostgreSQL DataSourceName. Only used when `externalDatabase.existingSecretDsn` is set. | POSTGRESQL_DSN                |
+| Name                                          | Description                                                                                                                                                                                                                                             | Value                         |
+|-----------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------|
+| `postgresql.enabled`                          | Deploy a PostgreSQL server to satisfy the applications database requirements                                                                                                                                                                            | `true`                        |
+| `postgresql.image.repository`                 | PostgreSQL image repository                                                                                                                                                                                                                             | `robjuz/postgresql-nominatim` |
+| `postgresql.image.tag`                        | PostgreSQL image tag                                                                                                                                                                                                                                    | `14.4.0-4.0.1`                |
+| `postgresql.auth.postgresPassword`            | PostgreSQL root password                                                                                                                                                                                                                                | `nominatim`                   |
+| `postgresql.primary.persistence.enabled`      | Enable persistence on PostgreSQL using PVC(s)                                                                                                                                                                                                           | `true`                        |
+| `postgresql.primary.persistence.storageClass` | Persistent Volume storage class                                                                                                                                                                                                                         | `nil`                         |
+| `postgresql.primary.persistence.accessModes`  | Persistent Volume access modes                                                                                                                                                                                                                          | `[ReadWriteOnce]`             |
+| `postgresql.primary.persistence.size`         | Persistent Volume size                                                                                                                                                                                                                                  | `500Gi`                       |
+| `postgresql.primary.resourcesPreset`          | Set container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge). This is ignored if postgresql.primary.resources is set (postgresql.primary.resources is recommended for production). | `none`                        |
+| `postgresql.primary.resources`                | Set container requests and limits for different resources like CPU or memory (essential for production workloads)                                                                                                                                       | `{}`                          |
+| `externalDatabase.host`                       | External PostgreSQL host (ignored if `postgresql.enabled = true`)                                                                                                                                                                                       | localhost                     |
+| `externalDatabase.port`                       | External PostgreSQL post (ignored if `postgresql.enabled = true`)                                                                                                                                                                                       | 5432                          |
+| `externalDatabase.user`                       | External PostgreSQL user (ignored if `postgresql.enabled = true`)                                                                                                                                                                                       | nominatim                     |
+| `externalDatabase.password`                   | External PostgreSQL password (ignored if `postgresql.enabled = true`)                                                                                                                                                                                   | ""                            |
+| `externalDatabase.existingSecretDsn`          | Name of existing secret to use to set full PostgreSQL DataSourceName (overrides `externalDatabase.*`)                                                                                                                                                   | `nil`                         |
+| `externalDatabase.existingSecretDsnKey`       | Name of key in existing secret to use to set full PostgreSQL DataSourceName. Only used when `externalDatabase.existingSecretDsn` is set.                                                                                                                | POSTGRESQL_DSN                |
 
 ### Nominatim Appserver Parameters
 
@@ -463,13 +465,32 @@ Using flatnode with replication enabled requires the usage of a ReadWriteMany vo
 be shared within the pods.
 This also applies when scaling the nominatim deployment.
 
-
-
 ### PVC For data
 
 When importing large extracts (Europe/Planet) the data needed to be downloaded are quite big. If your server has not
 enough disk space to store the data, you can use a dedicated PV for this.
 
+### Dealing with import errors and continuing the import
+
+When there is an error during importing, you can check for logs:
+```console
+kubectl logs jobs/nominatim-init
+```
+To continue, you first need to delete the job
+```console
+kubectl delete jobs nominatim-init
+```
+
+then add the `initJob.continue` 
+```yaml
+initJob:
+  continue: load-data
+```
+
+and reinstall the chart
+```console
+helm upgrade --install nominatim robjuz/nominatim -f values.yaml
+```
 ### External database support
 
 You may want to have Nominatim connect to an external database rather than installing one inside your cluster. Typical

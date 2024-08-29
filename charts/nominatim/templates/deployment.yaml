@@ -75,66 +75,66 @@ spec:
       {{- if .Values.topologySpreadConstraints }}
       topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.topologySpreadConstraints "context" .) | nindent 8 }}
       {{- end }}
-      {{- if or (and .Values.podSecurityContext.enabled .Values.volumePermissions.enabled .Values.flatnode.enabled) (.Values.initContainers) }}
-        initContainers:
-         {{- if .Values.nominatimUi.enabled }}
-          - name: nominatim-ui-download
-            image: curlimages/curl
-            command:
-              - /bin/sh
-            args:
-              - -ec
-              - |
-                mkdir -p  /nominatim/nominatim-ui
-                cd  /nominatim/nominatim-ui
-                curl -L {{ include "nominatim.uiUrl" . }} | tar -xz --strip-components 1
-              {{- if eq ( toString ( .Values.volumePermissions.containerSecurityContext.runAsUser )) "auto" }}
-                find  /nominatim/flatnode -mindepth 0 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | xargs -r chown -R $(id -u):$(id -G | cut -d " " -f2)
-              {{- else }}
-                find /nominatim/flatnode -mindepth 0 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | xargs -r chown -R {{ .Values.containerSecurityContext.runAsUser }}:{{ .Values.podSecurityContext.fsGroup }}
-              {{- end }}
-          {{- if eq ( toString ( .Values.volumePermissions.containerSecurityContext.runAsUser )) "auto " }}
-            securityContext: {{- omit .Values.volumePermissions.containerSecurityContext "runAsUser" | toYaml | nindent 12 }}
-          {{- else }}
-            securityContext: {{- .Values.volumePermissions.containerSecurityContext | toYaml | nindent 12 }}
-          {{- end }}
-          {{- if .Values.volumePermissions.resources }}
-            resources: {{- toYaml .Values.volumePermissions.resources | nindent 12 }}
-          {{- end }}
-            volumeMounts:
-              - mountPath: /nominatim/nominatim-ui
-                name: nominatim-ui
+      {{- if or (and .Values.podSecurityContext.enabled .Values.volumePermissions.enabled .Values.flatnode.enabled) (.Values.nominatimUi.enabled) (.Values.initContainers) }}
+      initContainers:
+       {{- if .Values.nominatimUi.enabled }}
+        - name: nominatim-ui-download
+          image: curlimages/curl
+          command:
+            - /bin/sh
+          args:
+            - -ec
+            - |
+              mkdir -p  /nominatim/nominatim-ui
+              cd  /nominatim/nominatim-ui
+              curl -L {{ include "nominatim.uiUrl" . }} | tar -xz --strip-components 1
+            {{- if eq ( toString ( .Values.volumePermissions.containerSecurityContext.runAsUser )) "auto" }}
+              find  /nominatim/nominatim-ui -mindepth 0 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | xargs -r chown -R $(id -u):$(id -G | cut -d " " -f2)
+            {{- else }}
+              find /nominatim/nominatim-ui -mindepth 0 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | xargs -r chown -R {{ .Values.containerSecurityContext.runAsUser }}:{{ .Values.podSecurityContext.fsGroup }}
+            {{- end }}
+        {{- if eq ( toString ( .Values.volumePermissions.containerSecurityContext.runAsUser )) "auto " }}
+          securityContext: {{- omit .Values.volumePermissions.containerSecurityContext "runAsUser" | toYaml | nindent 12 }}
+        {{- else }}
+          securityContext: {{- .Values.volumePermissions.containerSecurityContext | toYaml | nindent 12 }}
         {{- end }}
-        {{- if and .Values.podSecurityContext.enabled .Values.volumePermissions.enabled .Values.flatnode.enabled }}
-          - name: volume-permissions
-            image: "{{ include "nominatim.volumePermissions.image" . }}"
-            imagePullPolicy: {{ .Values.volumePermissions.image.pullPolicy | quote }}
-            command:
-              - /bin/bash
-            args:
-              - -ec
-              - |
-                mkdir -p  /nominatim/flatnode
-              {{- if eq ( toString ( .Values.volumePermissions.containerSecurityContext.runAsUser )) "auto" }}
-                find  /nominatim/flatnode -mindepth 0 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | xargs -r chown -R $(id -u):$(id -G | cut -d " " -f2)
-              {{- else }}
-                find /nominatim/flatnode -mindepth 0 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | xargs -r chown -R {{ .Values.containerSecurityContext.runAsUser }}:{{ .Values.podSecurityContext.fsGroup }}
-              {{- end }}
-          {{- if eq ( toString ( .Values.volumePermissions.containerSecurityContext.runAsUser )) "auto " }}
-            securityContext: {{- omit .Values.volumePermissions.containerSecurityContext "runAsUser" | toYaml | nindent 12 }}
-          {{- else }}
-            securityContext: {{- .Values.volumePermissions.containerSecurityContext | toYaml | nindent 12 }}
-          {{- end }}
-          {{- if .Values.volumePermissions.resources }}
-            resources: {{- toYaml .Values.volumePermissions.resources | nindent 12 }}
-          {{- end }}
-            volumeMounts:
-              - mountPath: /nominatim/flatnode
-                name: flatnode
+        {{- if .Values.volumePermissions.resources }}
+          resources: {{- toYaml .Values.volumePermissions.resources | nindent 12 }}
         {{- end }}
-        {{- if .Values.initContainers }}
-          {{- include "common.tplvalues.render" (dict "value" .Values.initContainers "context" $) | nindent 8 }}
+          volumeMounts:
+            - mountPath: /nominatim/nominatim-ui
+              name: nominatim-ui
+      {{- end }}
+      {{- if and .Values.podSecurityContext.enabled .Values.volumePermissions.enabled .Values.flatnode.enabled }}
+        - name: volume-permissions
+          image: "{{ include "nominatim.volumePermissions.image" . }}"
+          imagePullPolicy: {{ .Values.volumePermissions.image.pullPolicy | quote }}
+          command:
+            - /bin/bash
+          args:
+            - -ec
+            - |
+              mkdir -p  /nominatim/flatnode
+            {{- if eq ( toString ( .Values.volumePermissions.containerSecurityContext.runAsUser )) "auto" }}
+              find  /nominatim/flatnode -mindepth 0 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | xargs -r chown -R $(id -u):$(id -G | cut -d " " -f2)
+            {{- else }}
+              find /nominatim/flatnode -mindepth 0 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | xargs -r chown -R {{ .Values.containerSecurityContext.runAsUser }}:{{ .Values.podSecurityContext.fsGroup }}
+            {{- end }}
+        {{- if eq ( toString ( .Values.volumePermissions.containerSecurityContext.runAsUser )) "auto " }}
+          securityContext: {{- omit .Values.volumePermissions.containerSecurityContext "runAsUser" | toYaml | nindent 12 }}
+        {{- else }}
+          securityContext: {{- .Values.volumePermissions.containerSecurityContext | toYaml | nindent 12 }}
         {{- end }}
+        {{- if .Values.volumePermissions.resources }}
+          resources: {{- toYaml .Values.volumePermissions.resources | nindent 12 }}
+        {{- end }}
+          volumeMounts:
+            - mountPath: /nominatim/flatnode
+              name: flatnode
+      {{- end }}
+      {{- if .Values.initContainers }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.initContainers "context" $) | nindent 8 }}
+      {{- end }}
       {{- end }}
       containers:
         - name: nominatim
