@@ -138,7 +138,7 @@ spec:
                 nominatim import --osm-file data.osm.pbf --threads $THREADS
               else
                 echo "Continuing initialization from step: '$CONTINUE'."
-                nominatim import --continue $CONTINUE --osm-file data.osm.pbf --threads $THREADS
+                nominatim import --continue $CONTINUE --threads $THREADS
               fi
 
               nominatim index --threads $THREADS
