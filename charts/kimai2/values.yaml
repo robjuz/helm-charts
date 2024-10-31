@@ -553,8 +553,8 @@ ingress:
   ## e.g:
   ## extraTls:
   ## - hosts:
-  ##     - wordpress.local
-  ##   secretName: wordpress.local-tls
+  ##     - kimai.local
+  ##   secretName: kimai.local-tls
   ##
   extraTls: []
   ## @param ingress.secrets Custom TLS certificates as secrets
@@ -566,7 +566,7 @@ ingress:
   ## Please see README.md for more information
   ## e.g:
   ## secrets:
-  ##   - name: wordpress.local-tls
+  ##   - name: kimai.local-tls
   ##     key: |-
   ##       -----BEGIN RSA PRIVATE KEY-----
   ##       ...
@@ -581,12 +581,12 @@ ingress:
   ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules
   ## e.g:
   ## extraRules:
-  ## - host: wordpress.local
+  ## - host: kimai.local
   ##     http:
   ##       path: /
   ##       backend:
   ##         service:
-  ##           name: wordpress-svc
+  ##           name: kimai-svc
   ##           port:
   ##             name: http
   ##

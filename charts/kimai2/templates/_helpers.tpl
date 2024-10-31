@@ -9,7 +9,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{/*
-Return the proper WordPress image name
+Return the proper Kimai image name
 */}}
 {{- define "kimai.image" -}}
 {{- include "common.images.image" (dict "imageRoot" .Values.image "global" .Values.global) -}}
