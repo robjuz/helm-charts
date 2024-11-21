@@ -161,8 +161,7 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.externalDatabase.existingSecretDsn }}
                   key: {{ .Values.externalDatabase.existingSecretDsnKey }}
-              {{- end }}
-              {{- if not .Values.externalDatabase.existingSecretDsn }}
+              {{- else }}
               value: {{ include "nominatim.databaseUrl" . }}
               {{- end }}
             {{- if .Values.extraEnvVars }}
