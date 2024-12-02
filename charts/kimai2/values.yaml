@@ -282,8 +282,9 @@ tolerations: []
 
 resources:
   limits:
-    memory: 256Mi
+    memory: 512Mi
   requests:
+    memory: 256Mi
     cpu: 100m
 ## Container ports
 ## @param containerPorts.http Kimai HTTP container port
