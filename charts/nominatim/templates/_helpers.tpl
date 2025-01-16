@@ -90,6 +90,13 @@ Create the database URL.
 postgresql://{{ include "nominatim.databaseUser" . }}:{{ include "nominatim.databasePassword" . }}@{{ include "nominatim.databaseHost" . }}:{{ include "nominatim.databasePort" . }}/{{ include "nominatim.databaseName" . }}
 {{- end }}
 
+{{/*
+Create the database DSN.
+*/}}
+{{- define "nominatim.databaseDSN" -}}
+pgsql:dbname={{ include "nominatim.databaseName" . }};host={{ include "nominatim.databaseHost" . }};port={{ include "nominatim.databasePort" . }};user={{ include "nominatim.databaseUser" . }};password={{ include "nominatim.databasePassword" . }}
+{{- end }}
+
 {{- define "nominatim.containerPort" -}}
 {{- ternary 80 8080 .Values.nominatimUi.enabled -}}
 {{- end }}
