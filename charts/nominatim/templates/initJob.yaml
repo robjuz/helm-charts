@@ -29,7 +29,7 @@ spec:
         - name: wait-for-db
           image: postgres
           env:
-            - name: NOMINATIM_DATABASE_DSN
+            - name: NOMINATIM_DATABASE_URL
               {{- if .Values.externalDatabase.existingSecretDsn }}
               valueFrom:
                 secretKeyRef:
@@ -42,8 +42,8 @@ spec:
             - /bin/bash
             - -c
             - |
-              echo $NOMINATIM_DATABASE_DSN;
-              until pg_isready -d $NOMINATIM_DATABASE_DSN; do
+              echo $NOMINATIM_DATABASE_URL;
+              until pg_isready -d $NOMINATIM_DATABASE_URL; do
                 echo "Waiting for database..."
                 sleep 2
               done
@@ -128,7 +128,7 @@ spec:
                   name: {{ .Values.externalDatabase.existingSecretDsn }}
                   key: {{ .Values.externalDatabase.existingSecretDsnKey }}
               {{- else }}
-              value: {{ include "nominatim.databaseUrl" . }}
+              value: {{ include "nominatim.databaseDSN" . }}
               {{- end }}
             {{- if .Values.flatnode.enabled }}
             - name: NOMINATIM_FLATNODE_FILE

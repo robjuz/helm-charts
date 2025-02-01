@@ -113,7 +113,7 @@ spec:
                       key: {{ .Values.externalDatabase.existingSecretDsnKey }}
                   {{- end }}
                   {{- if not .Values.externalDatabase.existingSecretDsn }}
-                  value: {{ include "nominatim.databaseUrl" . }}
+                  value: {{ include "nominatim.databaseDSN" . }}
                   {{- end }}
                 - name: NOMINATIM_REPLICATION_URL
                   value: {{ .Values.updates.replicationUrl }}

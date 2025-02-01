@@ -162,7 +162,7 @@ spec:
                   name: {{ .Values.externalDatabase.existingSecretDsn }}
                   key: {{ .Values.externalDatabase.existingSecretDsnKey }}
               {{- else }}
-              value: {{ include "nominatim.databaseUrl" . }}
+              value: {{ include "nominatim.databaseDSN" . }}
               {{- end }}
             {{- if .Values.extraEnvVars }}
             {{- include "common.tplvalues.render" (dict "value" .Values.extraEnvVars "context" $) | nindent 12 }}
