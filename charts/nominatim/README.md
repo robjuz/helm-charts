@@ -95,7 +95,7 @@ helm delete nominatim
 The command removes all the Kubernetes components associated with the chart and deletes the release, but the imported data still remains.
 
 ## Removing persisted data
-For a total uninstallation of nomination, a data removal is necessary. To do so, first of all, you need to search for the right persistence volume. To indetify it, you need to type de command below, and search for a volume containing the helm release name.
+For a total uninstallation of nomination, a data removal is necessary. To do so, first of all, you need to search for the right persistence volume. To identify it, you need to type de command below, and search for a volume containing the helm release name.
 
 ```console
 kubectl get pvc
@@ -122,7 +122,7 @@ kubectl delete pvc -l app.kubernetes.io/instance=nominatim
 Note: The command above may differ a little depending the k8s cluster version you're using.
 
 ## Removing persisted data
-For a total uninstallation of nomination, a data removal is necessary. To do so, first of all, you need to search for the right persistence volume. To indetify it, you need to type de command below, and search for a volume containing the helm release name.
+For a total uninstallation of nomination, a data removal is necessary. To do so, first of all, you need to search for the right persistence volume. To identify it, you need to type de command below, and search for a volume containing the helm release name.
 
 ```console
 kubectl get pvc
