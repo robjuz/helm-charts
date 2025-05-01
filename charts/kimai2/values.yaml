@@ -73,7 +73,7 @@ diagnosticMode:
 image:
   registry: docker.io
   repository: kimai/kimai2
-  tag: apache-2.28.0
+  tag: apache-2.32.0
   digest: ""
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
@@ -882,7 +882,7 @@ externalDatabase:
   port: 3306
   ## @param externalDatabase.serverVersion External Database server version
   ##
-  serverVersion: '5.7'
+  serverVersion: "5.7"
   ## @param externalDatabase.user External Database username
   ##
   user: kimai
