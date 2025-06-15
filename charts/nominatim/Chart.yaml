@@ -29,7 +29,7 @@ dependencies:
     version: 2.x.x
     repository: https://charts.bitnami.com/bitnami
   - name: postgresql
-    version: 15.5.20
+    version: 15.5.38
     repository: https://charts.bitnami.com/bitnami
     condition: postgresql.enabled
 
