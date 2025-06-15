@@ -1,3 +1,4 @@
+{{- if .Values.nominatimUi.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -13,3 +14,4 @@ metadata:
 data:
   000-default.conf: |-
     {{- include "common.tplvalues.render" ( dict "value" .Values.nominatimUi.apacheConfiguration "context" $ ) | nindent 4 }}
+{{- end -}}
