@@ -1,4 +1,4 @@
-{{- if .Values.nominatimUi.configuration }}
+{{- if .Values.nominatimUi.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -14,4 +14,4 @@ metadata:
 data:
   config.theme.js: |-
     {{ .Values.nominatimUi.configuration | nindent 4 }}
-    {{- end -}}
+{{- end -}}
