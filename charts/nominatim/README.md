@@ -520,13 +520,18 @@ externalDatabase.port=3306
 #### Using an existing secret to connect to the database
 
 You may want to use an existing secret to configure the connection to the database for your needs. To do so, you can use
-the `externalDatabase.existingSecretDsn` and `externalDatabase.existingSecretDsnKey` parameters. The secret must contain
-a key with the name specified in `externalDatabase.existingSecretDsnKey` and the value must be a valid PostgreSQL
-DataSourceName. Here is an example:
+the `externalDatabase.existingSecretDsn`, `externalDatabase.existingSecretDsnKey`, `externalDatabase.existingSecretUrl` and `externalDatabase.existingSecretUrlKey` parameters.
+The secret must contain a key with the name specified in `externalDatabase.existingSecretDsnKey` and the value must be a valid PostgreSQL
+DataSourceName.
+The secret must contain a key with the name specified in `externalDatabase.existingSecretUrlKey` and the value must be a valid PostgreSQL
+Uniform Resource Locator.
+Here is an example:
 
 ```console
 externalDatabase.existingSecretDsn=my-secret
 externalDatabase.existingSecretDsnKey=POSTGRESQL_DSN
+externalDatabase.existingSecretUrl=my-secret
+externalDatabase.existingSecretUrlKey=POSTGRESQL_URL
 ```
 
 With a secret like this:
@@ -537,7 +542,8 @@ kind: Secret
 metadata:
   name: my-secret
 data:
-  POSTGRESQL_DSN: postgresql://user:password@host:port/database
+  POSTGRESQL_DSN: pgsql:dbname=database;host=host;port=port;user=user;password=password
+  POSTGRESQL_URL: postgresql://user:password@host:port/database
 ```
 
 ### Ingress
