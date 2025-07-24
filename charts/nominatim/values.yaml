@@ -1185,6 +1185,12 @@ externalDatabase:
   ## @param externalDatabase.existingSecretDsnKey Key in the existing secret to use for the DSN
   ##
   existingSecretDsnKey: POSTGRESQL_DSN
+  ## @param externalDatabase.existingSecretUrl Use an existing secret for the PostgreSQL url to connect to the external PostgreSQL database
+  ###
+  existingSecretUrl:
+  ## @param externalDatabase.existingSecretUrlKey Key in the existing secret to use for the PostgreSQL url
+  ##
+  existingSecretUrlKey: POSTGRESQL_URL
   ## @param externalDatabase.host External Database server host
   ##
   host: localhost

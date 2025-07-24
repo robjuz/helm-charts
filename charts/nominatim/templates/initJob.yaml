@@ -30,11 +30,11 @@ spec:
           image: postgres
           env:
             - name: NOMINATIM_DATABASE_URL
-              {{- if .Values.externalDatabase.existingSecretDsn }}
+              {{- if .Values.externalDatabase.existingSecretUrl }}
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.externalDatabase.existingSecretDsn }}
-                  key: {{ .Values.externalDatabase.existingSecretDsnKey }}
+                  name: {{ .Values.externalDatabase.existingSecretUrl }}
+                  key: {{ .Values.externalDatabase.existingSecretUrlKey }}
               {{- else }}
               value: {{ include "nominatim.databaseUrl" . }}
               {{- end }}
