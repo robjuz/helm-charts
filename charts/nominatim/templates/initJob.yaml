@@ -27,7 +27,7 @@ spec:
       {{- end }}
       initContainers:
         - name: wait-for-db
-          image: postgres
+          image: postgres:14-alpine
           env:
             - name: NOMINATIM_DATABASE_URL
               {{- if .Values.externalDatabase.existingSecretDsn }}
@@ -36,17 +36,54 @@ spec:
                   name: {{ .Values.externalDatabase.existingSecretDsn }}
                   key: {{ .Values.externalDatabase.existingSecretDsnKey }}
               {{- else }}
-              value: {{ include "nominatim.databaseUrl" . }}
+              value: {{ include "nominatim.databaseDSN" . }}
               {{- end }}
+            - name: TIMEOUT_SECONDS
+              value: "{{ .Values.initJob.dbWaitTimeout | default 300 }}"
           args:
             - /bin/bash
-            - -c
+            - -ec
             - |
-              echo $NOMINATIM_DATABASE_URL;
-              until pg_isready -d $NOMINATIM_DATABASE_URL; do
-                echo "Waiting for database..."
+              echo "Checking database connection at $(date)..."
+              
+              # Parse PDO connection string into PostgreSQL parameters
+              CONNECTION_STRING="${NOMINATIM_DATABASE_URL#pgsql:}"
+              
+              # Extract parameters
+              DB_NAME=$(echo "$CONNECTION_STRING" | grep -o 'dbname=[^;]*' | cut -d= -f2)
+              DB_HOST=$(echo "$CONNECTION_STRING" | grep -o 'host=[^;]*' | cut -d= -f2)
+              DB_PORT=$(echo "$CONNECTION_STRING" | grep -o 'port=[^;]*' | cut -d= -f2)
+              DB_USER=$(echo "$CONNECTION_STRING" | grep -o 'user=[^;]*' | cut -d= -f2)
+              DB_PASSWORD=$(echo "$CONNECTION_STRING" | grep -o 'password=[^;]*' | cut -d= -f2)
+              
+              # Export as PostgreSQL environment variables
+              export PGDATABASE="$DB_NAME"
+              export PGHOST="$DB_HOST"
+              export PGPORT="$DB_PORT"
+              export PGUSER="$DB_USER"
+              export PGPASSWORD="$DB_PASSWORD"
+              
+              echo "Waiting for PostgreSQL at $DB_HOST:$DB_PORT..."
+              
+              start_time=$(date +%s)
+              attempts=0
+              
+              until pg_isready -q; do
+                current_time=$(date +%s)
+                elapsed_time=$((current_time - start_time))
+                attempts=$((attempts + 1))
+                
+                if [ $elapsed_time -ge $TIMEOUT_SECONDS ]; then
+                  echo "ERROR: Timeout reached after ${TIMEOUT_SECONDS} seconds and ${attempts} attempts."
+                  echo "Database at ${DB_HOST}:${DB_PORT} is not ready. Please check your database configuration and status."
+                  exit 1
+                fi
+                
+                echo "Waiting for database at ${DB_HOST}:${DB_PORT}... Attempt ${attempts} (${elapsed_time}s elapsed)"
                 sleep 2
               done
+              
+              echo "✅ Database at ${DB_HOST}:${DB_PORT} is ready after ${attempts} attempts!"
 
         - name: download
           image: curlimages/curl

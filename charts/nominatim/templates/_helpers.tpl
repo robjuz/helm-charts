@@ -83,12 +83,6 @@ Add environment variables to configure database values
 {{- end -}}
 {{- end -}}
 
-{{/*
-Create the database URL.
-*/}}
-{{- define "nominatim.databaseUrl" -}}
-postgresql://{{ include "nominatim.databaseUser" . }}:{{ include "nominatim.databasePassword" . }}@{{ include "nominatim.databaseHost" . }}:{{ include "nominatim.databasePort" . }}/{{ include "nominatim.databaseName" . }}
-{{- end }}
 
 {{/*
 Create the database DSN.

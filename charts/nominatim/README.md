@@ -187,17 +187,18 @@ Note: The command above may differ a little depending the k8s cluster version yo
 
 ### Nominatim Initialisation Configuration parameters
 
-| Name                        | Description                                                 | Value                                                                 |
-|-----------------------------|-------------------------------------------------------------|-----------------------------------------------------------------------|
-| `initJob.enabled`           | enable/disable init job                                     | `false `                                                              |
-| `initJob.pbfUrl`            | URL of the pbf file to import                               | `https://download.geofabrik.de/europe/germany/sachsen-latest.osm.pbf` |
-| `initJob.importWikipedia`   | If additional Wikipedia/Wikidata rankings should be importe | `false`                                                               |
-| `initJob.wikipediaUrl`      | Wikipedia/Wikidata rankings file URL                        | `https://nominatim.org/data/wikimedia-importance.sql.gz`              |
-| `initJob.importGB_Postcode` | If external GB postcodes should be imported                 | `false`                                                               |
-| `initJob.importUS_Postcode` | If external US postcodes should be imported                 | `false`                                                               |
-| `initJob.importStyle`       | Nominatim import style                                      | `full`                                                                |
-| `initJob.customStyleUrl`    | Custom import style file URL                                | `nil`                                                                 |
-| `initJob.threads`           | The number of thread used by the import                     | `16`                                                                  |
+| Name                        | Description                                                                | Value                                                                 |
+|-----------------------------|----------------------------------------------------------------------------|-----------------------------------------------------------------------|
+| `initJob.enabled`           | enable/disable init job                                                    | `false `                                                              |
+| `initJob.pbfUrl`            | URL of the pbf file to import                                              | `https://download.geofabrik.de/europe/germany/sachsen-latest.osm.pbf` |
+| `initJob.importWikipedia`   | If additional Wikipedia/Wikidata rankings should be importe                | `false`                                                               |
+| `initJob.wikipediaUrl`      | Wikipedia/Wikidata rankings file URL                                       | `https://nominatim.org/data/wikimedia-importance.sql.gz`              |
+| `initJob.importGB_Postcode` | If external GB postcodes should be imported                                | `false`                                                               |
+| `initJob.importUS_Postcode` | If external US postcodes should be imported                                | `false`                                                               |
+| `initJob.importStyle`       | Nominatim import style                                                     | `full`                                                                |
+| `initJob.customStyleUrl`    | Custom import style file URL                                               | `nil`                                                                 |
+| `initJob.threads`           | The number of thread used by the import                                    | `16`                                                                  |
+| `initJob.dbWaitTimeout`     | The number of seconds to wait for the DB to be ready to accept connections | `300`                                                                 |
 
 
 ### Nominatim Initialisation Deployment parameters

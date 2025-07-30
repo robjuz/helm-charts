@@ -575,6 +575,9 @@ initJob:
   ## More info on: https://nominatim.org/release-docs/latest/admin/Faq/#can-a-stoppedkilled-import-process-be-resumed
   ##
   continue:
+
+  ## @param initJob.dbWaitTimeout The number of seconds to wait for the DB to be ready to accept connections
+  dbWaitTimeout: 300
   ## @param initJob.backoffLimit set backoff limit of the job
   ##
   backoffLimit: 0
