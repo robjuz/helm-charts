@@ -73,7 +73,7 @@ diagnosticMode:
 image:
   registry: docker.io
   repository: mediagis/nominatim
-  tag: 4.4
+  tag: 5.1
   digest: ""
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
