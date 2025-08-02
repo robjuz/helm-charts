@@ -7,7 +7,7 @@ appVersion: "0.0.5"
 
 dependencies:
   - name: common
-    version: 1.x.x
+    version: 2.x
     repository: https://charts.bitnami.com/bitnami
   - name: mongodb
     repository: https://charts.bitnami.com/bitnami
