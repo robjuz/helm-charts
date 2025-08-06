@@ -126,6 +126,9 @@ extraEnvVarsSecret: ""
 ## NOTE: ReadWriteMany PVC(s) are required if replicaCount > 1
 ##
 replicaCount: 1
+## @param revisionHistoryLimit Number of old ReplicaSets to retain to allow rollback
+## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#revision-history-limit
+revisionHistoryLimit: 10
 ## @param updateStrategy.type Nominatim deployment strategy type
 ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
 ## NOTE: Set it to `Recreate` if you use a PV that cannot be mounted on multiple pods
