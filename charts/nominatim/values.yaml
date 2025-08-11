@@ -1018,11 +1018,16 @@ serviceAccount:
 ## @param pdb.create Enable a Pod Disruption Budget creation
 ## @param pdb.minAvailable Minimum number/percentage of pods that should remain scheduled
 ## @param pdb.maxUnavailable Maximum number/percentage of pods that may be made unavailable
+## @param pdb.pdbMatchExpressions MatchExpressions for the pdb selector. Excludes job object by default
 ##
 pdb:
   create: false
   minAvailable: 1
   maxUnavailable: ""
+  pdbMatchExpressions:
+    - key: job-name
+      operator: DoesNotExist
+
 ## Nominatim Autoscaling configuration
 ## ref: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
 ## @param autoscaling.enabled Enable Horizontal POD autoscaling for Nominatim
