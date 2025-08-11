@@ -17,5 +17,11 @@ spec:
   {{- end }}
   {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.podLabels .Values.commonLabels ) "context" . ) }}
   selector:
+    {{- if .Values.pdb.pdbMatchExpressions }}
+    matchExpressions:
+      {{- with (.Values.pdb.pdbMatchExpressions) }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+    {{- end }}
     matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
 {{- end }}
