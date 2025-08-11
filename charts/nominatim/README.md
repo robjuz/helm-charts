@@ -15,7 +15,7 @@ helm install nominatim robjuz/nominatim
 This chart bootstraps a [Nominatim](https://nominatim.org/) deployment on a [Kubernetes](http://kubernetes.io) cluster
 using the [Helm](https://helm.sh) package manager.
 
-It also packages a [Bitnami PostgreSQL chart](https://github.com/bitnami/charts/tree/master/bitnami/postgresql) 
+It also packages a [Bitnami PostgreSQL chart](https://github.com/bitnami/charts/tree/master/bitnami/postgresql)
 which is required for bootstrapping a PostgreSQL deployment for the database requirements of the Nominatim application.
 
 This chart has been tested to work with NGINX Ingress and cert-manager on top of the [MicroK8s](https://microk8s.io/).
@@ -298,7 +298,7 @@ Note: The command above may differ a little depending the k8s cluster version yo
 | `nodeSelector`                                      | Node labels for pod assignment                                                                                                                                                                                    | `{}`             |
 | `tolerations`                                       | Tolerations for pod assignment                                                                                                                                                                                    | `[]`             |
 | `resourcesPreset`                                   | Set container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge). This is ignored if resources is set (resources is recommended for production). | `micro`          |
-| `resources`                                         | Set container requests and limits for different resources like CPU or memory (essential for production workloads)                                                                                                 | `{}`             | 
+| `resources`                                         | Set container requests and limits for different resources like CPU or memory (essential for production workloads)                                                                                                 | `{}`             |
 | `extraContainerPorts`                               | Optionally specify extra list of additional ports for Nominatim container(s)                                                                                                                                      | `[]`             |
 | `podSecurityContext.enabled`                        | Enabled Nominatim pods' Security Context                                                                                                                                                                          | `false`          |
 | `podSecurityContext.fsGroup`                        | Set Nominatim pod's Security Context fsGroup                                                                                                                                                                      | `1001`           |
@@ -387,20 +387,21 @@ Note: The command above may differ a little depending the k8s cluster version yo
 
 ### Other Parameters
 
-| Name                                          | Description                                                            | Value   |
-|-----------------------------------------------|------------------------------------------------------------------------|---------|
-| `serviceAccount.create`                       | Enable creation of ServiceAccount for Nominatim pod                    | `false` |
-| `serviceAccount.name`                         | The name of the ServiceAccount to use.                                 | `""`    |
-| `serviceAccount.automountServiceAccountToken` | Allows auto mount of ServiceAccountToken on the serviceAccount created | `true`  |
-| `serviceAccount.annotations`                  | Additional custom annotations for the ServiceAccount                   | `{}`    |
-| `pdb.create`                                  | Enable a Pod Disruption Budget creation                                | `false` |
-| `pdb.minAvailable`                            | Minimum number/percentage of pods that should remain scheduled         | `1`     |
-| `pdb.maxUnavailable`                          | Maximum number/percentage of pods that may be made unavailable         | `""`    |
-| `autoscaling.enabled`                         | Enable Horizontal POD autoscaling for Nominatim                        | `false` |
-| `autoscaling.minReplicas`                     | Minimum number of Nominatim replicas                                   | `1`     |
-| `autoscaling.maxReplicas`                     | Maximum number of Nominatim replicas                                   | `11`    |
-| `autoscaling.targetCPU`                       | Target CPU utilization percentage                                      | `50`    |
-| `autoscaling.targetMemory`                    | Target Memory utilization percentage                                   | `50`    |
+| Name                                          | Description                                                            | Value                                     |
+|-----------------------------------------------|------------------------------------------------------------------------|-------------------------------------------|
+| `serviceAccount.create`                       | Enable creation of ServiceAccount for Nominatim pod                    | `false`                                   |
+| `serviceAccount.name`                         | The name of the ServiceAccount to use.                                 | `""`                                      |
+| `serviceAccount.automountServiceAccountToken` | Allows auto mount of ServiceAccountToken on the serviceAccount created | `true`                                    |
+| `serviceAccount.annotations`                  | Additional custom annotations for the ServiceAccount                   | `{}`                                      |
+| `pdb.create`                                  | Enable a Pod Disruption Budget creation                                | `false`                                   |
+| `pdb.minAvailable`                            | Minimum number/percentage of pods that should remain scheduled         | `1`                                       |
+| `pdb.maxUnavailable`                          | Maximum number/percentage of pods that may be made unavailable         | `""`                                      |
+| `pdb.pdbMatchExpressions`                     | MatchExpressions for the pdb selector. Excludes job object by default  | `[{key:job-name, operator:DoesNotExist}]` |
+| `autoscaling.enabled`                         | Enable Horizontal POD autoscaling for Nominatim                        | `false`                                   |
+| `autoscaling.minReplicas`                     | Minimum number of Nominatim replicas                                   | `1`                                       |
+| `autoscaling.maxReplicas`                     | Maximum number of Nominatim replicas                                   | `11`                                      |
+| `autoscaling.targetCPU`                       | Target CPU utilization percentage                                      | `50`                                      |
+| `autoscaling.targetMemory`                    | Target Memory utilization percentage                                   | `50`                                      |
 
 ### NetworkPolicy parameters
 
@@ -483,7 +484,7 @@ To continue, you first need to delete the job
 kubectl delete jobs nominatim-init
 ```
 
-then add the `initJob.continue` 
+then add the `initJob.continue`
 ```yaml
 initJob:
   continue: load-data
