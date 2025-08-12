@@ -23,7 +23,7 @@ dependencies:
     repository: https://charts.bitnami.com/bitnami
     tags:
       - bitnami-common
-    version: 1.x.x
+    version: 2.x
 description: Web publishing platform for building blogs and websites.
 engine: gotpl
 home: https://github.com/robjuz/helm-charts/tree/master/charts/shopware
