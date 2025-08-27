@@ -9,6 +9,8 @@
 ## @param global.storageClass Global StorageClass for Persistent Volume(s)
 ##
 global:
+  security:
+    allowInsecureImages: true #required for bitnamilegacy
   imageRegistry: ""
   ## E.g.
   ## imagePullSecrets:
@@ -1151,6 +1153,9 @@ networkPolicy:
 ##
 postgresql:
   enabled: true
+  image:
+    repository: bitnamilegacy/postgresql
+
 
   auth:
     postgresPassword: nominatim
