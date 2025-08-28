@@ -75,7 +75,7 @@ diagnosticMode:
 image:
   registry: docker.io
   repository: mediagis/nominatim
-  tag: 4.4
+  tag: 5.1.0
   digest: ""
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
@@ -101,9 +101,13 @@ command:
   - /bin/bash
   - -ec
   - |
-    nominatim refresh --website
-    a2enmod rewrite
-    /usr/sbin/apache2ctl -D FOREGROUND
+    gunicorn \
+      --bind :8080 \
+      --workers 4 \
+      --enable-stdio-inheritance \
+      --worker-class uvicorn.workers.UvicornWorker \
+      nominatim_api.server.falcon.server:run_wsgi
+
 ## @param args Override default container args (useful when using custom images)
 ##
 args: []
@@ -304,7 +308,7 @@ containerSecurityContext:
 livenessProbe:
   enabled: true
   httpGet:
-    path: /
+    path: /status
     port: http
     ## If using an HTTPS-terminating load-balancer, the probes may need to behave
     ## like the balancer to prevent HTTP 302 responses. According to the Kubernetes
@@ -334,7 +338,7 @@ livenessProbe:
 readinessProbe:
   enabled: true
   httpGet:
-    path: /
+    path: /status
     port: http
     ## If using an HTTPS-terminating load-balancer, the probes may need to behave
     ## like the balancer to prevent HTTP 302 responses. According to the Kubernetes
@@ -364,7 +368,7 @@ readinessProbe:
 startupProbe:
   enabled: false
   httpGet:
-    path: /
+    path: /status
     port: http
     ## If using an HTTPS-terminating load-balancer, the probes may need to behave
     ## like the balancer to prevent HTTP 302 responses. According to the Kubernetes
@@ -840,58 +844,50 @@ nominatimUi:
   enabled: true
   version: 3.2.1
   # apacheConfiguration configures the apache webserver that serves the UI.
-  apacheConfiguration: |-
-    <VirtualHost *:80>
-      DocumentRoot /nominatim/website
-      CustomLog "|$/usr/bin/rotatelogs -n 7 /var/log/apache2/access.log 86400" combined
-      ErrorLog  "|$/usr/bin/rotatelogs -n 7 /var/log/apache2/error.log 86400"
-      LogLevel info
-
-      <Directory "/nominatim/nominatim-ui/dist">
-        DirectoryIndex search.html
-        Require all granted
-      </Directory>
-
-      Alias /ui /nominatim/nominatim-ui/dist
-
-      <Directory /nominatim/website>
-        Options FollowSymLinks MultiViews
-        DirectoryIndex search.php
-        Require all granted
-
-        RewriteEngine On
-
-          # This must correspond to the URL where nominatim can be found.
-          RewriteBase "/"
-
-          # If no endpoint is given, then use search.
-          RewriteRule ^(/|$)   "search.php"
-
-          # If format-html is explicity requested, forward to the UI.
-          RewriteCond %{QUERY_STRING} "format=html"
-          RewriteRule ^([^/]+).php ui/$1.html [R,END]
-          # Same but .php suffix is missing.
-          RewriteCond %{QUERY_STRING} "format=html"
-          RewriteRule ^([^/]+) ui/$1.html [R,END]
-
-          # If no format parameter is there then forward anything
-          # but /reverse and /lookup to the UI.
-          RewriteCond %{QUERY_STRING} "!format="
-          RewriteCond %{REQUEST_URI}  "!/lookup"
-          RewriteCond %{REQUEST_URI}  "!/reverse"
-          RewriteRule ^([^/]+).php ui/$1.html [R,END]
-          # Same but .php suffix is missing.
-          RewriteCond %{QUERY_STRING} "!format="
-          RewriteCond %{REQUEST_URI}  "!/lookup"
-          RewriteCond %{REQUEST_URI}  "!/reverse"
-          RewriteRule ^([^/]+) ui/$1.html [R,END]
-      </Directory>
-
-      AddType text/html .php
-    </VirtualHost>
+  nginxConfiguration: |-
+    server {
+      listen 80;
+    
+      index search.html;
+      root /nominatim/nominatim-ui/dist;
+  
+      # for debuging comment in this line, and the next line to your compose file:
+      # error_log /var/log/nginx/error.log debug;
+      # command: [nginx-debug, '-g', 'daemon off;']
+  
+      # n7m-api - Python endpoint
+      location /api/ {
+          rewrite /api/(.*) /$1 break;
+          proxy_set_header Host $http_host;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+          proxy_set_header Upgrade $http_upgrade;
+          proxy_set_header Connection $connection_upgrade;
+          proxy_redirect off;
+          proxy_buffering off;
+          proxy_pass http://127.0.0.1:8080;
+      }
+  
+      # n7m-api - Python health endpoint
+      location /status {
+          proxy_set_header Host $http_host;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+          proxy_set_header Upgrade $http_upgrade;
+          proxy_set_header Connection $connection_upgrade;
+          proxy_redirect off;
+          proxy_buffering off;
+          proxy_pass http://127.0.0.1:8080;
+      }
+    }
+  
+    map $http_upgrade $connection_upgrade {
+      default upgrade;
+      '' close;
+    }
 
   configuration: |-
-    Nominatim_Config.Nominatim_API_Endpoint = '/';
+    Nominatim_Config.Nominatim_API_Endpoint = '/api/';
 
 
 

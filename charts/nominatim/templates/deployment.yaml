@@ -37,7 +37,7 @@ spec:
       {{- if .Values.podAnnotations }}
         {{- include "common.tplvalues.render" (dict "value" .Values.podAnnotations "context" $) | nindent 8 }}
       {{- end }}
-        checksum/apache-configmap: {{ include (print $.Template.BasePath "/apache-configmap.yaml" ) . | sha256sum }}
+        checksum/nginx-configmap: {{ include (print $.Template.BasePath "/nginx-configmap.yaml" ) . | sha256sum }}
         checksum/ui-configmap: {{ include (print $.Template.BasePath "/ui-configmap.yaml" ) . | sha256sum }}
     spec:
       {{- include "nominatim.imagePullSecrets" . | nindent 6 }}
@@ -138,6 +138,22 @@ spec:
       {{- end }}
       {{- end }}
       containers:
+        {{- if .Values.nominatimUi.enabled }}
+        - name: nominatim-ui
+          image: nginx:1.29.1-alpine
+          imagePullPolicy: IfNotPresent
+          workingDir: /nominatim
+          volumeMounts:
+            - mountPath: /etc/nginx/conf.d
+              name: nginx-config
+            - mountPath: /nominatim/nominatim-ui
+              name: nominatim-ui
+          {{- if .Values.nominatimUi.configuration }}
+            - name: ui-config
+              mountPath: /nominatim/nominatim-ui/dist/theme/config.theme.js
+              subPath: config.theme.js
+          {{- end }}
+        {{- end }}
         - name: nominatim
           image: {{ include "nominatim.image" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
@@ -211,17 +227,6 @@ spec:
             - mountPath: /nominatim/flatnode
               name: flatnode
               {{- end }}
-            {{- if .Values.nominatimUi.enabled }}
-            - mountPath: /etc/apache2/sites-available
-              name: apache-config
-            - mountPath: /nominatim/nominatim-ui
-              name: nominatim-ui
-            {{- if .Values.nominatimUi.configuration }}
-            - name: ui-config
-              mountPath: /nominatim/nominatim-ui/dist/theme/config.theme.js
-              subPath: config.theme.js
-            {{- end }}
-            {{- end }}
         {{- if .Values.sidecars }}
         {{- include "common.tplvalues.render" (dict "value" .Values.sidecars "context" $) | nindent 8 }}
         {{- end }}
@@ -235,9 +240,9 @@ spec:
           emptyDir:
             medium: Memory
         {{- if .Values.nominatimUi.enabled }}
-        - name: apache-config
+        - name: nginx-config
           configMap:
-            name: {{ printf "%s-apache" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
+            name: {{ printf "%s-nginx" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
             defaultMode: 0555
         {{- if .Values.nominatimUi.configuration }}
         - name: ui-config
