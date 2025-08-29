@@ -37,8 +37,10 @@ spec:
       {{- if .Values.podAnnotations }}
         {{- include "common.tplvalues.render" (dict "value" .Values.podAnnotations "context" $) | nindent 8 }}
       {{- end }}
+      {{- if .Values.nominatimUi.enabled }}
         checksum/nginx-configmap: {{ include (print $.Template.BasePath "/nginx-configmap.yaml" ) . | sha256sum }}
         checksum/ui-configmap: {{ include (print $.Template.BasePath "/ui-configmap.yaml" ) . | sha256sum }}
+      {{- end }}
     spec:
       {{- include "nominatim.imagePullSecrets" . | nindent 6 }}
       {{- if .Values.hostAliases }}
@@ -80,7 +82,7 @@ spec:
       initContainers:
        {{- if .Values.nominatimUi.enabled }}
         - name: nominatim-ui-download
-          image: curlimages/curl
+          image: {{ .Values.initContainers.download.image }}
           command:
             - /bin/sh
           args:
@@ -140,8 +142,8 @@ spec:
       containers:
         {{- if .Values.nominatimUi.enabled }}
         - name: nominatim-ui
-          image: nginx:1.29.1-alpine
-          imagePullPolicy: IfNotPresent
+          image: {{ .Values.nominatimUi.nginx.image }}
+          imagePullPolicy: {{ .Values.nominatimUi.nginx.imagePullPolicy }}
           workingDir: /nominatim
           volumeMounts:
             - mountPath: /etc/nginx/conf.d
