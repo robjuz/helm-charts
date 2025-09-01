@@ -9,7 +9,7 @@ dependencies:
   - condition: mariadb.enabled
     name: mariadb
     repository: oci://registry-1.docker.io/bitnamicharts
-    version: 11.5.7
+    version: 22.0.0
   - condition: redis.enabled
     name: redis
     repository: oci://registry-1.docker.io/bitnamicharts
