@@ -1221,3 +1221,6 @@ externalDatabase:
   ## @param externalDatabase.password External Database user password
   ##
   password: ""
+  ## @param externalDatabase.databaseName External Database name
+  ##
+  databaseName: nominatim
