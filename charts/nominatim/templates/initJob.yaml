@@ -27,7 +27,7 @@ spec:
       {{- end }}
       initContainers:
         - name: wait-for-db
-          image: postgres:14-alpine
+          image: {{ .Values.initJob.initContainers.waitForDB.image }}
           env:
             - name: NOMINATIM_DATABASE_URL
               {{- if .Values.externalDatabase.existingSecretDsn }}
@@ -86,7 +86,7 @@ spec:
               echo "✅ Database at ${DB_HOST}:${DB_PORT} is ready after ${attempts} attempts!"
 
         - name: download
-          image: curlimages/curl
+          image: {{ .Values.initJob.initContainers.download.image }}
           workingDir: /nominatim
           volumeMounts:
             - mountPath: /nominatim

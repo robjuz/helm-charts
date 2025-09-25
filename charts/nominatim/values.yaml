@@ -566,6 +566,11 @@ ingress:
 
 initJob:
   enabled: false
+  initContainers:
+    waitForDB:
+      image: postgres:14-alpine
+    download:
+      image: curlimages/curl
 
   pbfUrl: https://download.geofabrik.de/europe/germany/sachsen-latest.osm.pbf
   importWikipedia: false
@@ -843,7 +848,14 @@ updates:
 nominatimUi:
   enabled: true
   version: 3.2.1
-  # apacheConfiguration configures the apache webserver that serves the UI.
+  initContainers:
+    download:
+      image: curlimages/curl
+  nginx:
+    image: nginx:1.29.1-alpine
+    imagePullPolicy: IfNotPresent
+
+  # nginxConfiguration configures the nginx webserver that serves the UI.
   nginxConfiguration: |-
     server {
       listen 80;
@@ -952,7 +964,7 @@ volumePermissions:
   image:
     registry: docker.io
     repository: bitnami/os-shell
-    tag: 12-debian-12-r18
+    tag: 12-debian-12-r51
     digest: ""
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
