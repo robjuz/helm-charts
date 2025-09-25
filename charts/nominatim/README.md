@@ -537,7 +537,7 @@ kind: Secret
 metadata:
   name: my-secret
 data:
-  POSTGRESQL_DSN: postgresql://user:password@host:port/database
+  POSTGRESQL_DSN: pgsql:dbname=database;host=host;port=port;user=user;password=password
 ```
 
 ### Ingress
