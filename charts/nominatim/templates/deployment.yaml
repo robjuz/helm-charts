@@ -82,7 +82,7 @@ spec:
       initContainers:
        {{- if .Values.nominatimUi.enabled }}
         - name: nominatim-ui-download
-          image: {{ .Values.initContainers.download.image }}
+          image: {{ .Values.nominatimUi.initContainers.download.image }}
           command:
             - /bin/sh
           args:
