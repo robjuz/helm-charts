@@ -96,7 +96,7 @@ spec:
             - -c
             - |
 {{- if .Values.initJob.customStyleUrl }}
-              if [ -f custom.style" ]; then
+              if [ -f "custom.style" ]; then
                 echo "custom.style exists."
               else
                 echo "Downloading US postcode"
