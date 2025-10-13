@@ -97,7 +97,7 @@ Return the Database ServerVersion
 {{- if .Values.mariadb.enabled }}
     {{- printf "%s" (regexReplaceAll "-.*$" .Values.mariadb.image.tag "") -}}
 {{- else -}}
-    {{- printf "%d" (.Values.externalDatabase.port | int ) -}}
+    {{- printf "%s" (.Values.externalDatabase.serverVersion) -}}
 {{- end -}}
 {{- end -}}
 
