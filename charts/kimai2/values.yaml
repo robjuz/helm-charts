@@ -840,6 +840,10 @@ mariadb:
   enabled: true
   ## @param mariadb.architecture MariaDB architecture. Allowed values: `standalone` or `replication`
   ##
+
+  image:
+    repository: bitnamilegacy/mariadb
+
   architecture: standalone
   ## MariaDB Authentication parameters
   ## @param mariadb.auth.rootPassword MariaDB root password
