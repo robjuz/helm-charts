@@ -6,6 +6,7 @@
   "packageRules": [
     {
       "matchFileNames": ["charts/**"],
+      "commitMessageTopic": "{{parentDir}} - {{depName}}",
       "bumpVersions": [
         {
           "filePatterns": ["{{packageFileDir}}/Chart.{yaml,yml}"],
@@ -13,8 +14,8 @@
             "appVersion: '(?<currentValue>.*?)'\\s+",
             "version:\\s(?<version>[^\\s]+)"
             ],
-          "bumpType": "{{#if isPatch}}patch{{else}}minor{{/if}}"
-        }
+          "bumpType": "{{#if isPatch}}patch{{else}}minor{{/if}}",
+        },
       ]
     }
   ]
