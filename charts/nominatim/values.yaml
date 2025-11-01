@@ -953,7 +953,7 @@ volumePermissions:
   ##
   enabled: false
   ## OS Shell + Utility image
-  ## ref: https://hub.docker.com/r/bitnami/os-shell/tags/
+  ## ref: https://hub.docker.com/r/bitnamilegacy/os-shell/tags/
   ## @param volumePermissions.image.registry [default: REGISTRY_NAME] OS Shell + Utility image registry
   ## @param volumePermissions.image.repository [default: REPOSITORY_NAME/os-shell] OS Shell + Utility image repository
   ## @skip volumePermissions.image.tag OS Shell + Utility image tag (immutable tags are recommended)
@@ -963,7 +963,7 @@ volumePermissions:
   ##
   image:
     registry: docker.io
-    repository: bitnami/os-shell
+    repository: bitnamilegacy/os-shell
     tag: 12-debian-12-r51
     digest: ""
     pullPolicy: IfNotPresent
