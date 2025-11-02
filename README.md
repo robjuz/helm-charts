@@ -12,6 +12,12 @@ $ helm search repo robjuz
 $ helm install my-release robjuz/<chart>
 ```
 
+OCI artifacts of all robjuz Helm charts are available in ghcr.io and can be pulled via:
+
+```bash
+helm install [RELEASE_NAME] oci://ghcr.io/robjuz/charts/<chart>
+```
+
 ## Available charts
 
 * [Futtertrog](charts/futtertrog/README.md)
