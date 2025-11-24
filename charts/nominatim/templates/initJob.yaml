@@ -186,7 +186,14 @@ spec:
             - /bin/bash
             - -ec
             - |
-
+              SECONDS=0
+              date "+%Y-%m-%d %H:%M:%S"
+              echo "pbfUrl: {{ .Values.initJob.pbfUrl }}"
+              echo "NOMINATIM_IMPORT_STYLE: $NOMINATIM_IMPORT_STYLE"
+              {{- if .Values.initJob.importFilterLua.enabled }}
+              cat $NOMINATIM_IMPORT_STYLE
+              echo
+              {{- end }}
               if [ -z "$CONTINUE" ]; then
                 echo "Starting data import."
                 nominatim import --osm-file data.osm.pbf --threads $THREADS
@@ -215,6 +222,13 @@ spec:
               nominatim admin --warm
 
               echo "Warming finished."
+              date "+%Y-%m-%d %H:%M:%S"
+              # show import duration in days, hours and minutes
+              duration=$SECONDS
+              D=$(( duration / 60 / 60 / 24))
+              H=$(( duration / 60 / 60)) ; H=$((H % 24))
+              M=$(( duration / 60 )) ; M=$((M % 60))
+              echo "Initialization duration: $D days, $H hours, $M minutes"
               echo "Initialization finished. Please continue with step 2 now."
             - /scripts/migrate-and-create-admin.sh
           {{- if .Values.initJob.containerSecurityContext.enabled }}
