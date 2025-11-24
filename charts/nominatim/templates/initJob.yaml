@@ -151,7 +151,10 @@ spec:
           workingDir: /nominatim
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            {{- if .Values.initJob.customStyleUrl }}
+            {{- if .Values.initJob.importFilterLua.enabled }}
+            - name: NOMINATIM_IMPORT_STYLE
+              value: /nominatim/importfilter/importFilter.lua
+            {{- else if .Values.initJob.customStyleUrl }}
             - name: NOMINATIM_IMPORT_STYLE
               value: /nominatim/custom.style
             {{- else }}
@@ -183,6 +186,7 @@ spec:
             - /bin/bash
             - -ec
             - |
+
               if [ -z "$CONTINUE" ]; then
                 echo "Starting data import."
                 nominatim import --osm-file data.osm.pbf --threads $THREADS
@@ -221,6 +225,10 @@ spec:
               name: data
             - mountPath: /dev/shm
               name: dshm
+            {{- if .Values.initJob.importFilterLua.enabled }}
+            - mountPath: /nominatim/importfilter
+              name: import-filter-lua
+            {{- end }}
             {{- if .Values.flatnode.enabled }}
             - mountPath: /nominatim/flatnode
               name: flatnode
@@ -254,4 +262,12 @@ spec:
           {{- else }}
           emptyDir: {}
           {{- end }}
+        - name: import-filter-lua
+          {{- if .Values.initJob.importFilterLua.enabled }}
+          configMap:
+            name: {{ printf "%s-importfilterlua" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+
 {{- end }}
