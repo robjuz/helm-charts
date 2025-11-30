@@ -11,5 +11,5 @@ dependencies:
     repository: https://charts.bitnami.com/bitnami
   - name: mongodb
     repository: https://charts.bitnami.com/bitnami
-    version: 13.x.x
+    version: 18.x
     condition: mongodb.enabled
