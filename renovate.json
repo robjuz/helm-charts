@@ -3,6 +3,11 @@
   "extends": [
     "config:recommended"
   ],
+  "ignorePaths": [
+    "**/node_modules/**",
+    "**/bower_components/**",
+    "archived/**"
+  ],
   "packageRules": [
     {
       "matchFileNames": ["charts/**"],
@@ -15,7 +20,7 @@
             "version:\\s(?<version>[^\\s]+)"
             ],
           "bumpType": "{{#if isPatch}}patch{{else}}minor{{/if}}",
-        },
+        }
       ]
     }
   ]
