@@ -676,6 +676,19 @@ initJob:
     allowPrivilegeEscalation: false
     capabilities:
       drop: ["ALL"]
+  ## @param initJob.extraEnvVars Array with extra environment variables to add to the Nominatim container
+  ## e.g:
+  ## extraEnvVars:
+  ##   - name: memory_limit
+  ##     value: "256M"
+  ##
+  extraEnvVars: []
+  ## @param initJob.extraEnvVarsCM Name of existing ConfigMap containing extra env vars
+  ##
+  extraEnvVarsCM: ""
+  ## @param initJob.extraEnvVarsSecret Name of existing Secret containing extra env vars
+  ##
+  extraEnvVarsSecret: ""
   ## @param initJob.resourcesPreset Set container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge). This is ignored if resources is set (resources is recommended for production).
   ## More information: https://github.com/bitnami/charts/blob/main/bitnami/common/templates/_resources.tpl#L15
   ##

@@ -182,6 +182,18 @@ spec:
               value: {{ include "nominatim.databaseUser" . }}
             - name: CONTINUE
               value: {{ .Values.initJob.continue | quote }}
+            {{- if .Values.initJob.extraEnvVars }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.initJob.extraEnvVars "context" $) | nindent 12 }}
+            {{- end }}
+          envFrom:
+            {{- if .Values.initJob.extraEnvVarsCM }}
+            - configMapRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.initJob.extraEnvVarsCM "context" $) }}
+            {{- end }}
+            {{- if .Values.initJob.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.initJob.extraEnvVarsSecret "context" $) }}
+            {{- end }}
           command:
             - /bin/bash
             - -ec
