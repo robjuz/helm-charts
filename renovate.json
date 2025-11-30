@@ -11,19 +11,26 @@
   ],
   "packageRules": [
     {
-      "matchFileNames": ["charts/**"],
-      "commitMessageTopic": "{{parentDir}} - {{depName}}",
-      "bumpVersions": [
-        {
-          "filePatterns": ["{{packageFileDir}}/Chart.{yaml,yml}"],
-          "matchStrings": ["version:\\s(?<version>[^\\s]+)"],
-          "bumpType": "{{#if isPatch}}patch{{else}}minor{{/if}}"
-        }
-      ]
+      "description": "Treat every chart as separate group with separate scope and branch prefix",
+      "matchFileNames": [
+        "charts/*/*"
+      ],
+      "additionalBranchPrefix": "{{parentDir}}-",
+      "semanticCommitScope": "{{parentDir}}"
     },
     {
       "matchPackageNames": "docker.io/kimai/kimai2",
       "versioning": "regex:apache-(?<major>\\d+)(\\.(?<minor>\\d+))?(\\.(?<patch>\\d+))?$"
+    },
+        {
+      "description": "Disable digest pinning for regex managers in Chart.yaml used for appVersion upgrading",
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "matchFileNames": [
+        "charts/*/Chart.yaml"
+      ],
+      "pinDigests": false
     }
   ]
 }
