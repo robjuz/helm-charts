@@ -1,7 +1,8 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended"
+    "config:recommended",
+    "customManagers:helmChartYamlAppVersions"
   ],
   "ignorePaths": [
     "**/node_modules/**",
@@ -15,11 +16,8 @@
       "bumpVersions": [
         {
           "filePatterns": ["{{packageFileDir}}/Chart.{yaml,yml}"],
-          "matchStrings": [
-            "appVersion: '(?<currentValue>.*?)'\\s+",
-            "version:\\s(?<version>[^\\s]+)"
-            ],
-          "bumpType": "{{#if isPatch}}patch{{else}}minor{{/if}}",
+          "matchStrings": ["version:\\s(?<version>[^\\s]+)"],
+          "bumpType": "{{#if isPatch}}patch{{else}}minor{{/if}}"
         }
       ]
     },
