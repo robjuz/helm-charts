@@ -577,6 +577,16 @@ initJob:
   importUS_Postcode: false
   importStyle: full
   # customStyleUrl: https://raw.githubusercontent.com/david-mart/Nominatim/master/settings/import-street.style
+  ## @parm initJob.importFilterLua
+  ## If undefined, don't use custom import style
+  ## If defined, use own embedded custom style
+  ## More info about import styles:
+  ## https://nominatim.org/release-docs/develop/customize/Import-Styles/
+  importFilterLua:
+    enabled: false
+    configuration: |-
+      local flex = require('import-full')
+
   threads: 16
   freeze: false
   wikipediaUrl: https://nominatim.org/data/wikimedia-importance.sql.gz
