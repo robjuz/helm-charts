@@ -9,6 +9,8 @@
 ## @param global.storageClass Global StorageClass for Persistent Volume(s)
 ##
 global:
+  security:
+    allowInsecureImages: true #required for bitnamilegacy
   imageRegistry: ""
   ## E.g.
   ## imagePullSecrets:
@@ -26,7 +28,7 @@ kubeVersion: ""
 ## @param nameOverride String to partially override common.names.fullname template (will maintain the release name)
 ##
 nameOverride: ""
-## @param fullnameOverride String to fully override common.names.fullname templatekimai
+## @param fullnameOverride String to fully override common.names.fullname template
 ##
 fullnameOverride: ""
 ## @param commonLabels Labels to add to all deployed resources

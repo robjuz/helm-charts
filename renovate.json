@@ -22,6 +22,10 @@
           "bumpType": "{{#if isPatch}}patch{{else}}minor{{/if}}",
         }
       ]
+    },
+    {
+      "matchPackageNames": "docker.io/kimai/kimai2",
+      "versioning": "regex:apache-(?<major>\\d+)(\\.(?<minor>\\d+))?(\\.(?<patch>\\d+))?$"
     }
   ]
 }
