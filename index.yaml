@@ -1837,6 +1837,26 @@ entries:
       repository: robjuz/helm-charts
     apiVersion: v2
     appVersion: 5.1.0
+    created: "2025-11-30T19:26:23.18488599Z"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      version: 2.21.0
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 15.5.38
+    description: A Helm chart for Kubernetes
+    digest: e4f20e8a263e23a31e7df7b55821f60b3ea44db2e53153c5af4fe1bb09d72e9f
+    name: nominatim
+    type: application
+    urls:
+    - https://github.com/robjuz/helm-charts/releases/download/nominatim-5.6.0/nominatim-5.6.0.tgz
+    version: 5.6.0
+  - annotations:
+      repository: robjuz/helm-charts
+    apiVersion: v2
+    appVersion: 5.1.0
     created: "2025-11-30T19:15:28.456590965Z"
     dependencies:
     - name: common
@@ -3513,4 +3533,4 @@ entries:
     urls:
     - https://github.com/robjuz/helm-charts/releases/download/unpubd-1.0.0/unpubd-1.0.0.tgz
     version: 1.0.0
-generated: "2025-11-30T19:15:28.45713114Z"
+generated: "2025-11-30T19:26:23.185613849Z"
