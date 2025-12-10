@@ -885,7 +885,7 @@ nominatimUi:
     download:
       image: curlimages/curl
   nginx:
-    image: nginx:1.29.3-alpine
+    image: nginx:1.29.4-alpine
     imagePullPolicy: IfNotPresent
 
   # nginxConfiguration configures the nginx webserver that serves the UI.
