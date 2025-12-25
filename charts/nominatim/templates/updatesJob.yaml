@@ -88,7 +88,7 @@ spec:
           restartPolicy: Never
           {{- if .Values.updates.initContainers }}
           initContainers:
-            {{- include "common.tplvalues.render" (dict "value" .Values.updates.initContainers "context" $) | nindent 8 }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.updates.initContainers "context" $) | nindent 12 }}
           {{- end }}
           containers:
             - name: nominatim-updates
