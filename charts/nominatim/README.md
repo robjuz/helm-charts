@@ -565,6 +565,10 @@ certificate management.
 
 ## Upgrading
 
+### To 6.0.0
+
+This major release bumps the version on Nominatim to 5.2.0. See the [migration guide](https://nominatim.org/release-docs/latest/admin/Migration/#510-520) for details
+
 ### To 5.0.0
 
 This major release bumps the version of Nominatim to 5.1.0 and default PostgreSQL to 16.4.0
