@@ -14,20 +14,4 @@ metadata:
 data:
   local.yaml: |-
     {{ .Values.configuration | nindent 4 }}
-    {{- if .Values.kimaiRedisCache }}
-    framework:
-      cache:
-        app: cache.adapter.redis
-        system: cache.adapter.redis
-        default_redis_provider: {{ include "kimai.redisUrl" .  }}
-        pools:
-          app.cache.redis:
-            adapter: cache.adapter.redis
-            public: false
-            default_lifetime: 120
-          doctrine.result_cache_pool:
-            adapter: app.cache.redis
-          doctrine.system_cache_pool:
-            adapter: app.cache.redis
-    {{- end -}}
 {{- end -}}
