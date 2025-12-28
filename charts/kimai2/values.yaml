@@ -75,7 +75,7 @@ diagnosticMode:
 image:
   registry: docker.io
   repository: kimai/kimai2
-  tag: apache-2.44.0
+  tag: apache-2.45.0
   digest: ""
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
