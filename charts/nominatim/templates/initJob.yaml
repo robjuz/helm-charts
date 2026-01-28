@@ -88,9 +88,16 @@ spec:
         - name: download
           image: {{ .Values.initJob.initContainers.download.image }}
           workingDir: /nominatim
+          env:
+            {{- if .Values.extraEnvVars }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.extraEnvVars "context" $) | nindent 12 }}
+            {{- end }}
           volumeMounts:
             - mountPath: /nominatim
               name: data
+            {{- if .Values.extraVolumeMounts }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumeMounts "context" $) | nindent 12 }}
+            {{- end }}
           command:
             - /bin/sh
             - -c
@@ -273,6 +280,9 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
+        {{- if .Values.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}
         {{- if  .Values.flatnode.enabled }}
         - name: flatnode
           persistentVolumeClaim:
