@@ -230,6 +230,26 @@ entries:
     version: 0.1.0
   kimai2:
   - apiVersion: v2
+    appVersion: apache-2.48.0
+    created: "2026-02-01T14:43:46.224512992Z"
+    dependencies:
+    - condition: mariadb.enabled
+      name: mariadb
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 11.5.7
+    - name: common
+      repository: oci://registry-1.docker.io/bitnamicharts
+      tags:
+      - bitnami-common
+      version: 2.x.x
+    description: A Helm chart for Kubernetes
+    digest: 4db6cfa5a6c872057639d50d4bc4ac860bb3698af7c38b29f0a667efe56ab2e3
+    name: kimai2
+    type: application
+    urls:
+    - https://github.com/robjuz/helm-charts/releases/download/kimai2-5.0.3/kimai2-5.0.3.tgz
+    version: 5.0.3
+  - apiVersion: v2
     appVersion: apache-2.47.0
     created: "2026-02-01T14:23:30.117464561Z"
     dependencies:
@@ -3617,4 +3637,4 @@ entries:
     urls:
     - https://github.com/robjuz/helm-charts/releases/download/unpubd-1.0.0/unpubd-1.0.0.tgz
     version: 1.0.0
-generated: "2026-02-01T14:23:30.117943368Z"
+generated: "2026-02-01T14:43:46.224793585Z"
