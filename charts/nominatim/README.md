@@ -199,6 +199,9 @@ Note: The command above may differ a little depending the k8s cluster version yo
 | `initJob.customStyleUrl`    | Custom import style file URL                                               | `nil`                                                                 |
 | `initJob.threads`           | The number of thread used by the import                                    | `16`                                                                  |
 | `initJob.dbWaitTimeout`     | The number of seconds to wait for the DB to be ready to accept connections | `300`                                                                 |
+| `initJob.extraEnvVars`      | Array with extra environment variables to add to the container             | `[]`                                                                  |
+| `initJob.extraVolumeMounts` | Optionally specify extra list of additional volumeMounts for container(s)  | `[]`                                                                  |
+| `initJob.extraVolumes`      | Optionally specify extra list of additional volumes for initJob pods       | `[]`                                                                  |
 
 
 ### Nominatim Initialisation Deployment parameters
