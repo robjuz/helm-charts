@@ -238,7 +238,14 @@ spec:
 
               echo "Import job done. Warming up database indices."
 
-              nominatim admin --warm
+              # `nominatim admin --warm` requires explicit timeout overrides since
+              # Nominatim 5.2.0 (asyncio TimeoutError on Planet imports). Mirrors
+              # the official mediagis/nominatim-docker init.sh wrapper. The `|| true`
+              # is defensive: warming is best-effort, no need to fail a multi-day
+              # import over a non-blocking cache preload.
+              # See: https://github.com/robjuz/helm-charts/issues/199
+              NOMINATIM_QUERY_TIMEOUT=600 NOMINATIM_REQUEST_TIMEOUT=3600 \
+                nominatim admin --warm || echo "WARN: warm exited non-zero, continuing"
 
               echo "Warming finished."
               date "+%Y-%m-%d %H:%M:%S"
