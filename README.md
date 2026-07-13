@@ -23,4 +23,3 @@ helm install [RELEASE_NAME] oci://ghcr.io/robjuz/charts/<chart>
 * [Futtertrog](charts/futtertrog/README.md)
 * [Kimai 2](charts/kimai2/README.md)
 * [Nominatim](charts/nominatim/README.md)
-* [Shopware 6](charts/shopware/README.md)
