@@ -705,6 +705,83 @@ initJob:
   #      cpu: 4000m
   #      memory: 4Gi
 
+## @section Migration Job Parameters
+## A post-install/post-upgrade hook Job that runs `nominatim admin --migrate`.
+## Useful for GitOps flows to ensure the database schema is up to date after upgrades.
+## If no migration is needed, it exits with code 0.
+##
+
+migrationJob:
+  ## @param migrationJob.enabled Enable a post-install/post-upgrade Job that runs `nominatim admin --migrate`
+  ## This is useful in GitOps flows to ensure the database schema is up to date after chart upgrades.
+  ## If no migration is needed, the job exits cleanly with code 0.
+  ##
+  enabled: false
+  ## @param migrationJob.backoffLimit set backoff limit of the job
+  ##
+  backoffLimit: 0
+  ## @param migrationJob.dbWaitTimeout The number of seconds to wait for the DB to be ready to accept connections
+  dbWaitTimeout: 300
+  ## @param migrationJob.annotations Additional annotations on the Job metadata
+  ##
+  annotations: {}
+  ## @param migrationJob.podLabels Additional pod labels
+  ## Ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  ##
+  podLabels: {}
+  ## @param migrationJob.podAnnotations Additional pod annotations
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
+  podAnnotations: {}
+
+  initContainers:
+    waitForDB:
+      image: postgres:14-alpine
+
+  ## Configure Pods Security Context
+  ## @param migrationJob.podSecurityContext.enabled Enabled Migration Job pods' Security Context
+  ## @param migrationJob.podSecurityContext.fsGroup Set Migration Job pod's Security Context fsGroup
+  ## @param migrationJob.podSecurityContext.seccompProfile.type Set Migration Job container's Security Context seccomp profile
+  ##
+  podSecurityContext:
+    enabled: true
+    fsGroup: 101
+    seccompProfile:
+      type: "RuntimeDefault"
+  ## Configure Container Security Context
+  ## @param migrationJob.containerSecurityContext.enabled Enabled Migration Job containers' Security Context
+  ## @param migrationJob.containerSecurityContext.runAsUser Set Migration Job container's Security Context runAsUser
+  ## @param migrationJob.containerSecurityContext.runAsNonRoot Set Migration Job container's Security Context runAsNonRoot
+  ## @param migrationJob.containerSecurityContext.allowPrivilegeEscalation Set Migration Job container's privilege escalation
+  ## @param migrationJob.containerSecurityContext.capabilities.drop Set Migration Job container's Security Context capabilities
+  ##
+  containerSecurityContext:
+    enabled: false
+    runAsUser: 1001
+    runAsNonRoot: true
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: ["ALL"]
+
+  ## @param migrationJob.extraEnvVars Array with extra environment variables to add to the container
+  ## e.g:
+  ## extraEnvVars:
+  ##   - name: memory_limit
+  ##     value: "256M"
+  ##
+  extraEnvVars: []
+  ## @param migrationJob.extraEnvVarsCM Name of existing ConfigMap containing extra env vars
+  ##
+  extraEnvVarsCM: ""
+  ## @param migrationJob.extraEnvVarsSecret Name of existing Secret containing extra env vars
+  ##
+  extraEnvVarsSecret: ""
+  ## @param migrationJob.resourcesPreset Set container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge). This is ignored if resources is set (resources is recommended for production).
+  ## More information: https://github.com/bitnami/charts/blob/main/bitnami/common/templates/_resources.tpl#L15
+  ##
+  resourcesPreset: "nano"
+  resources: {}
+
   ## K8s CronJob configuration
   ## ref: https://kubernetes.io/docs/tasks/job/automated-tasks-with-cron-jobs/
   ##

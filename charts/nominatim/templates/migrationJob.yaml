@@ -1,0 +1,146 @@
+{{- if .Values.migrationJob.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ printf "%s-migrate" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/part-of: nominatim
+    app.kubernetes.io/component: migration
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    {{- if .Values.migrationJob.annotations }}
+    {{- toYaml .Values.migrationJob.annotations | nindent 4 }}
+    {{- end }}
+    {{- if .Values.commonAnnotations }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- end }}
+spec:
+  backoffLimit: {{ .Values.migrationJob.backoffLimit }}
+  template:
+    metadata:
+      {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.migrationJob.podLabels .Values.commonLabels ) "context" . ) }}
+      labels: {{- include "common.labels.standard" ( dict "customLabels" $podLabels "context" $ ) | nindent 8 }}
+        app.kubernetes.io/component: migration
+      {{- if .Values.migrationJob.podAnnotations }}
+      annotations: {{- include "common.tplvalues.render" (dict "value" .Values.migrationJob.podAnnotations "context" $) | nindent 8 }}
+      {{- end }}
+    spec:
+      restartPolicy: Never
+      {{- if .Values.migrationJob.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.migrationJob.podSecurityContext "context" $) | nindent 8 }}
+      {{- end }}
+      initContainers:
+        - name: wait-for-db
+          image: {{ .Values.migrationJob.initContainers.waitForDB.image }}
+          env:
+            - name: NOMINATIM_DATABASE_URL
+              {{- if .Values.externalDatabase.existingSecretDsn }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.externalDatabase.existingSecretDsn }}
+                  key: {{ .Values.externalDatabase.existingSecretDsnKey }}
+              {{- else }}
+              value: {{ include "nominatim.databaseDSN" . }}
+              {{- end }}
+            - name: TIMEOUT_SECONDS
+              value: "{{ .Values.migrationJob.dbWaitTimeout | default 300 }}"
+          args:
+            - /bin/bash
+            - -ec
+            - |
+              echo "Checking database connection at $(date)..."
+
+              # Parse PDO connection string into PostgreSQL parameters
+              CONNECTION_STRING="${NOMINATIM_DATABASE_URL#pgsql:}"
+
+              # Extract parameters
+              DB_NAME=$(echo "$CONNECTION_STRING" | grep -o 'dbname=[^;]*' | cut -d= -f2)
+              DB_HOST=$(echo "$CONNECTION_STRING" | grep -o 'host=[^;]*' | cut -d= -f2)
+              DB_PORT=$(echo "$CONNECTION_STRING" | grep -o 'port=[^;]*' | cut -d= -f2)
+              DB_USER=$(echo "$CONNECTION_STRING" | grep -o 'user=[^;]*' | cut -d= -f2)
+              DB_PASSWORD=$(echo "$CONNECTION_STRING" | grep -o 'password=[^;]*' | cut -d= -f2)
+
+              # Export as PostgreSQL environment variables
+              export PGDATABASE="$DB_NAME"
+              export PGHOST="$DB_HOST"
+              export PGPORT="$DB_PORT"
+              export PGUSER="$DB_USER"
+              export PGPASSWORD="$DB_PASSWORD"
+
+              echo "Waiting for PostgreSQL at $DB_HOST:$DB_PORT..."
+
+              start_time=$(date +%s)
+              attempts=0
+
+              until pg_isready -q; do
+                current_time=$(date +%s)
+                elapsed_time=$((current_time - start_time))
+                attempts=$((attempts + 1))
+
+                if [ $elapsed_time -ge $TIMEOUT_SECONDS ]; then
+                  echo "ERROR: Timeout reached after ${TIMEOUT_SECONDS} seconds and ${attempts} attempts."
+                  echo "Database at ${DB_HOST}:${DB_PORT} is not ready. Please check your database configuration and status."
+                  exit 1
+                fi
+
+                echo "Waiting for database at ${DB_HOST}:${DB_PORT}... Attempt ${attempts} (${elapsed_time}s elapsed)"
+                sleep 2
+              done
+
+              echo "Database at ${DB_HOST}:${DB_PORT} is ready after ${attempts} attempts!"
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          workingDir: /nominatim
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: NOMINATIM_DATABASE_DSN
+              {{- if .Values.externalDatabase.existingSecretDsn }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.externalDatabase.existingSecretDsn }}
+                  key: {{ .Values.externalDatabase.existingSecretDsnKey }}
+              {{- else }}
+              value: {{ include "nominatim.databaseDSN" . }}
+              {{- end }}
+            {{- if .Values.flatnode.enabled }}
+            - name: NOMINATIM_FLATNODE_FILE
+              value: /nominatim/flatnode/flatnode.file
+            {{- end }}
+            {{- if .Values.migrationJob.extraEnvVars }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.migrationJob.extraEnvVars "context" $) | nindent 12 }}
+            {{- end }}
+          envFrom:
+            {{- if .Values.migrationJob.extraEnvVarsCM }}
+            - configMapRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.migrationJob.extraEnvVarsCM "context" $) }}
+            {{- end }}
+            {{- if .Values.migrationJob.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.migrationJob.extraEnvVarsSecret "context" $) }}
+            {{- end }}
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              echo "Running database migration at $(date)..."
+              NOMINATIM_REPLICATION_MAX_DIFF=5000 nominatim admin --migrate
+              echo "Migration finished at $(date)."
+          {{- if .Values.migrationJob.containerSecurityContext.enabled }}
+          securityContext: {{- omit .Values.migrationJob.containerSecurityContext "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.migrationJob.resources }}
+          resources:
+            {{- toYaml .Values.migrationJob.resources | nindent 12 }}
+          {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

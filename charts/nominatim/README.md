@@ -224,6 +224,27 @@ Note: The command above may differ a little depending the k8s cluster version yo
 | `initJob.extraEnvVarsCM`            | Name of existing ConfigMap containing extra env vars                                                                                                                                                              | `""`                                                |
 | `initJob.extraEnvVarsSecret`        | Name of existing Secret containing extra env vars                                                                                                                                                                 | `""`                                                |
 
+### Nominatim Migration Job Parameters
+
+| Name                                        | Description                                                                                                         | Value           |
+|---------------------------------------------|---------------------------------------------------------------------------------------------------------------------|-----------------|
+| `migrationJob.enabled`                      | Enable a post-install/post-upgrade hook that runs `nominatim admin --migrate`                                       | `false`         |
+| `migrationJob.backoffLimit`                 | Set backoff limit of the job                                                                                        | `0`             |
+| `migrationJob.dbWaitTimeout`                | The number of seconds to wait for the DB to be ready to accept connections                                          | `300`           |
+| `migrationJob.annotations`                  | Additional annotations on the Job metadata                                                                          | `{}`            |
+| `migrationJob.podLabels`                    | Extra labels for Migration Job pods                                                                                 | `{}`            |
+| `migrationJob.podAnnotations`               | Annotations for Migration Job pods                                                                                  | `{}`            |
+| `migrationJob.podSecurityContext.enabled`   | Enabled Migration Job pods' Security Context                                                                        | `true`          |
+| `migrationJob.podSecurityContext.fsGroup`   | Set Migration Job pod's Security Context fsGroup                                                                    | `101`           |
+| `migrationJob.containerSecurityContext.enabled` | Enabled Migration Job containers' Security Context                                                              | `false`         |
+| `migrationJob.containerSecurityContext.runAsUser` | Set Migration Job container's Security Context runAsUser                                                      | `1001`          |
+| `migrationJob.containerSecurityContext.runAsNonRoot` | Set Migration Job container's Security Context runAsNonRoot                                                  | `true`          |
+| `migrationJob.extraEnvVars`                 | Array with extra environment variables to add to the container                                                      | `[]`            |
+| `migrationJob.extraEnvVarsCM`               | Name of existing ConfigMap containing extra env vars                                                                | `""`            |
+| `migrationJob.extraEnvVarsSecret`           | Name of existing Secret containing extra env vars                                                                   | `""`            |
+| `migrationJob.resourcesPreset`              | Set container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge) | `nano`          |
+| `migrationJob.resources`                    | Set container requests and limits for different resources like CPU or memory                                        | `{}`            |
+
 ### Nominatim Updates Configuration parameters
 | Name                         | Description                                                              | Value                                                           |
 |------------------------------|--------------------------------------------------------------------------|-----------------------------------------------------------------|
@@ -545,6 +566,24 @@ metadata:
 data:
   POSTGRESQL_DSN: pgsql:dbname=database;host=host;port=port;user=user;password=password
 ```
+
+### Database migrations (GitOps)
+
+When upgrading the Nominatim image version, the database schema may need to be updated. The `migrationJob` provides a
+post-install/post-upgrade hook that runs `nominatim admin --migrate` automatically. This is especially useful in GitOps
+flows where you want the migration to run as part of the deployment process.
+
+If no migration is needed, the job exits cleanly with code 0. If a migration is required, it will be applied and the job
+exits with code 0 on success (or non-zero on failure).
+
+```yaml
+migrationJob:
+  enabled: true
+  resourcesPreset: "small"
+```
+
+The migration hook runs after both `helm install` and `helm upgrade`, ensuring the database schema is always in sync with
+the running Nominatim version.
 
 ### Ingress
 
