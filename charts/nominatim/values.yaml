@@ -712,11 +712,6 @@ initJob:
 ##
 
 migrationJob:
-  ## @param migrationJob.enabled Enable a post-install/post-upgrade Job that runs `nominatim admin --migrate`
-  ## This is useful in GitOps flows to ensure the database schema is up to date after chart upgrades.
-  ## If no migration is needed, the job exits cleanly with code 0.
-  ##
-  enabled: false
   ## @param migrationJob.backoffLimit set backoff limit of the job
   ##
   backoffLimit: 0

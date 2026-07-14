@@ -228,7 +228,6 @@ Note: The command above may differ a little depending the k8s cluster version yo
 
 | Name                                        | Description                                                                                                         | Value           |
 |---------------------------------------------|---------------------------------------------------------------------------------------------------------------------|-----------------|
-| `migrationJob.enabled`                      | Enable a post-install/post-upgrade hook that runs `nominatim admin --migrate`                                       | `false`         |
 | `migrationJob.backoffLimit`                 | Set backoff limit of the job                                                                                        | `0`             |
 | `migrationJob.dbWaitTimeout`                | The number of seconds to wait for the DB to be ready to accept connections                                          | `300`           |
 | `migrationJob.annotations`                  | Additional annotations on the Job metadata                                                                          | `{}`            |
@@ -576,14 +575,9 @@ flows where you want the migration to run as part of the deployment process.
 If no migration is needed, the job exits cleanly with code 0. If a migration is required, it will be applied and the job
 exits with code 0 on success (or non-zero on failure).
 
-```yaml
-migrationJob:
-  enabled: true
-  resourcesPreset: "small"
-```
-
-The migration hook runs after both `helm install` and `helm upgrade`, ensuring the database schema is always in sync with
-the running Nominatim version.
+The migration hook runs after both `helm install` and `helm upgrade`, ensuring the database schema is always in sync
+with the running Nominatim version. It only runs when `initJob.enabled` is `false` — if you use the initJob for a
+fresh import, the migration step is already included in that job's workflow.
 
 ### Ingress
 
