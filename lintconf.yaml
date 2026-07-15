@@ -1,0 +1,12 @@
+rules:
+  document-start:
+    present: false
+  line-length:
+    max: 300
+    level: warning
+  truthy:
+    check-keys: false
+  comments: disable
+  indentation:
+    spaces: 2
+    indent-sequences: true

@@ -22,7 +22,35 @@ helm template my-release charts/<chart>
 helm template my-release charts/nominatim --set initJob.enabled=true
 ```
 
-There is no test suite or chart-testing (ct) config; validate changes with `helm lint` and `helm template`.
+### Makefile Targets
+
+A `Makefile` is available for convenience:
+
+```bash
+make deps       # Build dependencies for all charts
+make lint       # Lint all charts (helm lint)
+make template   # Render templates for all charts (dry-run)
+make ct         # Run chart-testing lint (requires `ct` installed)
+make all        # Run deps + lint + template
+make help       # Show all targets
+```
+
+### Pre-commit Hooks
+
+Install pre-commit (`pip install pre-commit`) and run `pre-commit install`. The config includes:
+
+- **yamllint** — catches YAML formatting issues in `charts/`
+- **helm-docs** — auto-generates README.md parameter tables from values.yaml
+- **pre-commit-hooks** — trailing whitespace, end-of-file, merge conflict detection
+
+### CI/CD
+
+| Workflow | Trigger | What it does |
+|----------|---------|-------------|
+| `.github/workflows/pr.yaml` | PR touching `charts/**` | `ct lint` (Chart.yaml + helm lint + yamllint), template render, version bump check |
+| `.github/workflows/release.yaml` | Push to `master` touching `charts/**` | `lint-test` job runs `ct lint` + helm dep update + template render; gates the `release` job which runs chart-releaser + GHCR push |
+
+Validate changes with `make ct` (chart-testing) or `helm lint` + `helm template`.
 
 ## Release Process
 
@@ -39,7 +67,7 @@ All charts are built on the **Bitnami `common` library chart** and follow Bitnam
 - Templates delegate naming, labels, images, and pull secrets to `common.*` helpers (e.g. `common.names.fullname`, `common.images.image`, `common.labels.standard`, `common.capabilities.*`). Chart-specific helpers in `templates/_helpers.tpl` are thin wrappers around these.
 - Values follow the Bitnami shape: `image.registry/repository/tag`, `commonLabels`/`commonAnnotations`, `extraEnvVars`, `resources`, `volumePermissions`, `extraDeploy` (rendered via `templates/extra-list.yaml`), networkpolicy/pdb/hpa toggles.
 - Databases are bundled Bitnami subcharts (`postgresql` for nominatim, `mariadb` for kimai2/futtertrog) enabled via `<db>.enabled`, with an `externalDatabase.*` alternative — helpers like `nominatim.databaseHost` switch between them.
-- Dependencies are vendored as `.tgz` in each chart's `charts/` directory alongside `Chart.lock`.
+- Dependencies are resolved at release time via `helm dependency update` (CI runs this before chart-releaser). `Chart.lock` tracks the pinned versions. The `.gitignore` excludes `**/charts/*.tgz`.
 
 ### Nominatim specifics
 

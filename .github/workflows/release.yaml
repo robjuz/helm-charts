@@ -8,7 +8,39 @@ on:
       - 'charts/**'
 
 jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.16.4
+
+      - name: Install chart-testing
+        uses: helm/chart-testing-action@v2.7.0
+
+      - name: Add Helm repos
+        run: |
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add bitnami-oci oci://registry-1.docker.io/bitnamicharts
+
+      - name: Run chart-testing (ct lint)
+        run: ct lint --config ct.yaml --validate-chart-schema=false --all
+
+      - name: Run helm dependency update & template render
+        run: |
+          for chart in charts/*/; do
+            helm dependency update "$chart"
+            helm template test "$chart" > /dev/null
+          done
+
   release:
+    needs: lint-test
     permissions:
       contents: write # to push chart release and create a release (helm/chart-releaser-action)
       packages: write # needed for ghcr access
@@ -29,11 +61,15 @@ jobs:
       - name: Install Helm
         uses: azure/setup-helm@v4
         with:
-          version: v3.8.1
+          version: v3.16.4
 
-      - name: Helm Deps
+      - name: Add Helm repos & build dependencies
         run: |
           helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add bitnami-oci oci://registry-1.docker.io/bitnamicharts
+          for chart in charts/*/; do
+            helm dependency update "$chart"
+          done
 
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.7.0
