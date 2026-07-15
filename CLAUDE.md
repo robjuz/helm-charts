@@ -47,8 +47,8 @@ Install pre-commit (`pip install pre-commit`) and run `pre-commit install`. The 
 
 | Workflow | Trigger | What it does |
 |----------|---------|-------------|
-| `.github/workflows/pr.yaml` | PR touching `charts/**` | `ct lint` (Chart.yaml + helm lint + yamllint), template render, version bump check |
-| `.github/workflows/release.yaml` | Push to `master` touching `charts/**` | `lint-test` job runs `ct lint` + helm dep update + template render; gates the `release` job which runs chart-releaser + GHCR push |
+| `.github/workflows/pr.yaml` | PR touching `charts/**` | `ct list-changed` (skips expensive steps if no charts changed), `ct lint`, template render, kind cluster install test (only when charts changed), version bump warning |
+| `.github/workflows/release.yaml` | Push to `master` touching `charts/**` | `lint-test` job runs `ct lint` + helm dep update + template render; gates the `release` job which runs chart-releaser (with GPG signing if secrets are set) + GHCR push |
 
 Validate changes with `make ct` (chart-testing) or `helm lint` + `helm template`.
 
