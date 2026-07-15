@@ -10,9 +10,9 @@ sources:
 
 dependencies:
   - name: common
-    version: 0.x.x
+    version: 2.23.0
     repository: https://charts.bitnami.com/bitnami
   - name: mariadb
+    version: 11.5.7
     repository: https://charts.bitnami.com/bitnami
-    version: 9.x.x
     condition: mariadb.enabled
