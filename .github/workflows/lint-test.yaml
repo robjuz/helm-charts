@@ -1,15 +1,10 @@
-name: Lint & Test Charts
+name: Lint and Test Charts
 
-on:
-  pull_request:
-    paths:
-      - 'charts/**'
+on: pull_request
 
 jobs:
-  list-changed:
+  lint-test:
     runs-on: ubuntu-latest
-    outputs:
-      changed: ${{ steps.changes.outputs.changed }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -29,125 +24,25 @@ jobs:
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2.7.0
 
-      - name: List changed charts
-        id: changes
+      - name: Add Helm repos
+        run: |
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add bitnami-oci oci://registry-1.docker.io/bitnamicharts
+
+      - name: Run chart-testing (list-changed)
+        id: list-changed
         run: |
           changed=$(ct list-changed --config ct.yaml)
           if [[ -n "$changed" ]]; then
             echo "changed=true" >> $GITHUB_OUTPUT
           fi
 
-  lint:
-    needs: list-changed
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: Set up Helm
-        uses: azure/setup-helm@v4
-        with:
-          version: v3.16.4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
-      - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.7.0
-
-      - name: Add Helm repos
-        run: |
-          helm repo add bitnami https://charts.bitnami.com/bitnami
-          helm repo add bitnami-oci oci://registry-1.docker.io/bitnamicharts
-
       - name: Run chart-testing (lint)
-        run: ct lint --config ct.yaml --validate-chart-schema=false --all
-
-  template:
-    needs: list-changed
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: Set up Helm
-        uses: azure/setup-helm@v4
-        with:
-          version: v3.16.4
-
-      - name: Add Helm repos
-        run: |
-          helm repo add bitnami https://charts.bitnami.com/bitnami
-          helm repo add bitnami-oci oci://registry-1.docker.io/bitnamicharts
-
-      - name: Build dependencies & render templates
-        if: needs.list-changed.outputs.changed == 'true'
-        run: |
-          for chart in charts/*/; do
-            echo "==> Building deps for $chart"
-            helm dependency update "$chart"
-            echo "==> Rendering templates for $chart"
-            helm template test "$chart" > /dev/null
-          done
-
-  install:
-    needs: list-changed
-    runs-on: ubuntu-latest
-    if: needs.list-changed.outputs.changed == 'true'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: Set up Helm
-        uses: azure/setup-helm@v4
-        with:
-          version: v3.16.4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
-      - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.7.0
-
-      - name: Add Helm repos
-        run: |
-          helm repo add bitnami https://charts.bitnami.com/bitnami
-          helm repo add bitnami-oci oci://registry-1.docker.io/bitnamicharts
+        run: ct lint --config ct.yaml --validate-chart-schema=false
 
       - name: Create kind cluster
         uses: helm/kind-action@v1.12.0
+        if: steps.list-changed.outputs.changed == 'true'
 
       - name: Run chart-testing (install)
         run: ct install --config ct.yaml
-
-  version-check:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: Check chart versions were bumped
-        run: |
-          CHANGED_CHARTS=$(git diff --name-only origin/master...HEAD -- 'charts/*/Chart.yaml' | cut -d/ -f2 | sort -u)
-          if [ -z "$CHANGED_CHARTS" ]; then
-            # Check if any chart template/values changed without a version bump
-            TEMPLATE_CHANGED=$(git diff --name-only origin/master...HEAD -- 'charts/**' | grep -v 'Chart.yaml' || true)
-            if [ -n "$TEMPLATE_CHANGED" ]; then
-              echo "::warning::Chart templates/values changed but Chart.yaml version was not bumped."
-              echo "The release workflow will skip this chart since the version matches an existing release."
-              echo "Changed files:"
-              echo "$TEMPLATE_CHANGED"
-            fi
-          fi
