@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'charts/**'
 
 jobs:
   release:
@@ -48,7 +50,6 @@ jobs:
       - name: Add dependency chart repos
         run: |
           helm repo add bitnami https://charts.bitnami.com/bitnami
-          helm repo add bitnami-oci oci://registry-1.docker.io/bitnamicharts
 
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.7.0
