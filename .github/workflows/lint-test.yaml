@@ -27,7 +27,6 @@ jobs:
       - name: Add Helm repos
         run: |
           helm repo add bitnami https://charts.bitnami.com/bitnami
-          helm repo add bitnami-oci oci://registry-1.docker.io/bitnamicharts
 
       - name: Run chart-testing (list-changed)
         id: list-changed
