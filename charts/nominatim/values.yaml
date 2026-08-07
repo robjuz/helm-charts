@@ -705,6 +705,99 @@ initJob:
   #      cpu: 4000m
   #      memory: 4Gi
 
+## Database migration job, run as a Helm post-install/post-upgrade hook
+## It runs `nominatim admin --migrate`, which is a no-op when the database is already
+## at the version of the deployed Nominatim release
+## ref: https://nominatim.org/release-docs/latest/admin/Migration/
+##
+migrateJob:
+  ## @param migrateJob.enabled Run a post-install/post-upgrade hook Job migrating the database schema. Ignored when `initJob.enabled` is set
+  ##
+  enabled: true
+  ## @param migrateJob.dbWaitTimeout The number of seconds to wait for the DB to be ready to accept connections
+  ##
+  dbWaitTimeout: 300
+  ## @param migrateJob.backoffLimit Set backoff limit of the job
+  ##
+  backoffLimit: 1
+  ## @param migrateJob.activeDeadlineSeconds Set the duration in seconds the job may be active before the system tries to terminate it
+  ##
+  activeDeadlineSeconds: ""
+  ## @param migrateJob.ttlSecondsAfterFinished Set the number of seconds a finished job is kept before being deleted
+  ##
+  ttlSecondsAfterFinished: ""
+  ## @param migrateJob.annotations [object] Add annotations to the job
+  ##
+  annotations: {}
+  ## @param migrateJob.podLabels Additional pod labels
+  ## Ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  ##
+  podLabels: {}
+  ## @param migrateJob.podAnnotations Additional pod annotations
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
+  podAnnotations: {}
+  ## @param migrateJob.nodeSelector Node labels for pod assignment
+  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: {}
+  ## @param migrateJob.tolerations Tolerations for pod assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
+  ## Configure Pods Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ## @param migrateJob.podSecurityContext.enabled Enabled Nominatim Migration pods' Security Context
+  ## @param migrateJob.podSecurityContext.fsGroup Set Nominatim Migration pod's Security Context fsGroup
+  ## @param migrateJob.podSecurityContext.seccompProfile.type Set Nominatim Migration container's Security Context seccomp profile
+  ##
+  podSecurityContext:
+    enabled: true
+    fsGroup: 101
+    seccompProfile:
+      type: "RuntimeDefault"
+  ## Configure Container Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+  ## @param migrateJob.containerSecurityContext.enabled Enabled Nominatim Migration containers' Security Context
+  ## @param migrateJob.containerSecurityContext.runAsUser Set Nominatim Migration container's Security Context runAsUser
+  ## @param migrateJob.containerSecurityContext.runAsNonRoot Set Nominatim Migration container's Security Context runAsNonRoot
+  ## @param migrateJob.containerSecurityContext.allowPrivilegeEscalation Set Nominatim Migration container's privilege escalation
+  ## @param migrateJob.containerSecurityContext.capabilities.drop Set Nominatim Migration container's Security Context runAsNonRoot
+  ##
+  containerSecurityContext:
+    enabled: false
+    runAsUser: 1001
+    runAsNonRoot: true
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: ["ALL"]
+  ## @param migrateJob.extraEnvVars Array with extra environment variables to add to the Nominatim container
+  ## e.g:
+  ## extraEnvVars:
+  ##   - name: memory_limit
+  ##     value: "256M"
+  ##
+  extraEnvVars: []
+  ## @param migrateJob.extraEnvVarsCM Name of existing ConfigMap containing extra env vars
+  ##
+  extraEnvVarsCM: ""
+  ## @param migrateJob.extraEnvVarsSecret Name of existing Secret containing extra env vars
+  ##
+  extraEnvVarsSecret: ""
+  ## @param migrateJob.extraVolumes Optionally specify extra list of additional volumes for the Nominatim migration pod
+  ##
+  extraVolumes: []
+  ## @param migrateJob.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the Nominatim migration container
+  ##
+  extraVolumeMounts: []
+  ## @param migrateJob.resourcesPreset Set container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge). This is ignored if resources is set (resources is recommended for production).
+  ## More information: https://github.com/bitnami/charts/blob/main/bitnami/common/templates/_resources.tpl#L15
+  ##
+  resourcesPreset: "micro"
+  ## @param migrateJob.resources Set container requests and limits for different resources like CPU or memory (essential for production workloads)
+  ##
+  resources: {}
+
   ## K8s CronJob configuration
   ## ref: https://kubernetes.io/docs/tasks/job/automated-tasks-with-cron-jobs/
   ##

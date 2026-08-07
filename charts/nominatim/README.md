@@ -224,6 +224,36 @@ Note: The command above may differ a little depending the k8s cluster version yo
 | `initJob.extraEnvVarsCM`            | Name of existing ConfigMap containing extra env vars                                                                                                                                                              | `""`                                                |
 | `initJob.extraEnvVarsSecret`        | Name of existing Secret containing extra env vars                                                                                                                                                                 | `""`                                                |
 
+### Nominatim Migration Job parameters
+
+| Name                                                          | Description                                                                                                                                                                                                      | Value            |
+|---------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------|
+| `migrateJob.enabled`                                          | Run a post-install/post-upgrade hook Job migrating the database schema. Ignored when `initJob.enabled` is set                                                                                                     | `true`           |
+| `migrateJob.dbWaitTimeout`                                    | The number of seconds to wait for the DB to be ready to accept connections                                                                                                                                       | `300`            |
+| `migrateJob.backoffLimit`                                     | Set backoff limit of the job                                                                                                                                                                                     | `1`              |
+| `migrateJob.activeDeadlineSeconds`                            | Set the duration in seconds the job may be active before the system tries to terminate it                                                                                                                        | `""`             |
+| `migrateJob.ttlSecondsAfterFinished`                          | Set the number of seconds a finished job is kept before being deleted                                                                                                                                            | `""`             |
+| `migrateJob.annotations`                                      | Add annotations to the job                                                                                                                                                                                       | `{}`             |
+| `migrateJob.podLabels`                                        | Additional pod labels                                                                                                                                                                                            | `{}`             |
+| `migrateJob.podAnnotations`                                   | Additional pod annotations                                                                                                                                                                                       | `{}`             |
+| `migrateJob.nodeSelector`                                     | Node labels for pod assignment                                                                                                                                                                                   | `{}`             |
+| `migrateJob.tolerations`                                      | Tolerations for pod assignment                                                                                                                                                                                   | `[]`             |
+| `migrateJob.podSecurityContext.enabled`                       | Enabled Nominatim Migration pods' Security Context                                                                                                                                                               | `true`           |
+| `migrateJob.podSecurityContext.fsGroup`                       | Set Nominatim Migration pod's Security Context fsGroup                                                                                                                                                           | `101`            |
+| `migrateJob.podSecurityContext.seccompProfile.type`           | Set Nominatim Migration container's Security Context seccomp profile                                                                                                                                             | `RuntimeDefault` |
+| `migrateJob.containerSecurityContext.enabled`                 | Enabled Nominatim Migration containers' Security Context                                                                                                                                                         | `false`          |
+| `migrateJob.containerSecurityContext.runAsUser`               | Set Nominatim Migration container's Security Context runAsUser                                                                                                                                                   | `1001`           |
+| `migrateJob.containerSecurityContext.runAsNonRoot`            | Set Nominatim Migration container's Security Context runAsNonRoot                                                                                                                                                | `true`           |
+| `migrateJob.containerSecurityContext.allowPrivilegeEscalation` | Set Nominatim Migration container's privilege escalation                                                                                                                                                        | `false`          |
+| `migrateJob.containerSecurityContext.capabilities.drop`       | Set Nominatim Migration container's Security Context capabilities to drop                                                                                                                                        | `["ALL"]`        |
+| `migrateJob.extraEnvVars`                                     | Array with extra environment variables to add to the Nominatim container                                                                                                                                         | `[]`             |
+| `migrateJob.extraEnvVarsCM`                                   | Name of existing ConfigMap containing extra env vars                                                                                                                                                             | `""`             |
+| `migrateJob.extraEnvVarsSecret`                               | Name of existing Secret containing extra env vars                                                                                                                                                                | `""`             |
+| `migrateJob.extraVolumes`                                     | Optionally specify extra list of additional volumes for the Nominatim migration pod                                                                                                                              | `[]`             |
+| `migrateJob.extraVolumeMounts`                                | Optionally specify extra list of additional volumeMounts for the Nominatim migration container                                                                                                                   | `[]`             |
+| `migrateJob.resourcesPreset`                                  | Set container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge). This is ignored if resources is set (resources is recommended for production). | `micro`          |
+| `migrateJob.resources`                                        | Set container requests and limits for different resources like CPU or memory (essential for production workloads)                                                                                                | `{}`             |
+
 ### Nominatim Updates Configuration parameters
 | Name                         | Description                                                              | Value                                                           |
 |------------------------------|--------------------------------------------------------------------------|-----------------------------------------------------------------|
@@ -474,6 +504,18 @@ Using flatnode with replication enabled requires the usage of a ReadWriteMany vo
 be shared within the pods.
 This also applies when scaling the nominatim deployment.
 
+### Database migration
+
+Whenever the Nominatim version changes, the database schema has to be migrated. The chart does this for you with a
+`post-install`/`post-upgrade` hook Job running `nominatim admin --migrate`, so a GitOps flow like ArgoCD (which maps the
+hook to a `PostSync` resource) picks up the migration without a manual step.
+
+The job is a no-op when there is nothing to do: it exits successfully when the database is already at the version of the
+deployed release, and also when no Nominatim database exists yet. It is skipped entirely while `initJob.enabled` is set,
+because during the initialisation phase the database is built from scratch anyway.
+
+Set `migrateJob.enabled: false` to opt out and migrate manually.
+
 ### PVC For data
 
 When importing large extracts (Europe/Planet) the data needed to be downloaded are quite big. If your server has not
@@ -567,6 +609,11 @@ The chart also facilitates the creation of TLS secrets for use with the Ingress 
 certificate management.
 
 ## Upgrading
+
+### To 6.2.0
+
+This release adds the database migration job, which is enabled by default. From now on every `helm upgrade` runs
+`nominatim admin --migrate` against the database. Set `migrateJob.enabled: false` to keep migrating manually.
 
 ### To 6.0.0
 
