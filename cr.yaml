@@ -1,0 +1,8 @@
+# Chart Releaser configuration
+# See: https://github.com/helm/chart-releaser#config-file
+
+# Directory where chart packages are stored (default: .cr-release-packages)
+release-name-template: "{{ .Name }}-{{ .Version }}"
+
+# Skip creating a GitHub Release if one already exists
+skip_existing: true
