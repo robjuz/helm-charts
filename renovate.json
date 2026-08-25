@@ -24,6 +24,10 @@
     {
       "matchPackageNames": "docker.io/kimai/kimai2",
       "versioning": "regex:apache-(?<major>\\d+)(\\.(?<minor>\\d+))?(\\.(?<patch>\\d+))?$"
+    },
+    {
+      "matchPackageNames": ["nginx"],
+      "automerge": true
     }
   ]
 }
