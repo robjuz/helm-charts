@@ -591,6 +591,28 @@ initJob:
   freeze: false
   wikipediaUrl: https://nominatim.org/data/wikimedia-importance.sql.gz
 
+  ## Warm-up step (`nominatim admin --warm`) configuration.
+  ## Since Nominatim 5.2.0, the warm step requires explicit timeout overrides
+  ## to avoid an asyncio TimeoutError on large imports (notably Planet OSM).
+  ## Defaults mirror the official mediagis/nominatim-docker init.sh wrapper.
+  ## See: https://github.com/robjuz/helm-charts/issues/199
+  warm:
+    ## @param initJob.warm.enabled Whether to run `nominatim admin --warm` after import.
+    ## Disabling skips the cache preload entirely; the database will warm naturally
+    ## on first user queries. Useful when warm consistently times out and warming
+    ## via HTTP requests on the running service is preferred.
+    ##
+    enabled: true
+    ## @param initJob.warm.queryTimeout Value of NOMINATIM_QUERY_TIMEOUT during warm.
+    ## Bound to the per-query asyncio timeout in nominatim_api.
+    ##
+    queryTimeout: 600
+    ## @param initJob.warm.requestTimeout Value of NOMINATIM_REQUEST_TIMEOUT during warm.
+    ## This is the variable that actually controls the timeout that fires on Planet
+    ## imports; the default of 60s in env.defaults is too short for cold-cache warm.
+    ##
+    requestTimeout: 3600
+
   ## @param initJob.continue Nominatim import CLI continue arg
   ## If undefined (default) `--continue` flag is not set on nominatim import
   ## If defined, `nominatim import --continue <step>` is set
