@@ -28,6 +28,11 @@
     {
       "matchPackageNames": ["nginx"],
       "automerge": true
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
     }
   ]
 }
