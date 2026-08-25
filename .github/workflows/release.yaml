@@ -29,7 +29,7 @@ jobs:
       - name: Install Helm
         uses: azure/setup-helm@v4
         with:
-          version: v3.8.1
+          version: v3.21.4
 
       - name: Helm Deps
         run: |
