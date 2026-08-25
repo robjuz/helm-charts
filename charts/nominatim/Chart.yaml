@@ -34,3 +34,4 @@ dependencies:
 
 annotations:
   repository: robjuz/helm-charts
+  dockerImage: "mediagis/nominatim"
