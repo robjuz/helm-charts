@@ -784,6 +784,29 @@ migrateJob:
   ## @param migrateJob.extraEnvVarsSecret Name of existing Secret containing extra env vars
   ##
   extraEnvVarsSecret: ""
+  ## @param migrateJob.initContainers Add additional init containers to the Nominatim migration pod
+  ## Also the place for a native sidecar (an init container with `restartPolicy: Always`), which is
+  ## what a database proxy has to be here: a plain sidecar container never exits, so the Job would
+  ## never complete.
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/sidecar-containers/
+  ## e.g:
+  ## initContainers:
+  ##  - name: cloud-sql-proxy
+  ##    image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:latest
+  ##    restartPolicy: Always
+  ##    args: ['--port=5432', 'project:region:instance']
+  ##
+  initContainers: []
+  ## @param migrateJob.sidecars Add additional sidecar containers to the Nominatim migration pod
+  ## Only for containers that terminate on their own; anything long-running belongs in
+  ## `migrateJob.initContainers` as a native sidecar, or the Job never completes.
+  ## e.g:
+  ## sidecars:
+  ##   - name: your-image-name
+  ##     image: your-image
+  ##     imagePullPolicy: Always
+  ##
+  sidecars: []
   ## @param migrateJob.extraVolumes Optionally specify extra list of additional volumes for the Nominatim migration pod
   ##
   extraVolumes: []
