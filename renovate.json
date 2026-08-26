@@ -1,9 +1,9 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended",
-    "customManagers:helmChartYamlAppVersions"
+    "config:recommended"
   ],
+  "helmChartYamlAppVersions": true,
   "ignorePaths": [
     "**/node_modules/**",
     "**/bower_components/**",
