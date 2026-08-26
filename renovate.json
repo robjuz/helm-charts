@@ -10,15 +10,15 @@
   ],
   "packageRules": [
     {
-      "matchFileNames": ["charts/**"],
-      "commitMessageTopic": "{{parentDir}} - {{depName}}",
-      "bumpVersions": [
-        {
-          "filePatterns": ["{{packageFileDir}}/Chart.{yaml,yml}"],
-          "matchStrings": ["version:\\s(?<version>[^\\s]+)"],
-          "bumpType": "patch"
-        }
-      ]
+      "description": "Bump helm chart versions by a patch when updating values files. Digests, pins, rollbacks, replacements and pinDigest updates are deliberately ignored since in our use case, these need a manual decision about the version bump for the chart. This can be removed when https://github.com/renovatebot/renovate/issues/8231 is implemented and enabled.",
+      "matchManagers": ["helm-values"],
+      "postUpgradeTasks": {
+        "commands": [
+          "bash scripts/bump-chart-version.sh '{{{parentDir}}}' '{{{isMajor}}}' '{{{isMinor}}}' '{{{isPatch}}}'"
+        ],
+        "fileFilters": ["**/Chart.yaml"],
+        "executionMode": "branch"
+      }
     },
     {
       "matchPackageNames": ["nginx"],
