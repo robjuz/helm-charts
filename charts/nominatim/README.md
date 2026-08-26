@@ -220,6 +220,8 @@ Note: The command above may differ a little depending the k8s cluster version yo
 | `initJob.resourcesPreset`           | Set container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge). This is ignored if resources is set (resources is recommended for production). | `micro`                                             |
 | `initJob.resources`                 | Set container requests and limits for different resources like CPU or memory (essential for production workloads)                                                                                                 | `{}`                                                |
 | `initJob.continue`                  | Select init step to continue from                                                                                                                                                                                 | `nil` `[ load-data \| indexing \| db-postprocess ]` |
+| `initJob.extraInitContainers`       | Add additional init containers to the Nominatim init pod, rendered before `wait-for-db`                                                                                                                           | `[]`                                                |
+| `initJob.sidecars`                  | Add additional sidecar containers to the Nominatim init pod, for containers that terminate on their own                                                                                                           | `[]`                                                |
 | `initJob.extraEnvVars`              | Array with extra environment variables to add to the Nominatim container                                                                                                                                          | `[]`                                                |
 | `initJob.extraEnvVarsCM`            | Name of existing ConfigMap containing extra env vars                                                                                                                                                              | `""`                                                |
 | `initJob.extraEnvVarsSecret`        | Name of existing Secret containing extra env vars                                                                                                                                                                 | `""`                                                |
@@ -523,6 +525,9 @@ When the database is reached through a proxy (Cloud SQL Auth Proxy, AlloyDB Auth
 [native sidecar](https://kubernetes.io/docs/concepts/workloads/pods/sidecar-containers/). A proxy placed in
 `migrateJob.sidecars` never exits, so the pod would keep running after the migration finishes and the Job would never
 complete.
+
+The same applies to the init Job, via `initJob.extraInitContainers` — rendered ahead of the built-in `wait-for-db`, so
+the proxy is already up when the database is first probed.
 
 ### PVC For data
 

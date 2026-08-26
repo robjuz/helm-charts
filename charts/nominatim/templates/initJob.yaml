@@ -26,6 +26,9 @@ spec:
       securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.initJob.podSecurityContext "context" $) | nindent 8 }}
       {{- end }}
       initContainers:
+        {{- if .Values.initJob.extraInitContainers }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.initJob.extraInitContainers "context" $) | nindent 8 }}
+        {{- end }}
         - name: wait-for-db
           image: {{ .Values.initJob.initContainers.waitForDB.image }}
           env:
@@ -271,6 +274,9 @@ spec:
           resources:
             {{- toYaml .Values.initJob.resources | nindent 12 }}
           {{- end }}
+        {{- if .Values.initJob.sidecars }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.initJob.sidecars "context" $) | nindent 8 }}
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

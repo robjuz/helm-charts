@@ -676,6 +676,25 @@ initJob:
     allowPrivilegeEscalation: false
     capabilities:
       drop: ["ALL"]
+  ## @param initJob.extraInitContainers Add additional init containers to the Nominatim init pod, rendered before `wait-for-db`
+  ## A database proxy belongs here as a native sidecar (`restartPolicy: Always`): it is rendered first, so it is
+  ## already running by the time `wait-for-db` tries to connect. A plain sidecar container never exits and the Job
+  ## would never complete. This is a separate key because `initJob.initContainers` is a map configuring the images
+  ## of the built-in init containers, not a list.
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/sidecar-containers/
+  ## e.g:
+  ## extraInitContainers:
+  ##  - name: cloud-sql-proxy
+  ##    image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:latest
+  ##    restartPolicy: Always
+  ##    args: ['--port=5432', 'project:region:instance']
+  ##
+  extraInitContainers: []
+  ## @param initJob.sidecars Add additional sidecar containers to the Nominatim init pod
+  ## Only for containers that terminate on their own; anything long-running belongs in
+  ## `initJob.extraInitContainers` as a native sidecar, or the Job never completes.
+  ##
+  sidecars: []
   ## @param initJob.extraEnvVars Array with extra environment variables to add to the Nominatim container
   ## e.g:
   ## extraEnvVars:
