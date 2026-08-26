@@ -3,7 +3,6 @@
   "extends": [
     "config:recommended"
   ],
-  "helmChartYamlAppVersions": true,
   "ignorePaths": [
     "**/node_modules/**",
     "**/bower_components/**",
