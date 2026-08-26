@@ -47,6 +47,10 @@ spec:
       {{- if .Values.migrateJob.podSecurityContext.enabled }}
       securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.migrateJob.podSecurityContext "context" $) | nindent 8 }}
       {{- end }}
+      {{- if .Values.migrateJob.initContainers }}
+      initContainers:
+        {{- include "common.tplvalues.render" (dict "value" .Values.migrateJob.initContainers "context" $) | nindent 8 }}
+      {{- end }}
       containers:
         - name: nominatim-migrate
           image: {{ include "nominatim.image" . }}
@@ -140,6 +144,9 @@ spec:
           {{- else if ne .Values.migrateJob.resourcesPreset "none" }}
           resources: {{- include "common.resources.preset" (dict "type" .Values.migrateJob.resourcesPreset) | nindent 12 }}
           {{- end }}
+        {{- if .Values.migrateJob.sidecars }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.migrateJob.sidecars "context" $) | nindent 8 }}
+        {{- end }}
       volumes:
         {{- if .Values.flatnode.enabled }}
         - name: nominatim

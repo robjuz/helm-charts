@@ -249,6 +249,8 @@ Note: The command above may differ a little depending the k8s cluster version yo
 | `migrateJob.extraEnvVars`                                     | Array with extra environment variables to add to the Nominatim container                                                                                                                                         | `[]`             |
 | `migrateJob.extraEnvVarsCM`                                   | Name of existing ConfigMap containing extra env vars                                                                                                                                                             | `""`             |
 | `migrateJob.extraEnvVarsSecret`                               | Name of existing Secret containing extra env vars                                                                                                                                                                | `""`             |
+| `migrateJob.initContainers`                                   | Add additional init containers to the Nominatim migration pod, including native sidecars (`restartPolicy: Always`) such as a database proxy                                                                       | `[]`             |
+| `migrateJob.sidecars`                                         | Add additional sidecar containers to the Nominatim migration pod. Only for containers that terminate on their own                                                                                                 | `[]`             |
 | `migrateJob.extraVolumes`                                     | Optionally specify extra list of additional volumes for the Nominatim migration pod                                                                                                                              | `[]`             |
 | `migrateJob.extraVolumeMounts`                                | Optionally specify extra list of additional volumeMounts for the Nominatim migration container                                                                                                                   | `[]`             |
 | `migrateJob.resourcesPreset`                                  | Set container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge). This is ignored if resources is set (resources is recommended for production). | `micro`          |
@@ -515,6 +517,12 @@ deployed release, and also when no Nominatim database exists yet. It is skipped 
 because during the initialisation phase the database is built from scratch anyway.
 
 Set `migrateJob.enabled: false` to opt out and migrate manually.
+
+When the database is reached through a proxy (Cloud SQL Auth Proxy, AlloyDB Auth Proxy, or similar), add it under
+`migrateJob.initContainers` with `restartPolicy: Always` so it becomes a
+[native sidecar](https://kubernetes.io/docs/concepts/workloads/pods/sidecar-containers/). A proxy placed in
+`migrateJob.sidecars` never exits, so the pod would keep running after the migration finishes and the Job would never
+complete.
 
 ### PVC For data
 
