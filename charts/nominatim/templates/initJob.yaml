@@ -1,4 +1,5 @@
 {{- if .Values.initJob.enabled }}
+{{- include "nominatim.flatnode.validate" . }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -299,10 +300,20 @@ spec:
         {{- if .Values.initJob.extraVolumes }}
         {{- include "common.tplvalues.render" (dict "value" .Values.initJob.extraVolumes "context" $) | nindent 8 }}
         {{- end }}
-        {{- if  .Values.flatnode.enabled }}
+        {{- if .Values.flatnode.enabled }}
         - name: flatnode
+          {{- if .Values.flatnode.emptyDir.enabled }}
+          emptyDir:
+            {{- with .Values.flatnode.emptyDir.medium }}
+            medium: {{ . }}
+            {{- end }}
+            {{- with .Values.flatnode.emptyDir.sizeLimit }}
+            sizeLimit: {{ . }}
+            {{- end }}
+          {{- else }}
           persistentVolumeClaim:
             claimName: {{ include "common.names.fullname" . }}
+          {{- end }}
         {{- end }}
         - name: dshm
           emptyDir:

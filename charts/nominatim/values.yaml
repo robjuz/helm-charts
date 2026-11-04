@@ -1011,6 +1011,23 @@ flatnode:
   ## @param flatnode.annotations Persistent Volume Claim annotations
   ##
   annotations: {}
+  ## Keep the flatnode file in an emptyDir instead of a PVC (import only).
+  ## The flatnode is read randomly, one node at a time, while osm2pgsql processes
+  ## ways and relations: its speed is bound by the storage latency. An emptyDir
+  ## lands on the node's ephemeral storage, which can be a local NVMe instance
+  ## store (e.g. AWS `*d` instances with Karpenter `instanceStorePolicy: RAID0`).
+  ## The file is lost with the import pod, so this mode is only valid for a
+  ## one-shot import: no PVC is created, the service Deployment does not mount
+  ## the flatnode, and `updates.enabled` is refused (replication needs the file).
+  ## Request `ephemeral-storage` in `initJob.resources` to size the node.
+  ## @param flatnode.emptyDir.enabled Use an emptyDir for the flatnode file of the init job
+  ## @param flatnode.emptyDir.sizeLimit emptyDir size limit (the pod is evicted beyond it, leave empty for none)
+  ## @param flatnode.emptyDir.medium emptyDir medium ("" = node disk, "Memory" = tmpfs)
+  ##
+  emptyDir:
+    enabled: false
+    sizeLimit: ""
+    medium: ""
 ## Init containers parameters:
 ## volumePermissions: Change the owner and group of the persistent volume(s) mountpoint(s) to 'runAsUser:fsGroup' on each node
 ##

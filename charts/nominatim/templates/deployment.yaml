@@ -1,4 +1,5 @@
 {{- if not .Values.initJob.enabled }}
+{{- include "nominatim.flatnode.validate" . }}
 apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
 kind: Deployment
 metadata:
@@ -82,7 +83,7 @@ spec:
       {{- if .Values.topologySpreadConstraints }}
       topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.topologySpreadConstraints "context" .) | nindent 8 }}
       {{- end }}
-      {{- if or (and .Values.podSecurityContext.enabled .Values.volumePermissions.enabled .Values.flatnode.enabled) (.Values.nominatimUi.enabled) (.Values.initContainers) }}
+      {{- if or (and .Values.podSecurityContext.enabled .Values.volumePermissions.enabled (include "nominatim.flatnode.pvc" .)) (.Values.nominatimUi.enabled) (.Values.initContainers) }}
       initContainers:
        {{- if .Values.nominatimUi.enabled }}
         - name: nominatim-ui-download
@@ -112,7 +113,7 @@ spec:
             - mountPath: /nominatim/nominatim-ui
               name: nominatim-ui
       {{- end }}
-      {{- if and .Values.podSecurityContext.enabled .Values.volumePermissions.enabled .Values.flatnode.enabled }}
+      {{- if and .Values.podSecurityContext.enabled .Values.volumePermissions.enabled (include "nominatim.flatnode.pvc" .) }}
         - name: volume-permissions
           image: "{{ include "nominatim.volumePermissions.image" . }}"
           imagePullPolicy: {{ .Values.volumePermissions.image.pullPolicy | quote }}
@@ -229,7 +230,7 @@ spec:
             {{- end }}
             - mountPath: /dev/shm
               name: dshm
-              {{- if .Values.flatnode.enabled }}
+              {{- if include "nominatim.flatnode.pvc" . }}
             - mountPath: /nominatim/flatnode
               name: flatnode
               {{- end }}
@@ -237,7 +238,7 @@ spec:
         {{- include "common.tplvalues.render" (dict "value" .Values.sidecars "context" $) | nindent 8 }}
         {{- end }}
       volumes:
-        {{- if  .Values.flatnode.enabled }}
+        {{- if include "nominatim.flatnode.pvc" . }}
         - name: flatnode
           persistentVolumeClaim:
             claimName: {{ .Values.flatnode.existingClaim | default (include "common.names.fullname" .) }}
