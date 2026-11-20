@@ -138,5 +138,5 @@ Return the Database Password
 Create the Database URL. For the time being, this supports only an integrated MySQL
 */}}
 {{- define "kimai.databaseUrl" -}}
-mysql://{{ include "kimai.databaseUser" . }}:{{ include "kimai.databasePassword" . }}@{{ include "kimai.databaseHost" . }}/{{ include "kimai.databaseName" . }}?charset=utf8&serverVersion={{ include "kimai.databaseServerVersion" . }}
+mysql://{{ include "kimai.databaseUser" . }}:{{ include "kimai.databasePassword" . }}@{{ include "kimai.databaseHost" . }}:{{ include "kimai.databasePort" . }}/{{ include "kimai.databaseName" . }}?charset=utf8&serverVersion={{ include "kimai.databaseServerVersion" . }}
 {{- end }}
