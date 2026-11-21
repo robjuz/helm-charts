@@ -1,5 +1,4 @@
 {{- if .Values.initJob.enabled }}
-{{- include "nominatim.flatnode.validate" . }}
 apiVersion: batch/v1
 kind: Job
 metadata:

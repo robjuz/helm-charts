@@ -1,5 +1,4 @@
 {{- if not .Values.initJob.enabled }}
-{{- include "nominatim.flatnode.validate" . }}
 apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
 kind: Deployment
 metadata:
