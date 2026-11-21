@@ -1,3 +1,4 @@
+{{- include "nominatim.flatnode.validate" . -}}
 1. Get the application URL by running these commands:
 {{- if .Values.ingress.enabled }}
   http{{ if $.Values.ingress.tls }}s{{ end }}://{{ .Values.ingress.hostname }}

@@ -414,6 +414,9 @@ Note: The command above may differ a little depending the k8s cluster version yo
 | `flatnode.existingClaim`                               | The name of an existing PVC to use for flatnode                                                               | `nil`                   |
 | `flatnode.selector`                                    | Selector to match an existing Persistent Volume for Nominatim data PVC                                        | `{}`                    |
 | `flatnode.annotations`                                 | Persistent Volume Claim annotations                                                                           | `{}`                    |
+| `flatnode.emptyDir.enabled`                            | Use an emptyDir for the flatnode file of the init job (one-shot import, no PVC)                               | `false`                 |
+| `flatnode.emptyDir.sizeLimit`                          | emptyDir size limit (the pod is evicted beyond it, leave empty for none)                                      | `""`                    |
+| `flatnode.emptyDir.medium`                             | emptyDir medium ("" = node disk, "Memory" = tmpfs)                                                            | `""`                    |
 | `volumePermissions.enabled`                            | Enable init container that changes the owner/group of the PV mount point to `runAsUser:fsGroup`               | `false`                 |
 | `volumePermissions.image.registry`                     | Bitnami Shell image registry                                                                                  | `docker.io`             |
 | `volumePermissions.image.repository`                   | Bitnami Shell image repository                                                                                | `bitnamilegacy/os-shell` |

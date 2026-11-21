@@ -1,4 +1,4 @@
-{{- if and .Values.flatnode.enabled (not .Values.flatnode.existingClaim) }}
+{{- if and (include "nominatim.flatnode.pvc" .) (not .Values.flatnode.existingClaim) }}
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:

@@ -109,3 +109,24 @@ Create user agent string for curl
 {{- define "chart.userAgent" -}}
 {{- printf "%s/%s:%s" .Chart.Annotations.Repository .Chart.Name .Chart.Version }}
 {{- end }}
+
+{{/*
+Return "true" when the flatnode file lives on a PVC (flatnode enabled, not in emptyDir mode).
+*/}}
+{{- define "nominatim.flatnode.pvc" -}}
+{{- if and .Values.flatnode.enabled (not .Values.flatnode.emptyDir.enabled) -}}
+true
+{{- end -}}
+{{- end -}}
+
+{{/*
+Fail on settings that contradict the flatnode emptyDir mode.
+*/}}
+{{- define "nominatim.flatnode.validate" -}}
+{{- if and .Values.flatnode.emptyDir.enabled (not .Values.flatnode.enabled) -}}
+{{- fail "flatnode.emptyDir.enabled requires flatnode.enabled=true" -}}
+{{- end -}}
+{{- if and .Values.flatnode.emptyDir.enabled .Values.updates.enabled -}}
+{{- fail "flatnode.emptyDir.enabled is incompatible with updates.enabled: the flatnode file is lost with the import pod and replication needs it" -}}
+{{- end -}}
+{{- end -}}
