@@ -29,7 +29,7 @@ spec:
               {{- include "common.tplvalues.render" (dict "value" .Values.networkPolicy.ingress.podSelector "context" $) | nindent 14 }}
         {{- end }}
     {{- end }}
-    {{- if and .Values.metrics.enabled .Values.networkPolicy.metrics.enabled (or .Values.networkPolicy.metrics.namespaceSelector .Values.networkPolicy.metrics.podSelector) }}
+    {{- if and .Values.networkPolicy.metrics.enabled (or .Values.networkPolicy.metrics.namespaceSelector .Values.networkPolicy.metrics.podSelector) }}
     - from:
         {{- if .Values.networkPolicy.metrics.namespaceSelector }}
         - namespaceSelector:
