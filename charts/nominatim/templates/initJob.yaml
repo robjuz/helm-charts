@@ -22,6 +22,7 @@ spec:
           {{- end }}
     spec:
       restartPolicy: Never
+      automountServiceAccountToken: {{ .Values.automountServiceAccountToken }}
       {{- if .Values.initJob.podSecurityContext.enabled }}
       securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.initJob.podSecurityContext "context" $) | nindent 8 }}
       {{- end }}

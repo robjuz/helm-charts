@@ -434,8 +434,9 @@ Note: The command above may differ a little depending the k8s cluster version yo
 |-----------------------------------------------|------------------------------------------------------------------------|-------------------------------------------|
 | `serviceAccount.create`                       | Enable creation of ServiceAccount for Nominatim pod                    | `false`                                   |
 | `serviceAccount.name`                         | The name of the ServiceAccount to use.                                 | `""`                                      |
-| `serviceAccount.automountServiceAccountToken` | Allows auto mount of ServiceAccountToken on the serviceAccount created | `true`                                    |
+| `serviceAccount.automountServiceAccountToken` | Mount the service account token by default in pods using the created ServiceAccount | `false` |
 | `serviceAccount.annotations`                  | Additional custom annotations for the ServiceAccount                   | `{}`                                      |
+| `automountServiceAccountToken` | Mount the service account token in the Nominatim pods. Nominatim does not use the Kubernetes API. | `false` |
 | `pdb.create`                                  | Enable a Pod Disruption Budget creation                                | `false`                                   |
 | `pdb.minAvailable`                            | Minimum number/percentage of pods that should remain scheduled         | `1`                                       |
 | `pdb.maxUnavailable`                          | Maximum number/percentage of pods that may be made unavailable         | `""`                                      |
