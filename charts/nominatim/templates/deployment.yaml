@@ -27,7 +27,8 @@ spec:
   revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
   template:
     metadata:
-      labels: {{- include "common.labels.standard" . | nindent 8 }}
+      labels: {{- include "common.labels.matchLabels" . | nindent 8 }}
+        app.kubernetes.io/managed-by: {{ .Release.Service }}
         {{- if .Values.podLabels }}
         {{- include "common.tplvalues.render" (dict "value" .Values.podLabels "context" $) | nindent 8 }}
         {{- end }}
@@ -38,11 +39,11 @@ spec:
         {{- include "common.tplvalues.render" (dict "value" .Values.podAnnotations "context" $) | nindent 8 }}
       {{- end }}
       {{- if .Values.nominatimUi.enabled }}
-        checksum/nginx-configmap: {{ include (print $.Template.BasePath "/nginx-configmap.yaml" ) . | sha256sum }}
-        checksum/ui-configmap: {{ include (print $.Template.BasePath "/ui-configmap.yaml" ) . | sha256sum }}
+        checksum/nginx-configmap: {{ (include (print $.Template.BasePath "/nginx-configmap.yaml") . | fromYaml).data | toYaml | sha256sum }}
+        checksum/ui-configmap: {{ (include (print $.Template.BasePath "/ui-configmap.yaml") . | fromYaml).data | toYaml | sha256sum }}
       {{- end }}
       {{- if .Values.initJob.importFilterLua.enabled }}
-        checksum/importfilter-configmap: {{ include (print $.Template.BasePath "/importfilter-configmap.yaml" ) . | sha256sum }}
+        checksum/importfilter-configmap: {{ (include (print $.Template.BasePath "/importfilter-configmap.yaml") . | fromYaml).data | toYaml | sha256sum }}
       {{- end }}
 
     spec:

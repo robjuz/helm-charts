@@ -14,7 +14,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      {{- include "common.labels.standard" . | nindent 6 }}
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
   ingress:
     {{- if and .Values.ingress.enabled .Values.networkPolicy.ingress.enabled (or .Values.networkPolicy.ingress.namespaceSelector .Values.networkPolicy.ingress.podSelector) }}
     - from:
