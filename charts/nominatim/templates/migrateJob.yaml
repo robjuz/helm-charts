@@ -38,6 +38,7 @@ spec:
       {{- include "nominatim.imagePullSecrets" . | nindent 6 }}
       restartPolicy: Never
       serviceAccountName: {{ include "nominatim.serviceAccountName" . }}
+      automountServiceAccountToken: {{ .Values.automountServiceAccountToken }}
       {{- if .Values.migrateJob.nodeSelector }}
       nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.migrateJob.nodeSelector "context" $) | nindent 8 }}
       {{- end }}

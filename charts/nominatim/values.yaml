@@ -1197,13 +1197,15 @@ serviceAccount:
   ## If not set and create is true, a name is generated using the common.names.fullname template
   ##
   name: ""
-  ## @param serviceAccount.automountServiceAccountToken Allows auto mount of ServiceAccountToken on the serviceAccount created
-  ## Can be set to false if pods using this serviceAccount do not need to use K8s API
+  ## @param serviceAccount.automountServiceAccountToken Mount the service account token by default in pods using the created ServiceAccount
   ##
-  automountServiceAccountToken: true
+  automountServiceAccountToken: false
   ## @param serviceAccount.annotations Additional custom annotations for the ServiceAccount
   ##
   annotations: {}
+## @param automountServiceAccountToken Mount the service account token in the Nominatim pods. Nominatim does not use the Kubernetes API.
+##
+automountServiceAccountToken: false
 ## Nominatim Pod Disruption Budget configuration
 ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
 ## @param pdb.create Enable a Pod Disruption Budget creation
