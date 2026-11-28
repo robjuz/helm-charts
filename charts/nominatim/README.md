@@ -627,6 +627,16 @@ certificate management.
 
 ## Upgrading
 
+### To 6.7.0
+
+The Nominatim pod template no longer carries the `helm.sh/chart` and `app.kubernetes.io/version` labels, and the
+ConfigMap checksum annotations only hash the ConfigMap data. A chart release that changes neither the configuration nor
+the image no longer restarts the Nominatim pods. Both labels remain on the Deployment and the other resources. The
+pods are recreated once on upgrade to 6.7.0.
+
+The ingress NetworkPolicy now selects the pods by `app.kubernetes.io/name` and `app.kubernetes.io/instance`. If you
+select or group the pods by the removed labels, use `podLabels` to add what you need.
+
 ### To 6.2.0
 
 This release adds the database migration job, which is enabled by default. From now on every `helm upgrade` runs
