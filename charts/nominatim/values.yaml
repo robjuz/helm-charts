@@ -569,7 +569,7 @@ initJob:
     waitForDB:
       image: postgres:14-alpine
     download:
-      image: curlimages/curl
+      image: curlimages/curl:8.23.0
 
   pbfUrl: https://download.geofabrik.de/europe/germany/sachsen-latest.osm.pbf
   importWikipedia: false
@@ -1018,7 +1018,7 @@ nominatimUi:
   version: 3.2.1
   initContainers:
     download:
-      image: curlimages/curl
+      image: curlimages/curl:8.23.0
   nginx:
     image: nginx:1.31.10-alpine
     imagePullPolicy: IfNotPresent
